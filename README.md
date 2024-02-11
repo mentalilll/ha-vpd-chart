@@ -71,4 +71,7 @@ vpd_phases:
 - air_text: (optional) Der Text, der für Temperaturangaben verwendet wird. Standard ist "Air".
 - rh_text: (optional) Der Text, der für Feuchtigkeitsangaben verwendet wird. Standard ist "RH".
 - sensors: (erforderlich) Eine Liste von Sensoren mit ihren temperature und humidity Entity-IDs sowie optionalen name zur Anzeige.
-- vpd_phases: (optional) Eine Liste von VPD-Phasen und ihren Klassen zur vis
+- vpd_phases: (optional) Eine Liste von VPD-Phasen und ihren Klassen zur visuellen Darstellung.
+
+![Beispielbild](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
+
