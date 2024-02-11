@@ -21,7 +21,6 @@ class VpdTableCard extends HTMLElement {
             {lower: 1.2, upper: 1.6, className: 'mid-late-flower'},
             {lower: 1.6, className: 'danger-zone'},
         ];
-        this.intervalId = null;
         this.sensors = [];
         this.min_temperature = 5;
         this.max_temperature = 40;
@@ -85,6 +84,7 @@ class VpdTableCard extends HTMLElement {
                 transition: opacity 0.3s;
                 font-size: 12px; 
             }
+           
             .custom-tooltip:focus {
                 z-index:9999999;
             }
@@ -97,6 +97,18 @@ class VpdTableCard extends HTMLElement {
             .highlight {
                 cursor: pointer; 
             }
+            .vpd-table {
+                display: table;
+                width: 100%;
+                height: 100%;
+            }
+            .row {
+                display: table-row;
+                background-color: #fff;
+            }
+            .cell {
+               display: table-cell;
+            }
             </style>
             <div class="vpd-card-container"></div>
         </ha-card>
@@ -104,7 +116,14 @@ class VpdTableCard extends HTMLElement {
             this.content = this.querySelector("div.vpd-card-container");
         }
         this.content.innerHTML = "";
+        const rows = Math.ceil((this.max_temperature - this.min_temperature) / this.steps_temperature);
+        const columns = Math.ceil((this.max_humidity - this.min_humidity) / this.steps_humidity);
+        // Setze die berechneten Werte als CSS-Variablen
+        this.style.setProperty('--rows', rows);
+        this.style.setProperty('--columns', columns);
         this.initTable(hass);
+
+
     }
 
     setConfig(config) {
@@ -125,36 +144,30 @@ class VpdTableCard extends HTMLElement {
     getCardSize() {
         return 3;
     }
-
     initTable(hass) {
         const container = this.content;
         container.innerHTML = '';
 
-        const table = document.createElement('table');
+        const table = document.createElement('div');
         table.className = 'vpd-table';
-        const thead = document.createElement('thead');
-        const tbody = document.createElement('tbody');
         container.appendChild(table);
-        table.appendChild(thead);
-        table.appendChild(tbody);
-        this.buildTable(tbody);
+        this.buildTable(table);
         this.buildTooltip(table, hass);
-        console.log('finished');
-
     }
 
     buildTable(tbody) {
         for (let Tair = this.min_temperature; Tair <= this.max_temperature; Tair += this.steps_temperature) {
             const Tleaf = Tair - 2;
-            const row = document.createElement('tr');
+            const row = document.createElement('div');
+            row.className = 'row';
             tbody.appendChild(row);
 
             for (let RH = this.max_humidity; RH >= this.min_humidity; RH -= this.steps_humidity) {
                 const vpd = this.calculateVPD(Tleaf, Tair, RH);
                 const phaseClass = this.getPhaseClass(vpd);
-                const cell = document.createElement('td');
+                const cell = document.createElement('div');
                 row.appendChild(cell);
-                cell.className = `${phaseClass}`;
+                cell.className = `${phaseClass} cell`;
 
             }
         }
