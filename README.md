@@ -47,9 +47,11 @@ rh_text: r.F.
 sensors:
   - temperature: sensor.temperatur_2
     humidity: sensor.luftfeuchtigkeit_2
+    leafTemperature: sensor.infrared_sensor
     name: Zelt 1
   - temperature: sensor.temperatur_zelt_2
     humidity: sensor.luftfeuchtigkeit_zelt_2
+    vpd: sensor.vpd
     name: Zelt 2
 vpd_phases:
   - upper: 0.4
