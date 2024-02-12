@@ -168,7 +168,6 @@ class VpdTableCard extends HTMLElement {
                 const cell = document.createElement('div');
                 row.appendChild(cell);
                 cell.className = `${phaseClass} cell`;
-
             }
         }
     }
@@ -196,6 +195,7 @@ class VpdTableCard extends HTMLElement {
         this.config.sensors.forEach((sensor, index)=> {
             let humidity = hass.states[sensor.humidity].state;
             let temperature = hass.states[sensor.temperature].state;
+            let leafTemperature = hass.states[sensor.temperature].state || (temperature - 2);
             let name = sensor.name || `Tent ${index + 1}`;
             const relativeHumidity = this.max_humidity - humidity; // Umkehren der Berechnung
             const totalHumidityRange = this.max_humidity - this.min_humidity;
@@ -236,9 +236,9 @@ class VpdTableCard extends HTMLElement {
             const tooltip = document.createElement('div');
             tooltip.className = 'custom-tooltip';
 
-            let vpa = this.calculateVPD(parseFloat(temperature-2), parseFloat(temperature), parseFloat(humidity)).toFixed(2);
+            let vpd =  sensor.vpd || this.calculateVPD(parseFloat(leafTemperature), parseFloat(temperature), parseFloat(humidity)).toFixed(2);
 
-            tooltip.innerHTML = `<strong>${name}:</strong> kPa: ${vpa} | ${this.rhText}: ${humidity}% | ${this.airText}: ${temperature}°C`;
+            tooltip.innerHTML = `<strong>${name}:</strong> kPa: ${vpd} | ${this.rhText}: ${humidity}% | ${this.airText}: ${temperature}°C`;
 
             circle.appendChild(tooltip);
             table.appendChild(circle);
