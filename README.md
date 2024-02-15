@@ -44,6 +44,12 @@ Um die `VpdTableCard` in Ihrem Lovelace-Dashboard zu nutzen, fügen Sie die folg
 type: custom:vpd-table-card
 air_text: Temp.
 rh_text: r.F.
+min_temperature: 5
+max_temperature: 35
+min_humidity: 10
+max_humidity: 100
+steps_humidity: 1
+steps_temperature: 0.5
 sensors:
   - temperature: sensor.temperatur_2
     humidity: sensor.luftfeuchtigkeit_2
@@ -72,6 +78,12 @@ vpd_phases:
 - type: (erforderlich) Muss custom:vpd-table-card sein.
 - air_text: (optional) Der Text, der für Temperaturangaben verwendet wird. Standard ist "Air".
 - rh_text: (optional) Der Text, der für Feuchtigkeitsangaben verwendet wird. Standard ist "RH".
+- min_temperature: (optional) Minimale Temperatur im Chart
+- min_humidity: (optional) Minimale Luftfeuchtigkeit im Chart
+- max_temperature: (optional) Maximale Temperatur im Chart
+- max_humidity: (optional) Maximale Luftfeuchtigkeit im Chart
+- steps_temperature: (optional) Auflösung der Temperatur im Chart
+- steps_humidity: (optional) Auflösung der Luftfeuchtigkeit im Chart
 - sensors: (erforderlich) Eine Liste von Sensoren mit ihren temperature und humidity Entity-IDs sowie optionalen name zur Anzeige.
 - vpd_phases: (optional) Eine Liste von VPD-Phasen und ihren Klassen zur visuellen Darstellung.
 
