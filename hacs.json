@@ -1,4 +1,5 @@
 {
     "name": "Homeassistant VPD Chart",
-    "content_in_root": true
+    "content_in_root": true,
+    "render_readme": true
 }
