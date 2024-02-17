@@ -1,4 +1,5 @@
 # HaVpdChart for Home Assistant
+![HaVpdChart Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
 
 `HaVpdChart` is a custom card component for Home Assistant that allows for visual representations of VPD (Vapour Pressure Deficit) based on temperature and humidity sensors. It's ideal for monitoring environmental conditions in tents or rooms.
 
@@ -101,7 +102,7 @@ vpd_phases:
 
 Diese Tabelle bietet eine detaillierte Übersicht über die verfügbaren Konfigurationsoptionen und deren Standardwerte für das `custom:ha-vpd-chart` Element.
 
-![HaVpdChart Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
+
 
 
 ###################################################################################
@@ -206,7 +207,4 @@ vpd_phases:
 - `late-veg`: 0,8 ≤ VPD < 1,2
 - `mid-late-flower`: 1,2 ≤ VPD < 1,6
 - `danger-zone`: VPD ≥ 1,6
-
-
-![HaVpdChart Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
 
