@@ -1,5 +1,5 @@
 # HaVpdChart for Home Assistant
-[![HaVpdChart Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)](https://github.com/mentalilll/ha-vpd-chart/blob/5171c557afb0bb9b81e6b54d0cecdacb851e61b9/assets/image.png)
+![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/5171c557afb0bb9b81e6b54d0cecdacb851e61b9/assets/image.png)
 
 `HaVpdChart` is a custom card component for Home Assistant that allows for visual representations of VPD (Vapour Pressure Deficit) based on temperature and humidity sensors. It's ideal for monitoring environmental conditions in tents or rooms.
 
