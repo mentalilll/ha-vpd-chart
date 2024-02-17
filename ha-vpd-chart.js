@@ -1,4 +1,4 @@
-class VpdTableCard extends HTMLElement {
+class HaVpdChart extends HTMLElement {
     static get properties() {
         return {
             sensors: {type: Array},
@@ -356,11 +356,11 @@ class VpdTableCard extends HTMLElement {
     }
 }
 
-customElements.define('vpd-table-card', VpdTableCard);
+customElements.define('ha-vpd-chart', HaVpdChart);
 window.customCards = window.customCards || [];
 window.customCards.push({
-    type: "vpd-table-card",
-    name: "VPD Table Card",
+    type: "ha-vpd-chart",
+    name: "Home Assistant VPD Chart",
     preview: false, // Optional - defaults to false
     description: "A custom card to display VPD values in a table",
     documentationURL: "https://github.com/mentalilll/ha-vpd-chart", // Adds a help link in the frontend card editor
