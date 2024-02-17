@@ -75,22 +75,36 @@ vpd_phases:
     className: danger-zone
 ```
 ## Configuration Parameters
-- type: (required) Must be custom:ha-vpd-chart.
-- air_text: (optional) The text used for temperature readings. Default is "Air".
-- rh_text: (optional) The text used for humidity readings. Default is "RH".
-- min_temperature: (optional) Minimum temperature in the chart
-- min_humidity: (optional) Minimum humidity in the chart
-- max_temperature: (optional) Maximum temperature in the chart
-- max_humidity: (optional) Maximum humidity in the chart
-- steps_temperature: (optional) Temperature resolution in the chart
-- steps_humidity: (optional) Humidity resolution in the chart
-- sensors: (required) A list of sensors with their temperature and humidity entity IDs, and an optional name for display.
-- vpd_phases: (optional) A list of VPD phases and their classes for visual representation.
+
+
+| Name               | Type         | Required     | Default                 | Description                                                                                   |
+| ------------------ | ------------ | ------------ | ----------------------- | --------------------------------------------------------------------------------------------- |
+| type               | string       | **required** |                         | Must be `custom:ha-vpd-chart`.                                                                |
+| air_text           | string       | optional     | `Air`                   | The text used for temperature readings. Default is "Air".                                     |
+| rh_text            | string       | optional     | `RH`                    | The text used for humidity readings. Default is "RH".                                         |
+| min_temperature    | number       | optional     | `5`                     | Minimum temperature in the chart. Default is 5.                                               |
+| min_humidity       | number       | optional     | `10`                    | Minimum humidity in the chart. Default is 10.                                                 |
+| max_temperature    | number       | optional     | `35`                    | Maximum temperature in the chart. Default is 35.                                              |
+| max_humidity       | number       | optional     | `90`                    | Maximum humidity in the chart. Default is 90.                                                 |
+| steps_temperature  | number       | optional     | `0.5`                   | Temperature resolution in the chart. Default is 0.5.                                          |
+| steps_humidity     | number       | optional     | `1`                     | Humidity resolution in the chart. Default is 1.                                               |
+| sensors            | list         | **required** |                         | A list of sensors with their temperature and humidity entity IDs, and an optional name for display. |
+| vpd_phases         | list         | optional     | See description         | A list of VPD phases and their classes for visual representation. See below for defaults.     |
+| enable_tooltip     | boolean      | optional     | `true`                  | Tooltip enabled by default.                                                                   |
+
+**Default `vpd_phases` Configuration:**
+- `under-transpiration`: VPD < 0.4
+- `early-veg`: 0.4 ≤ VPD < 0.8
+- `late-veg`: 0.8 ≤ VPD < 1.2
+- `mid-late-flower`: 1.2 ≤ VPD < 1.6
+- `danger-zone`: VPD ≥ 1.6
+
+Diese Tabelle bietet eine detaillierte Übersicht über die verfügbaren Konfigurationsoptionen und deren Standardwerte für das `custom:ha-vpd-chart` Element.
 
 ![Example Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
 
 
-###############################################################################################################################################################################
+###################################################################################
 
 
 # HaVpdChart für Home Assistant
@@ -170,17 +184,29 @@ vpd_phases:
     className: danger-zone
 ```
 ## Konfigurationsparameter
-- type: (erforderlich) Muss custom:ha-vpd-chart sein.
-- air_text: (optional) Der Text, der für Temperaturangaben verwendet wird. Standard ist "Air".
-- rh_text: (optional) Der Text, der für Feuchtigkeitsangaben verwendet wird. Standard ist "RH".
-- min_temperature: (optional) Minimale Temperatur im Chart
-- min_humidity: (optional) Minimale Luftfeuchtigkeit im Chart
-- max_temperature: (optional) Maximale Temperatur im Chart
-- max_humidity: (optional) Maximale Luftfeuchtigkeit im Chart
-- steps_temperature: (optional) Auflösung der Temperatur im Chart
-- steps_humidity: (optional) Auflösung der Luftfeuchtigkeit im Chart
-- sensors: (erforderlich) Eine Liste von Sensoren mit ihren temperature und humidity Entity-IDs sowie optionalen name zur Anzeige.
-- vpd_phases: (optional) Eine Liste von VPD-Phasen und ihren Klassen zur visuellen Darstellung.
+
+| Name               | Typ          | Erforderlich | Standard               | Beschreibung                                                                                   |
+| ------------------ | ------------ | ------------ | ---------------------- | ---------------------------------------------------------------------------------------------- |
+| type               | string       | **erforderlich** |                      | Muss `custom:ha-vpd-chart` sein.                                                               |
+| air_text           | string       | optional     | `Air`                 | Der Text für Temperaturmessungen. Standard ist "Air".                                         |
+| rh_text            | string       | optional     | `RH`                  | Der Text für Feuchtigkeitsmessungen. Standard ist "RH".                                        |
+| min_temperature    | number       | optional     | `5`                   | Minimale Temperatur im Diagramm. Standard ist 5.                                               |
+| min_humidity       | number       | optional     | `10`                  | Minimale Feuchtigkeit im Diagramm. Standard ist 10.                                            |
+| max_temperature    | number       | optional     | `35`                  | Maximale Temperatur im Diagramm. Standard ist 35.                                              |
+| max_humidity       | number       | optional     | `90`                  | Maximale Feuchtigkeit im Diagramm. Standard ist 90.                                            |
+| steps_temperature  | number       | optional     | `0.5`                 | Temperaturauflösung im Diagramm. Standard ist 0.5.                                             |
+| steps_humidity     | number       | optional     | `1`                   | Feuchtigkeitsauflösung im Diagramm. Standard ist 1.                                            |
+| sensors            | list         | **erforderlich** |                      | Eine Liste von Sensoren mit ihren Temperatur- und Feuchtigkeits-Entity-IDs und einem optionalen Namen zur Anzeige. |
+| vpd_phases         | list         | optional     | Siehe Beschreibung    | Eine Liste von VPD-Phasen und ihren Klassen zur visuellen Darstellung. Siehe unten für Standards. |
+| enable_tooltip     | boolean      | optional     | `true`                | Tooltip ist standardmäßig aktiviert.                                                           |
+
+**Standardkonfiguration der `vpd_phases`:**
+- `under-transpiration`: VPD < 0,4
+- `early-veg`: 0,4 ≤ VPD < 0,8
+- `late-veg`: 0,8 ≤ VPD < 1,2
+- `mid-late-flower`: 1,2 ≤ VPD < 1,6
+- `danger-zone`: VPD ≥ 1,6
+
 
 ![Beispielbild](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
 
