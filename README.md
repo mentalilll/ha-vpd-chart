@@ -101,7 +101,7 @@ vpd_phases:
 
 Diese Tabelle bietet eine detaillierte Übersicht über die verfügbaren Konfigurationsoptionen und deren Standardwerte für das `custom:ha-vpd-chart` Element.
 
-![Example Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
+![HaVpdChart Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
 
 
 ###################################################################################
@@ -208,5 +208,5 @@ vpd_phases:
 - `danger-zone`: VPD ≥ 1,6
 
 
-![Beispielbild](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
+![HaVpdChart Image](https://raw.githubusercontent.com/mentalilll/ha-vpd-chart/main/image.png?raw=true)
 
