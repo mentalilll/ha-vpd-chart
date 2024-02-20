@@ -1,6 +1,8 @@
 # HaVpdChart for Home Assistant
 ![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/5171c557afb0bb9b81e6b54d0cecdacb851e61b9/assets/image.png)
 
+![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/bar_view.png)
+
 `HaVpdChart` is a custom card component for Home Assistant that allows for visual representations of VPD (Vapour Pressure Deficit) based on temperature and humidity sensors. It's ideal for monitoring environmental conditions in tents or rooms.
 
 ## Prerequisites
@@ -51,6 +53,7 @@ min_humidity: 10
 max_humidity: 100
 steps_humidity: 1
 steps_temperature: 0.5
+is_bar_view: true
 sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
@@ -92,6 +95,7 @@ vpd_phases:
 | sensors            | list         | **required** |                         | A list of sensors with their temperature and humidity entity IDs, and an optional name for display. |
 | vpd_phases         | list         | optional     | See description         | A list of VPD phases and their classes for visual representation. See below for defaults.     |
 | enable_tooltip     | boolean      | optional     | `true`                  | Tooltip enabled by default.                                                                   |
+| is_bar_view        | boolean      | optional     | `false`                 | Second view of this chart for fast information of sensors                                     |
 
 **Default `vpd_phases` Configuration:**
 - `under-transpiration`: VPD < 0.4
