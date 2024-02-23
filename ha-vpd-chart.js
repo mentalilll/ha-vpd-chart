@@ -48,7 +48,6 @@ class HaVpdChart extends HTMLElement {
             this.buildBarChart(hass);
         }
     }
-
     setConfig(config) {
         this.config = config;
         if (!config.sensors) {
@@ -73,100 +72,7 @@ class HaVpdChart extends HTMLElement {
             this.innerHTML = `
                 <ha-card header="VPD Informations">
                     <style>
-                        .ha-card {
-                            width: 100%;
-                        }
-                        .type-custom-ha-vpd-chart
-                         {
-                            margin-bottom:5px;
-                         }
-                        .bar {
-                            box-shadow: inset 0px 0px 3em -1.2em rgba(0, 0, 0, 0.5);
-                            padding:15px;
-                            border-radius: 5px;
-                        }
-                        .bar span {
-                            border-left:1px solid #999999;
-                            padding-left:15px;
-                            padding-right:15px;
-                        }
-                        .bar span:first-child {
-                            border-left:0;
-                            padding-left:0;
-                        }
-                        .legend {
-                            box-shadow: inset 0 0 3em -1.2em rgba(0, 0, 0, 0.5);
-                            padding:15px;
-}
-                        .vpd-state {
-                            float:right;
-                            width:20px;
-                            height:20px;
-                            padding:0 !important;
-                            border-left:0 !important;
-                            border-radius: 5px;
-                        }
-                        
-                        .vpd-state-legend {
-                            padding:0 !important;
-                            border-left:0 !important;
-                        }
-                        .vpd-state-legend span:first-child {
-                            width:20px;
-                            height:20px;
-                            padding-left:15px;
-                            padding-right:5px;
-                            margin-right:5px;
-                        }
-                        .vpd-state-legend span:last-child {
-                            
-                            margin-right:5px;
-                        }
-                        .danger-zone {
-                            background-color: #ce4234;
-                        }
-                       
-                        .early-veg {
-                            background-color: #22ab9c;
-
-                        }
-                        
-                        .late-veg {
-                            background-color: #9cc55b;
-
-                        }
-                        
-                        .mid-late-flower {
-                            background-color: #e7c12b;
-                        }
-                        
-                        .under-transpiration {
-                            background-color: #1a6c9c;
-                        }
-                        /* style parent of under-transpiration border */
-                        .vpd-state.under-transpiration::before {
-                            background: linear-gradient(-90deg, rgba(26,108,156,0.47) 0%, rgba(26, 108, 156, 0) 100%);
-                            content: "";
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                           
-                            border-radius: 5px;
-                        }
-                        .vpd-state.danger-zone::before {
-                            /* gradient from this color to transparent */
-                            background: linear-gradient(-90deg, rgba(206,66,52,0.47) 0%, rgba(206, 66, 52, 0) 100%);
-                            content: "";
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                            border-radius: 5px;
-                        }
-
+                        @import '/hacsfiles/ha-vpd-chart/assets/bar.css'
                     </style>
                     <div class="vpd-card-container card-content"></div>
                     <div class="highlight mousePointer" style="opacity:0">
@@ -204,14 +110,14 @@ class HaVpdChart extends HTMLElement {
 
         let container = document.createElement('div');
 
-        this.config.sensors.forEach((sensor, index) => {
+        this.config.sensors.forEach((sensor) => {
             let humidity = hass.states[sensor.humidity].state;
             let temperature = hass.states[sensor.temperature].state;
-            let leafTemperature = temperature - 2;
+            let leafTemperature = temperature - sensor.leaf_temperature_offset || 2;
             if (sensor.leaf_temperature !== undefined) {
                 leafTemperature = hass.states[sensor.leaf_temperature].state;
             }
-            let vpd = sensor.vpd || this.calculateVPD(parseFloat(leafTemperature), parseFloat(temperature), parseFloat(humidity)).toFixed(2)
+            let vpd = hass.states[sensor.vpd].state || this.calculateVPD(parseFloat(leafTemperature), parseFloat(temperature), parseFloat(humidity)).toFixed(2)
             let card = document.createElement('ha-card');
             card.innerHTML += `
                     <div class="bar">
@@ -229,7 +135,7 @@ class HaVpdChart extends HTMLElement {
                         this.buildMouseTooltip(event.target, hass);
                     }
                 });
-                this.addEventListener('mouseleave', (event) => {
+                this.addEventListener('mouseleave', () => {
                     let tooltip = this.querySelector('.mousePointer');
                     let fadeOut = setInterval(function () {
                         if (!tooltip.style.opacity) {
@@ -252,149 +158,22 @@ class HaVpdChart extends HTMLElement {
     buildChart(hass) {
         // Initialize the content if it's not there yet.
         if (!this.content) {
+
             this.innerHTML = `
                 <ha-card>
                     <style>
-                        ha-card, ha-card .vpd-card-container {
-                            height: 100%;
-                            min-height: 400px;
-                            overflow:hidden;
-                        }
-                        
-                        body, html {
-                            font-family: "Segoe UI", Arial, sans-serif;
-                            font-size: 10px;
-                            margin: 0;
-                            padding: 0;
-                            height: 100%;
-                            position: relative;
-                        }
-                        
-                        .danger-zone {
-                            background-color: #ce4234;
-                        }
-                        
-                        .early-veg {
-                            background-color: #22ab9c;
-                        }
-                        
-                        .late-veg {
-                            background-color: #9cc55b;
-                        }
-                        
-                        .mid-late-flower {
-                            background-color: #e7c12b;
-                        }
-                        
-                        .under-transpiration {
-                            background-color: #1a6c9c;
-                        }
-                        
-                        table {
-                            width: 100%;
-                            height: 100%;
-                        }
-                        
-                        table, th, td {
-                            border: 1px solid rgba(255, 255, 255, 0.05);
-                            border-collapse: collapse;
-                        }
-                        
-                        th, td {
-                            text-align: center;
-                            min-width: 2px;
-                        }
-                        
-                        .highlight {
-                            position: relative;
-                            z-index: 2;
-                            background-color: white !important; /* oder eine andere Farbe Ihrer Wahl */
-                            color: #333333 !important;
-                            cursor: pointer;
-                        }
-                        .mousePointer {
-                            z-index:9999;
-                        }
-                        .custom-tooltip {
-                            bottom: 150%;
-                            
-                            margin-bottom: 5px;
-                            /*margin-left: -120px;*/
-                            margin-left: -5px;
-                            padding: 7px;
-                            width: 240px;
-                            -webkit-border-radius: 3px;
-                            -moz-border-radius: 3px;
-                            border-radius: 3px;
-                            background-color: #000000;
-                            background-color: hsla(0, 0%, 20%, 0.9);
-                            color: #ffffff;
-                       
-                            text-align: center;
-                            font-size: 12px;
-                            line-height: 1.2;
-                            position: absolute;
-                        }
-                        
-                        .custom-tooltip:after {
-                        
-                            position: absolute;
-                            bottom: -15%;
-                            left: 2%;
-                            
-                            width: 0;
-                            border-top: 5px solid #000000;
-                            border-top: 5px solid hsla(0, 0%, 20%, 0.9);
-                            border-right: 5px solid transparent;
-                            border-left: 5px solid transparent;
-                            content: " ";
-                            font-size: 0;
-                            line-height: 0;
-                        }
-                        
-                        .vpd-table {
-                            display: table;
-                            width: 100%;
-                            height: 100%;
-                        }
-                        
-                        .row {
-                            display: table-row;
-                            background-color: #ffffff;
-                        }
-                        
-                        .cell {
-                            display: table-cell;
-                        }
-                        #sensors {
-                            width:100%;
-                            height:100%;
-                            position:absolute;
-                            top:0;
-                            left:0;
-                            pointer-events: none;
-                        }
-                        
+                        @import '/hacsfiles/ha-vpd-chart/assets/chart.css'
                     </style>
-                    <div class="vpd-card-container"></div>
+                    <div id="vpd-card-container" class="vpd-card-container"></div>
                     <div id="sensors"></div>
-                    <div class="highlight mousePointer" style="opacity:0">
-                        <div class="custom-tooltip"></div>
-                    </div> <!-- Tooltip -->
-                    
+                    <div class="highlight mousePointer" style="opacity:0"></div> <!-- Tooltip -->
+                    <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
+                   
                 </ha-card>
             `;
             this.content = this.querySelector("div.vpd-card-container");
-
-            let table;
-            if (localStorage.getItem('vpd-table-card')) {
-                table = localStorage.getItem('vpd-table-card');
-            } else {
-                table = this.buildTable();
-                localStorage.setItem('vpd-table-card', table);
-            }
-            this.content.innerHTML = "<div class='vpd-table'>" + table + "</div>";
-
+            let table = this.buildTable();
+            this.content.appendChild(table);
         }
         this.buildTooltip(this.content, hass);
         if (this.enable_tooltip) {
@@ -403,14 +182,17 @@ class HaVpdChart extends HTMLElement {
                     this.buildMouseTooltip(event.target, hass);
                 }
             });
-            this.addEventListener('mouseleave', (event) => {
+            this.addEventListener('mouseleave', () => {
                 let tooltip = this.querySelector('.mousePointer');
+                let banner = this.querySelector('.mouse-custom-tooltip');
                 let fadeOut = setInterval(function () {
                     if (!tooltip.style.opacity) {
                         tooltip.style.opacity = 1;
+                        banner.style.opacity = 1;
                     }
                     if (tooltip.style.opacity > 0) {
                         tooltip.style.opacity -= 0.1;
+                        banner.style.opacity -= 0.1;
                     } else {
                         clearInterval(fadeOut);
                     }
@@ -484,25 +266,29 @@ class HaVpdChart extends HTMLElement {
         return table;
     }
 
-
     buildTooltip(table, hass) {
         const fragment = document.createDocumentFragment();
         const sensors = this.querySelector('#sensors');
+        let vpd = 0;
         this.config.sensors.forEach((sensor, index) => {
             let humidity = hass.states[sensor.humidity].state;
             let temperature = hass.states[sensor.temperature].state;
-            let leafTemperature = temperature - 2;
+            let leafTemperature = temperature - sensor.leaf_temperature_offset || 2;
             if (sensor.leaf_temperature !== undefined) {
                 leafTemperature = hass.states[sensor.leaf_temperature].state;
             }
-            let vpd = sensor.vpd || this.calculateVPD(parseFloat(leafTemperature), parseFloat(temperature), parseFloat(humidity)).toFixed(2)
+            if (sensor.vpd !== undefined) {
+                vpd = hass.states[sensor.vpd].state;
+            } else {
+                vpd = this.calculateVPD(parseFloat(leafTemperature), parseFloat(temperature), parseFloat(humidity)).toFixed(2);
+            }
             const relativeHumidity = this.max_humidity - humidity; // Umkehren der Berechnung
             const totalHumidityRange = this.max_humidity - this.min_humidity;
             const percentageHumidity = (relativeHumidity / totalHumidityRange) * 100;
             const relativeTemperature = temperature - this.min_temperature;
             const totalTemperatureRange = this.max_temperature - this.min_temperature;
             const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
-            // Check if the circle already exists, if not create a new one and set a already_created_bool to not append
+
             let circle = document.getElementsByClassName('sensor-circle-' + index)[0] || document.createElement('div');
             circle.className = 'highlight sensor-circle-' + index;
             circle.style.width = "10px";
@@ -536,7 +322,6 @@ class HaVpdChart extends HTMLElement {
 
             let tooltip = document.createElement('div');
             tooltip.className = 'custom-tooltip';
-
             tooltip.innerHTML = `<strong>${sensor.name}:</strong> kPa: ${vpd} | ${this.rhText}: ${humidity}% | ${this.airText}: ${temperature}°C`;
             circle.appendChild(tooltip);
             fragment.appendChild(circle);
@@ -544,27 +329,52 @@ class HaVpdChart extends HTMLElement {
 
         requestAnimationFrame(() => {
             sensors.replaceChildren(fragment);
+            this.adjustTooltipPositions();
         });
     }
 
-    buildMouseTooltip(target) {
-        const humidity = target.getAttribute('data-rh');
-        const temperature = target.getAttribute('data-air');
-        const vpd = parseFloat(target.getAttribute('data-vpd')).toFixed(2);
-        const percentageHumidity = ((this.max_humidity - humidity) / (this.max_humidity - this.min_humidity)) * 100;
-        const percentageTemperature = ((temperature - this.min_temperature) / (this.max_temperature - this.min_temperature)) * 100;
-
-        let circle = this.querySelector('.mousePointer');
-        circle.className = 'highlight mousePointer';
-        circle.style.cssText = `width: 10px; height: 10px; background-color: white; border-radius: 50%; position: absolute; transform: translateX(-50%); left: ${percentageHumidity}%; bottom: ${100 - percentageTemperature}%;`;
-        let tooltip = circle.querySelector('.custom-tooltip') || document.createElement('div');
-        tooltip.className = 'custom-tooltip';
-        tooltip.innerHTML = `<strong>kPa:</strong> ${vpd} | <strong>${this.rhText}:</strong> ${humidity}% | <strong>${this.airText}:</strong> ${temperature}°C`;
-        if (!this.content.querySelector('.mousePointer')) {
-            circle.appendChild(tooltip);
-        }
+    adjustTooltipPositions() {
+        const containerRect = this.querySelector('#vpd-card-container').getBoundingClientRect();
+        const tooltips = this.querySelectorAll('.custom-tooltip');
+        tooltips.forEach(tooltip => {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            if (tooltipRect.right > containerRect.right) {
+                // Berechnen, wie weit das Tooltip nach links verschoben werden muss
+                const overflow = tooltipRect.right - containerRect.right;
+                tooltip.style.transform = `translateX(-${overflow}px)`;
+            }
+        });
     }
+    buildMouseTooltip(target) {
+        if (this.tooltipTimeout) {
+            clearTimeout(this.tooltipTimeout);
+        }
+        this.tooltipTimeout = setTimeout(() => {
 
+            const humidity = target.getAttribute('data-rh');
+            const temperature = target.getAttribute('data-air');
+            const vpd = parseFloat(target.getAttribute('data-vpd')).toFixed(2);
+            const percentageHumidity = ((this.max_humidity - humidity) / (this.max_humidity - this.min_humidity)) * 100;
+            const percentageTemperature = ((temperature - this.min_temperature) / (this.max_temperature - this.min_temperature)) * 100;
+
+            let circle = this.querySelector('.mousePointer');
+            circle.className = 'mousePointer highlight';
+            circle.style.width = "10px";
+            circle.style.height = "10px";
+            circle.style.backgroundColor = "white";
+            circle.style.borderRadius = "50%";
+            circle.style.position = "absolute";
+            circle.style.left = `${percentageHumidity}%`;
+            circle.style.bottom = `${100 - percentageTemperature}%`;
+            circle.style.opacity = 1;
+            circle.style.transform = "translateX(-50%)";
+            let tooltip = this.querySelector('.mouse-custom-tooltip');
+            tooltip.className = 'mouse-custom-tooltip';
+            tooltip.innerHTML = `kPa: ${vpd} | ${this.rhText}: ${humidity}% | ${this.airText}: ${temperature}°C`;
+            tooltip.style.opacity = 1;
+
+        }, 1);
+    }
 }
 
 customElements.define('ha-vpd-chart', HaVpdChart);
