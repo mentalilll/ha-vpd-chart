@@ -1,5 +1,5 @@
 # HaVpdChart for Home Assistant
-![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/5171c557afb0bb9b81e6b54d0cecdacb851e61b9/assets/image.png)
+![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/image.png?raw=true)
 
 ![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/bar_view.png)
 
