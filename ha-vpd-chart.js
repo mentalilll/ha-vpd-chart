@@ -12,7 +12,8 @@ class HaVpdChart extends HTMLElement {
             air_text: {type: String},
             rh_text: {type: String},
             enable_tooltip: {type: Boolean},
-            is_bar_view: {type: Boolean}
+            is_bar_view: {type: Boolean},
+            enable_axes: {type: Boolean},
         };
     }
 
@@ -37,6 +38,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_tooltip = true;
         this.airText = "Air";
         this.rhText = "RH";
+        this.enable_axes = true;
     }
 
     // Whenever the state changes, a new `hass` object is set. Use this to
@@ -65,6 +67,7 @@ class HaVpdChart extends HTMLElement {
         this.steps_temperature = config.steps_temperature || this.steps_temperature;
         this.steps_humidity = config.steps_humidity || this.steps_humidity;
         this.is_bar_view = config.is_bar_view || this.is_bar_view;
+        this.enable_axes = config.enable_axes || this.enable_axes;
     }
 
     buildBarChart(hass) {
@@ -100,8 +103,6 @@ class HaVpdChart extends HTMLElement {
                             <span class="danger-zone"></span>
                             <span class="vpd-title">Danger Zone</span>
                         </span>
-                        
-                        
                     </div>
                 </ha-card>
             `;
@@ -158,7 +159,6 @@ class HaVpdChart extends HTMLElement {
     buildChart(hass) {
         // Initialize the content if it's not there yet.
         if (!this.content) {
-
             this.innerHTML = `
                 <ha-card>
                     <style>
@@ -166,41 +166,72 @@ class HaVpdChart extends HTMLElement {
                     </style>
                     <div id="vpd-card-container" class="vpd-card-container"></div>
                     <div id="sensors"></div>
-                    <div class="highlight mousePointer" style="opacity:0"></div> <!-- Tooltip -->
                     <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
-                   
                 </ha-card>
             `;
             this.content = this.querySelector("div.vpd-card-container");
             let table = this.buildTable();
             this.content.appendChild(table);
+            if(this.enable_axes) {
+                let axes = document.createElement('div');
+                axes.className = 'axes';
+                let temperatureAxis = document.createElement('div');
+                temperatureAxis.className = 'temperature-axis';
+                let humidityAxis = document.createElement('div');
+                humidityAxis.className = 'humidity-axis';
+
+                let range = this.max_temperature - this.min_temperature;
+                let stepSize = range / (5 - 1); // Korrekt: Berechnen der Schrittgröße basierend auf der Range
+
+                for (let i = 0; i < 5; i++) {
+                    let currentValue = this.min_temperature + (stepSize * i);
+                    let temp = document.createElement('div');
+                    temp.className = 'temperature-axis-label';
+                    // Runden auf eine sinnvolle Anzahl von Dezimalstellen, z.B. 0
+                    temp.innerHTML = `${currentValue.toFixed(0)}°`; // Entfernt das Prozentzeichen, da es sich um Temperaturen handelt
+                    temperatureAxis.appendChild(temp);
+                }
+
+
+                range = this.max_humidity - this.min_humidity;
+                stepSize = range / (10 - 1); // Berechnen der Schrittgröße
+
+                for (let i = 0; i < 10; i++) {
+                    let currentValue = this.max_humidity - (stepSize * i);
+                    let hum = document.createElement('div');
+                    hum.className = 'humidity-axis-label';
+                    // Runden auf eine sinnvolle Anzahl von Dezimalstellen, z.B. 1
+                    hum.innerHTML = `${currentValue}%`;
+                    humidityAxis.appendChild(hum);
+                }
+                axes.appendChild(temperatureAxis);
+                axes.appendChild(humidityAxis);
+                this.content.appendChild(axes);
+            }
+            if (this.enable_tooltip) {
+                this.content.addEventListener('mouseover', (event) => {
+                    if (event.target.classList.contains('cell')) {
+                        this.buildMouseTooltip(event.target, hass);
+                    }
+                });
+                this.addEventListener('mouseleave', () => {
+                    let banner = this.querySelector('.mouse-custom-tooltip');
+                    let fadeOut = setInterval(function () {
+                        if (!banner.style.opacity) {
+                            banner.style.opacity = 1;
+                        }
+                        if (banner.style.opacity > 0) {
+                            banner.style.opacity -= 0.1;
+                        } else {
+                            clearInterval(fadeOut);
+                        }
+                    }, 100);
+                });
+            } else {
+                this.querySelector('.mousePointer').style.display = 'none';
+            }
         }
         this.buildTooltip(this.content, hass);
-        if (this.enable_tooltip) {
-            this.content.addEventListener('mouseover', (event) => {
-                if (event.target.classList.contains('cell')) {
-                    this.buildMouseTooltip(event.target, hass);
-                }
-            });
-            this.addEventListener('mouseleave', () => {
-                let tooltip = this.querySelector('.mousePointer');
-                let banner = this.querySelector('.mouse-custom-tooltip');
-                let fadeOut = setInterval(function () {
-                    if (!tooltip.style.opacity) {
-                        tooltip.style.opacity = 1;
-                        banner.style.opacity = 1;
-                    }
-                    if (tooltip.style.opacity > 0) {
-                        tooltip.style.opacity -= 0.1;
-                        banner.style.opacity -= 0.1;
-                    } else {
-                        clearInterval(fadeOut);
-                    }
-                }, 100);
-            });
-        } else {
-            this.querySelector('.mousePointer').style.display = 'none';
-        }
     }
 
     getCardSize() {
@@ -273,7 +304,7 @@ class HaVpdChart extends HTMLElement {
         this.config.sensors.forEach((sensor, index) => {
             let humidity = hass.states[sensor.humidity].state;
             let temperature = hass.states[sensor.temperature].state;
-            let leafTemperature = temperature - sensor.leaf_temperature_offset || 2;
+            let leafTemperature = temperature - sensor.leaf_temperature_offset || temperature - 2;
             if (sensor.leaf_temperature !== undefined) {
                 leafTemperature = hass.states[sensor.leaf_temperature].state;
             }
@@ -291,33 +322,19 @@ class HaVpdChart extends HTMLElement {
 
             let circle = document.getElementsByClassName('sensor-circle-' + index)[0] || document.createElement('div');
             circle.className = 'highlight sensor-circle-' + index;
-            circle.style.width = "10px";
-            circle.style.height = "10px";
-            circle.style.backgroundColor = "white";
-            circle.style.borderRadius = "50%";
-            circle.style.position = "absolute";
             circle.style.left = `${percentageHumidity}%`;
             circle.style.bottom = `${100 - percentageTemperature}%`;
-            circle.style.transform = "translateX(-50%)";
 
             let horizontalLine = document.getElementsByClassName('horizontal-line-' + index)[0] || document.createElement('div');
-            horizontalLine.style.position = 'absolute';
-            horizontalLine.style.left = 0;
-            horizontalLine.style.right = 0;
             horizontalLine.className = 'horizontal-line horizontal-line-' + index;
             horizontalLine.style.top = `calc(${percentageTemperature}% - 5px)`;
-            horizontalLine.style.height = '1px';
-            horizontalLine.style.backgroundColor = 'rgba(255,255,255,0.4)';
+
             fragment.appendChild(horizontalLine);
 
             let verticalLine = document.getElementsByClassName('vertical-line-' + index)[0] || document.createElement('div');
-            verticalLine.style.position = 'absolute';
             verticalLine.className = 'vertical-line vertical-line-' + index;
-            verticalLine.style.top = 0;
-            verticalLine.style.bottom = 0;
             verticalLine.style.left = `calc(${percentageHumidity}% - 0.5px)`;
-            verticalLine.style.width = '1px';
-            verticalLine.style.backgroundColor = 'rgba(255,255,255,0.4)';
+
             fragment.appendChild(verticalLine);
 
             let tooltip = document.createElement('div');
@@ -354,20 +371,7 @@ class HaVpdChart extends HTMLElement {
             const humidity = target.getAttribute('data-rh');
             const temperature = target.getAttribute('data-air');
             const vpd = parseFloat(target.getAttribute('data-vpd')).toFixed(2);
-            const percentageHumidity = ((this.max_humidity - humidity) / (this.max_humidity - this.min_humidity)) * 100;
-            const percentageTemperature = ((temperature - this.min_temperature) / (this.max_temperature - this.min_temperature)) * 100;
 
-            let circle = this.querySelector('.mousePointer');
-            circle.className = 'mousePointer highlight';
-            circle.style.width = "10px";
-            circle.style.height = "10px";
-            circle.style.backgroundColor = "white";
-            circle.style.borderRadius = "50%";
-            circle.style.position = "absolute";
-            circle.style.left = `${percentageHumidity}%`;
-            circle.style.bottom = `${100 - percentageTemperature}%`;
-            circle.style.opacity = 1;
-            circle.style.transform = "translateX(-50%)";
             let tooltip = this.querySelector('.mouse-custom-tooltip');
             tooltip.className = 'mouse-custom-tooltip';
             tooltip.innerHTML = `kPa: ${vpd} | ${this.rhText}: ${humidity}% | ${this.airText}: ${temperature}°C`;
