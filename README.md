@@ -59,11 +59,12 @@ is_bar_view: true
 sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
-    leafTemperature: sensor.infrared_sensor
+    leaf_temperature: sensor.infrared_sensor
     name: Tent 1
   - temperature: sensor.temperature_tent_2
     humidity: sensor.humidity_tent_2
     vpd: sensor.vpd
+    leaf_temperature_offset: 3 # optional and is ignored if leaf_temperature isset
     name: Tent 2
 vpd_phases:
   - upper: 0.4
@@ -166,29 +167,31 @@ min_humidity: 10
 max_humidity: 100
 steps_humidity: 1
 steps_temperature: 0.5
+is_bar_view: true
 sensors:
-  - temperature: sensor.temperatur_2
-    humidity: sensor.luftfeuchtigkeit_2
-    leafTemperature: sensor.infrared_sensor
-    name: Zelt 1
-  - temperature: sensor.temperatur_zelt_2
-    humidity: sensor.luftfeuchtigkeit_zelt_2
-    vpd: sensor.vpd
-    name: Zelt 2
+   - temperature: sensor.temperature_2
+     humidity: sensor.humidity_2
+     leaf_temperature: sensor.infrared_sensor
+     name: Tent 1
+   - temperature: sensor.temperature_tent_2
+     humidity: sensor.humidity_tent_2
+     vpd: sensor.vpd
+     leaf_temperature_offset: 3 # optional and is ignored if leaf_temperature isset
+     name: Tent 2
 vpd_phases:
-  - upper: 0.4
-    className: under-transpiration
-  - lower: 0.4
-    upper: 0.8
-    className: early-veg
-  - lower: 0.8
-    upper: 1.2
-    className: late-veg
-  - lower: 1.2
-    upper: 1.6
-    className: mid-late-flower
-  - lower: 1.6
-    className: danger-zone
+   - upper: 0.4
+     className: under-transpiration
+   - lower: 0.4
+     upper: 0.8
+     className: early-veg
+   - lower: 0.8
+     upper: 1.2
+     className: late-veg
+   - lower: 1.2
+     upper: 1.6
+     className: mid-late-flower
+   - lower: 1.6
+     className: danger-zone
 ```
 ## Konfigurationsparameter
 
