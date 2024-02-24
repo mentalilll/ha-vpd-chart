@@ -118,7 +118,12 @@ class HaVpdChart extends HTMLElement {
             if (sensor.leaf_temperature !== undefined) {
                 leafTemperature = hass.states[sensor.leaf_temperature].state;
             }
-            let vpd = hass.states[sensor.vpd].state || this.calculateVPD(parseFloat(leafTemperature), parseFloat(temperature), parseFloat(humidity)).toFixed(2)
+            let vpd;
+            if (sensor.vpd !== undefined) {
+                vpd = hass.states[sensor.vpd].state;
+            } else {
+                vpd = this.calculateVPD(parseFloat(leafTemperature), parseFloat(temperature), parseFloat(humidity)).toFixed(2);
+            }
             let card = document.createElement('ha-card');
             card.innerHTML += `
                     <div class="bar">
@@ -201,7 +206,7 @@ class HaVpdChart extends HTMLElement {
                     let hum = document.createElement('div');
                     hum.className = 'humidity-axis-label';
                     // Runden auf eine sinnvolle Anzahl von Dezimalstellen, z.B. 1
-                    hum.innerHTML = `${currentValue}%`;
+                    hum.innerHTML = `${currentValue.toFixed(0)}%`;
                     humidityAxis.appendChild(hum);
                 }
                 axes.appendChild(temperatureAxis);
