@@ -75,7 +75,7 @@ class HaVpdChart extends HTMLElement {
             this.innerHTML = `
                 <ha-card header="VPD Informations">
                     <style>
-                         @import '/hacsfiles/ha-vpd-chart/dist/bar.css'
+                         @import '/hacsfiles/ha-vpd-chart/bar.css'
                     </style>
                     <div class="vpd-card-container card-content"></div>
                     <div class="highlight mousePointer" style="opacity:0">
@@ -167,7 +167,7 @@ class HaVpdChart extends HTMLElement {
             this.innerHTML = `
                 <ha-card>
                     <style>
-                        @import '/hacsfiles/ha-vpd-chart/dist/chart.css'
+                        @import '/hacsfiles/ha-vpd-chart/chart.css'
                     </style>
                     <div id="vpd-card-container" class="vpd-card-container"></div>
                     <div id="sensors"></div>
