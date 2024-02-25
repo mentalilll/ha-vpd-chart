@@ -1,0 +1,182 @@
+ha-card, ha-card .vpd-card-container {
+    height: 100%;
+    min-height: 400px;
+    overflow:hidden;
+}
+
+body, html {
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 10px;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    position: relative;
+}
+
+.danger-zone {
+    background-color: #ce4234;
+}
+
+.early-veg {
+    background-color: #22ab9c;
+}
+
+.late-veg {
+    background-color: #9cc55b;
+}
+
+.mid-late-flower {
+    background-color: #e7c12b;
+}
+
+.under-transpiration {
+    background-color: #1a6c9c;
+}
+
+table {
+    width: 100%;
+    height: 100%;
+}
+
+table, th, td {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: center;
+    min-width: 2px;
+}
+
+.highlight {
+    position: absolute;
+    z-index: 2;
+    background-color: white !important; /* oder eine andere Farbe Ihrer Wahl */
+    color: #333333 !important;
+    cursor:pointer;
+    width:10px;
+    height:10px;
+    border-radius: 50%;
+    transform: translate(-50%);
+    pointer-events: all;
+}
+.highlight:hover {
+    z-index:9999;
+}
+.vertical-line {
+    top:0;
+    bottom:0;
+    position:absolute;
+    width: 1px;
+    background:rgba(255,255,255,0.4);
+}
+.horizontal-line {
+    left:0;
+    right:0;
+    position:absolute;
+    height: 1px;
+    pointer-events: none;
+    background-color:rgba(255,255,255,0.4);
+}
+.mousePointer {
+    z-index:5;
+    width: 10px;
+    height:10px;
+    border-radius: 50%;
+    position:absolute;
+    opacity: 1;
+    transform: translate(-50%);
+}
+
+.mouse-custom-tooltip,
+.custom-tooltip {
+    bottom: 70%;
+    margin-bottom: 5px;
+    padding: 7px;
+    width: max-content;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #000000;
+    background-color: hsla(0, 0%, 20%, 0.9);
+    color: #ffffff;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.2;
+    position: absolute;
+    z-index:5;
+}
+.mouse-custom-tooltip {
+    right: 10px;
+    top: 10px;
+    bottom:auto;
+    pointer-events: none;
+}
+.axes {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    pointer-events: none;
+    font-size:10px;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+.axes .humidity-axis {
+    position:absolute;
+    width:100%;
+    top:10px;
+    left: 0;
+    right: 0;
+    display:flex;
+}
+.axes .humidity-axis .humidity-axis-label {
+    flex-grow: 1;
+    display:inline;
+    text-align:center;
+    border-right:1px solid rgba(255,255,255,0.4);
+}
+
+.axes .temperature-axis {
+    position:absolute;
+    height:100%;
+    top:0;
+    bottom:0;
+    left:10px;
+    display:flex;
+    flex-direction: column;
+
+}
+.axes .temperature-axis .temperature-axis-label {
+    flex-grow: 1;
+    display:flex;
+    align-items: center; /* Zentriert den Inhalt vertikal */
+    justify-content: center; /* Zentriert den Inhalt horizontal */
+    border-bottom:1px solid rgba(255,255,255,0.4);
+}
+.axes .temperature-axis .temperature-axis-label:last-child {
+    border-bottom:0;
+}
+.vpd-table {
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+
+.row {
+    display: table-row;
+    background-color: #ffffff;
+}
+
+.cell {
+    display: table-cell;
+}
+#sensors {
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    pointer-events: none;
+
+}
