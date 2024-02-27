@@ -58,6 +58,7 @@ steps_temperature: 0.5
 is_bar_view: true
 enable_tooltip: true
 enable_axes: true
+enable_ghostmap: true
 sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
@@ -102,6 +103,7 @@ vpd_phases:
 | enable_tooltip     | boolean      | optional     | `true`          | Tooltip enabled by default.                                                                         |
 | is_bar_view        | boolean      | optional     | `false`         | Second view of this chart for fast information of sensors                                           |
 | enable_axes        | boolean      | optional     | `true`          | Enable Axes on the Chart                                                                            |
+| enable_ghostmap    | boolean      | optional     | `true`          | Enable Ghostmap on the Chart                                                                        |
 
 **Default `vpd_phases` Configuration:**
 - `under-transpiration`: VPD < 0.4
@@ -109,117 +111,3 @@ vpd_phases:
 - `late-veg`: 0.8 ≤ VPD < 1.2
 - `mid-late-flower`: 1.2 ≤ VPD < 1.6
 - `danger-zone`: VPD ≥ 1.6
-
-Diese Tabelle bietet eine detaillierte Übersicht über die verfügbaren Konfigurationsoptionen und deren Standardwerte für das `custom:ha-vpd-chart` Element.
-
-
-
-
-###################################################################################
-
-
-# HaVpdChart für Home Assistant
-
-`HaVpdChart` ist eine benutzerdefinierte Kartenkomponente für Home Assistant, die es ermöglicht, visuelle Darstellungen von VPD (Vapour Pressure Deficit) basierend auf Temperatur- und Feuchtigkeitssensoren zu erstellen. Ideal für die Überwachung von Umgebungsbedingungen in Zelten oder Räumen.
-
-## Voraussetzungen
-
-- Home Assistant Installation
-- Grundkenntnisse in YAML und Home Assistant Konfiguration
-
-## Installation
-
-### Von GitHub
-
-1. **Repository klonen oder JS-Datei herunterladen**
-
-    Zuerst müssen Sie das JavaScript-File `ha-vpd-chart.js` von GitHub herunterladen oder das gesamte Repository klonen.
-
-2. **Datei in Home Assistant einbinden**
-
-    Kopieren Sie `ha-vpd-chart.js` in Ihr `www` Verzeichnis von Home Assistant, typischerweise unter `<config>/www/`.
-
-3. **Resource in Home Assistant hinzufügen**
-
-    Fügen Sie die Resource in Ihre `configuration.yaml` oder über die Home Assistant UI unter `Konfiguration` -> `Lovelace-Dashboards` -> `Ressourcen` hinzu:
-
-    ```yaml
-    lovelace:
-      resources:
-        - url: /local/ha-vpd-chart.js
-          type: module
-    ```
-
-    **Hinweis:** Nachdem Sie die Resource hinzugefügt haben, müssen Sie möglicherweise Home Assistant neustarten.
-
-### Lokale Installation
-
-Folgen Sie den oben genannten Schritten, um die Datei lokal zu speichern und als Resource einzubinden.
-
-## Anwendung
-
-Um die `HaVpdChart` in Ihrem Lovelace-Dashboard zu nutzen, fügen Sie die folgende Konfiguration zu Ihrem Dashboard hinzu. Passen Sie die Sensoren und andere Optionen entsprechend Ihrer Konfiguration an:
-
-```yaml
-type: custom:ha-vpd-chart
-air_text: Temp.
-rh_text: r.F.
-min_temperature: 5
-max_temperature: 35
-min_humidity: 10
-max_humidity: 100
-steps_humidity: 1
-steps_temperature: 0.5
-is_bar_view: true
-enable_tooltip: true
-enable_axes: true
-sensors:
-   - temperature: sensor.temperature_2
-     humidity: sensor.humidity_2
-     leaf_temperature: sensor.infrared_sensor
-     name: Tent 1
-   - temperature: sensor.temperature_tent_2
-     humidity: sensor.humidity_tent_2
-     vpd: sensor.vpd
-     leaf_temperature_offset: 3 # optional and is ignored if leaf_temperature isset
-     name: Tent 2
-vpd_phases:
-   - upper: 0.4
-     className: under-transpiration
-   - lower: 0.4
-     upper: 0.8
-     className: early-veg
-   - lower: 0.8
-     upper: 1.2
-     className: late-veg
-   - lower: 1.2
-     upper: 1.6
-     className: mid-late-flower
-   - lower: 1.6
-     className: danger-zone
-```
-## Konfigurationsparameter
-
-| Name               | Typ          | Erforderlich | Standard               | Beschreibung                                                                                   |
-| ------------------ | ------------ | ------------ | ---------------------- | ---------------------------------------------------------------------------------------------- |
-| type               | string       | **erforderlich** |                      | Muss `custom:ha-vpd-chart` sein.                                                               |
-| air_text           | string       | optional     | `Air`                 | Der Text für Temperaturmessungen. Standard ist "Air".                                         |
-| rh_text            | string       | optional     | `RH`                  | Der Text für Feuchtigkeitsmessungen. Standard ist "RH".                                        |
-| min_temperature    | number       | optional     | `5`                   | Minimale Temperatur im Diagramm. Standard ist 5.                                               |
-| min_humidity       | number       | optional     | `10`                  | Minimale Feuchtigkeit im Diagramm. Standard ist 10.                                            |
-| max_temperature    | number       | optional     | `35`                  | Maximale Temperatur im Diagramm. Standard ist 35.                                              |
-| max_humidity       | number       | optional     | `90`                  | Maximale Feuchtigkeit im Diagramm. Standard ist 90.                                            |
-| steps_temperature  | number       | optional     | `0.5`                 | Temperaturauflösung im Diagramm. Standard ist 0.5.                                             |
-| steps_humidity     | number       | optional     | `1`                   | Feuchtigkeitsauflösung im Diagramm. Standard ist 1.                                            |
-| sensors            | list         | **erforderlich** |                      | Eine Liste von Sensoren mit ihren Temperatur- und Feuchtigkeits-Entity-IDs und einem optionalen Namen zur Anzeige. |
-| vpd_phases         | list         | optional     | Siehe Beschreibung    | Eine Liste von VPD-Phasen und ihren Klassen zur visuellen Darstellung. Siehe unten für Standards. |
-| enable_tooltip     | boolean      | optional     | `true`                | Tooltip ist standardmäßig aktiviert.                                                           |
-| is_bar_view        | boolean      | optional     | `false`               | Zweite Ansicht dieses Diagramms für schnelle Informationen zu Sensoren                           |
-| enable_axes        | boolean      | optional     | `true`                | Aktivieren Sie die Achsen im Diagramm                                                           |
-**Standardkonfiguration der `vpd_phases`:**
-- `under-transpiration`: VPD < 0,4
-- `early-veg`: 0,4 ≤ VPD < 0,8
-- `late-veg`: 0,8 ≤ VPD < 1,2
-- `mid-late-flower`: 1,2 ≤ VPD < 1,6
-- `danger-zone`: VPD ≥ 1,6
-
