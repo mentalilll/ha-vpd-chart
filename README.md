@@ -43,39 +43,63 @@ Follow the steps above to store the file locally and include it as a resource.
 
 ## Usage
 
-To use the `HaVpdChart` in your Lovelace dashboard, add the following configuration to your dashboard. Adjust the sensors and other options according to your setup:
-
+Easy start as Chart View:
 ```yaml
 type: custom:ha-vpd-chart
-air_text: Temp.
-rh_text: r.H.
-min_temperature: 5
-max_temperature: 35
-min_humidity: 10
-max_humidity: 100
-steps_humidity: 1
-steps_temperature: 0.5
-is_bar_view: true
-enable_tooltip: true
-enable_axes: true
-enable_ghostmap: true
 sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
-    leaf_temperature: sensor.infrared_sensor
     name: Tent 1
   - temperature: sensor.temperature_tent_2
     humidity: sensor.humidity_tent_2
-    vpd: sensor.vpd
+    name: Tent 2
+```
+
+Easy start as Bar View:
+```yaml
+type: custom:ha-vpd-chart
+is_bar_view: true
+sensors:
+  - temperature: sensor.temperature_2
+    humidity: sensor.humidity_2
+    name: Tent 1
+  - temperature: sensor.temperature_tent_2
+    humidity: sensor.humidity_tent_2
+    name: Tent 2
+```
+
+To use the `HaVpdChart` in your Lovelace dashboard, add the following configuration to your dashboard. Adjust the sensors and other options according to your setup:
+```yaml
+type: custom:ha-vpd-chart
+air_text: Temp. #optional
+rh_text: r.H. #optional
+min_temperature: 5 #optional
+max_temperature: 35 #optional
+min_humidity: 10 #optional
+max_humidity: 100 #optional
+steps_humidity: 1 #optional
+steps_temperature: 0.5 #optional
+is_bar_view: true #optional
+enable_tooltip: true #optional
+enable_axes: true #optional
+enable_ghostmap: true #optional
+sensors:
+  - temperature: sensor.temperature_2
+    humidity: sensor.humidity_2
+    leaf_temperature: sensor.infrared_sensor #optional
+    name: Tent 1
+  - temperature: sensor.temperature_tent_2
+    humidity: sensor.humidity_tent_2
+    vpd: sensor.vpd #optional
     leaf_temperature_offset: 3 # optional and is ignored if leaf_temperature isset
     name: Tent 2
-vpd_phases:
+vpd_phases: #optional
   - upper: 0.4
     className: under-transpiration
   - lower: 0.4
     upper: 0.8
     className: early-veg
-  - lower: 0.8
+  - lower: 0.8 
     upper: 1.2
     className: late-veg
   - lower: 1.2

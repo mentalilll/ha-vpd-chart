@@ -27,7 +27,8 @@ class HaVpdChart extends HTMLElement {
     constructor() {
         super();
         this.vpd_phases = [
-            {upper: 0.4, className: 'under-transpiration'},
+            {upper: 0, className: 'gray-danger-zone'},
+            {lower: 0, upper: 0.4, className: 'under-transpiration'},
             {lower: 0.4, upper: 0.8, className: 'early-veg'},
             {lower: 0.8, upper: 1.2, className: 'late-veg'},
             {lower: 1.2, upper: 1.6, className: 'mid-late-flower'},
@@ -47,11 +48,6 @@ class HaVpdChart extends HTMLElement {
         this.rh_text = "RH";
         this.enable_axes = true;
         this.enable_ghostmap = true;
-
-        this.sensor_colors = [
-            "#FFFFFF","#00FF66", "#FF0000", "#FF9900", "#CBFF00", "#33FF00",
-            "#00FFFF", "#0066FF", "#3200FF", "#CC00FF", "#FF0098"
-        ];
     }
 
     set hass(hass) {

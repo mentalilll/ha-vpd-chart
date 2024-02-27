@@ -46,15 +46,12 @@ export const ghostmap = {
                 circle.style.left = `${percentageHumidity}%`;
                 circle.style.bottom = `${100 - percentageTemperature}%`;
                 circle.style.opacity = opacityFade;
-                circle.style.backgroundColor = this.sensor_colors[index];
-                circle.style.boxShadow = `0 0 25px 5px ${this.sensor_colors[index]}`;
+                circle.style.boxShadow = `0 0 25px 5px rgba(255, 255, 255, ${opacityFade})`;
 
                 fragment.appendChild(circle);
             });
         }
-        requestAnimationFrame(() => {
-            ghostmap.replaceChildren(fragment);
-        });
+        ghostmap.replaceChildren(fragment);
     }
 
 }

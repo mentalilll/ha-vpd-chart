@@ -1,56 +1,49 @@
-ha-card, ha-card .vpd-card-container {
+ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     height: 100%;
     min-height: 400px;
     overflow:hidden;
 }
-
-body, html {
-    font-family: "Segoe UI", Arial, sans-serif;
-    font-size: 10px;
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    position: relative;
+.vpd-chart-view .gray-danger-zone {
+    background-color: #999999;
 }
-
-.danger-zone {
+.vpd-chart-view .danger-zone {
     background-color: #ce4234;
 }
 
-.early-veg {
+.vpd-chart-view .early-veg {
     background-color: #22ab9c;
 }
 
-.late-veg {
+.vpd-chart-view .late-veg {
     background-color: #9cc55b;
 }
 
-.mid-late-flower {
+.vpd-chart-view .mid-late-flower {
     background-color: #e7c12b;
 }
 
-.under-transpiration {
+.vpd-chart-view .under-transpiration {
     background-color: #1a6c9c;
 }
 
-table {
+.vpd-chart-view table {
     width: 100%;
     height: 100%;
 }
 
-table, th, td {
+.vpd-chart-view table,.vpd-chart-view  th,.vpd-chart-view  td {
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-collapse: collapse;
 }
 
-th, td {
+.vpd-chart-view th,.vpd-chart-view  td {
     text-align: center;
     min-width: 2px;
 }
-.history-circle {
+.vpd-chart-view .history-circle {
     display:none;
 }
-.highlight {
+.vpd-chart-view .highlight {
     position: absolute;
     z-index: 2;
     cursor:pointer;
@@ -59,22 +52,23 @@ th, td {
     border-radius: 50%;
     transform: translate(-50%);
     pointer-events: all;
+    background-color:#ffffff;
 }
-.custom-tooltip {
+.vpd-chart-view .custom-tooltip {
     pointer-events: none;
 }
-.highlight:hover {
+.vpd-chart-view .highlight:hover {
     z-index:9999;
 }
 
-.vertical-line {
+.vpd-chart-view .vertical-line {
     top:0;
     bottom:0;
     position:absolute;
     width: 1px;
     background:rgba(255,255,255,0.4);
 }
-.horizontal-line {
+.vpd-chart-view .horizontal-line {
     left:0;
     right:0;
     position:absolute;
@@ -82,7 +76,7 @@ th, td {
     pointer-events: none;
     background-color:rgba(255,255,255,0.4);
 }
-.mousePointer {
+.vpd-chart-view .mousePointer {
     z-index:5;
     width: 10px;
     height:10px;
@@ -92,8 +86,8 @@ th, td {
     transform: translate(-50%);
 }
 
-.mouse-custom-tooltip,
-.custom-tooltip {
+.vpd-chart-view .mouse-custom-tooltip,
+.vpd-chart-view .custom-tooltip {
     bottom: 70%;
     margin-bottom: 5px;
     padding: 7px;
@@ -110,13 +104,13 @@ th, td {
     position: absolute;
     z-index:5;
 }
-.mouse-custom-tooltip {
+.vpd-chart-view .mouse-custom-tooltip {
     right: 10px;
     top: 10px;
     bottom:auto;
     pointer-events: none;
 }
-.axes {
+.vpd-chart-view .axes {
     position:absolute;
     top:0;
     left:0;
@@ -126,7 +120,7 @@ th, td {
     font-size:10px;
     font-family: "Segoe UI", Arial, sans-serif;
 }
-.axes .humidity-axis {
+.vpd-chart-view .axes .humidity-axis {
     position:absolute;
     width:100%;
     top:10px;
@@ -134,14 +128,14 @@ th, td {
     right: 0;
     display:flex;
 }
-.axes .humidity-axis .humidity-axis-label {
+.vpd-chart-view .axes .humidity-axis .humidity-axis-label {
     flex-grow: 1;
     display:inline;
     text-align:center;
     border-right:1px solid rgba(255,255,255,0.4);
 }
 
-.axes .temperature-axis {
+.vpd-chart-view .axes .temperature-axis {
     position:absolute;
     height:100%;
     top:0;
@@ -151,31 +145,31 @@ th, td {
     flex-direction: column;
 
 }
-.axes .temperature-axis .temperature-axis-label {
+.vpd-chart-view .axes .temperature-axis .temperature-axis-label {
     flex-grow: 1;
     display:flex;
     align-items: center; /* Zentriert den Inhalt vertikal */
     justify-content: center; /* Zentriert den Inhalt horizontal */
     border-bottom:1px solid rgba(255,255,255,0.4);
 }
-.axes .temperature-axis .temperature-axis-label:last-child {
+.vpd-chart-view .axes .temperature-axis .temperature-axis-label:last-child {
     border-bottom:0;
 }
-.vpd-table {
+.vpd-chart-view .vpd-table {
     display: table;
     width: 100%;
     height: 100%;
 }
 
-.row {
+.vpd-chart-view .row {
     display: table-row;
     background-color: #ffffff;
 }
 
-.cell {
+.vpd-chart-view .cell {
     display: table-cell;
 }
-#sensors, #ghostmap {
+.vpd-chart-view #sensors,.vpd-chart-view  #ghostmap {
     width:100%;
     height:100%;
     position:absolute;
