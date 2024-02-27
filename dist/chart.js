@@ -170,7 +170,6 @@ export const chart = {
                     // get circle tooltip
 
                     this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
-                        console.log(tooltip.className, event.target.className);
                        if(!tooltip.classList.contains('custom-tooltip-' + index)) {
                            tooltip.style.display = 'none';
                        } else {
