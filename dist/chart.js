@@ -143,7 +143,7 @@ export const chart = {
             const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
 
             let circle = this.querySelectorAll('sensor-circle-' + index)[0] || document.createElement('div');
-            circle.className = 'highlight sensor-circle-' + index;
+            circle.className = 'highlight sensor-circle sensor-circle-' + index;
             circle.dataset.index = index;
             circle.style.left = `${percentageHumidity}%`;
             circle.style.bottom = `${100 - percentageTemperature}%`;
@@ -162,20 +162,35 @@ export const chart = {
             let tooltip = this.querySelectorAll('.custom-tooltip-' + index)[0] || document.createElement('div');
             tooltip.className = 'custom-tooltip custom-tooltip-' + index;
             tooltip.innerHTML = `<strong>${sensor.name}:</strong> kPa: ${vpd} | ${this.rh_text}: ${humidity}% | ${this.air_text}: ${temperature}°C`;
+            circle.replaceChildren(tooltip);
             if(this.enable_ghostmap) {
                 circle.addEventListener('mouseover', (event) => {
-                    let circle = this.querySelectorAll('.history-circle-' + index).forEach(circle => {
+                    this.querySelectorAll('.history-circle-' + index).forEach(circle => {
                         circle.style.display = 'block';
                     });
-                    // get circle tooltip
-
                     this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
-                       if(!tooltip.classList.contains('custom-tooltip-' + index)) {
-                           tooltip.style.display = 'none';
-                       } else {
-                           tooltip.style.opacity = 0.75;
-                       }
+                        if(!tooltip.classList.contains('custom-tooltip-' + index)) {
+                            tooltip.style.display = 'none';
+                        } else {
+                            tooltip.style.opacity = 0.75;
+                        }
                     });
+                    this.querySelectorAll('.horizontal-line').forEach(line => {
+                        if(!line.classList.contains('horizontal-line-' + index)) {
+                            line.style.display = 'none';
+                        }
+                    });
+                    this.querySelectorAll('.vertical-line').forEach(line => {
+                        if(!line.classList.contains('vertical-line-' + index)) {
+                            line.style.display = 'none';
+                        }
+                    });
+                    this.querySelectorAll('.sensor-circle').forEach(circle => {
+                        if(!circle.classList.contains('sensor-circle-' + index)) {
+                            circle.style.display = 'none';
+                        }
+                    });
+
                 });
                 circle.addEventListener('mouseleave', () => {
                     this.querySelectorAll('.history-circle-' + index).forEach(circle => {
@@ -185,9 +200,18 @@ export const chart = {
                         tooltip.style.display = 'block';
                         tooltip.style.opacity = 1;
                     });
+                    this.querySelectorAll('.horizontal-line').forEach(line => {
+                        line.style.display = 'block';
+                    });
+                    this.querySelectorAll('.vertical-line').forEach(line => {
+                        line.style.display = 'block';
+                    });
+                    this.querySelectorAll('.sensor-circle').forEach(circle => {
+                        circle.style.display = 'block';
+                    });
                 });
             }
-            circle.replaceChildren(tooltip);
+
             fragment.appendChild(circle);
         });
 

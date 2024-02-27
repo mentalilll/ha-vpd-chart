@@ -156,18 +156,21 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     border-bottom:0;
 }
 .vpd-chart-view .vpd-table {
-    display: table;
+    display: flex !important;
+    flex-direction: column !important;
     width: 100%;
     height: 100%;
 }
 
 .vpd-chart-view .row {
-    display: table-row;
+    display: flex !important;
+    flex-grow: 1 !important;
     background-color: #ffffff;
 }
 
 .vpd-chart-view .cell {
-    display: table-cell;
+    flex-grow: 1 !important;
+    display:block !important;
 }
 .vpd-chart-view #sensors,.vpd-chart-view  #ghostmap {
     width:100%;

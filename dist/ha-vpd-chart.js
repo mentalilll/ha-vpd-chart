@@ -25,6 +25,9 @@ class HaVpdChart extends HTMLElement {
     }
 
     constructor() {
+        console.groupCollapsed("%c HA-VPD-CHART Installed", "color: green; background: black; font-weight: bold;");
+        console.log('Readme: ', 'https://github.com/mentalilll/ha-vpd-chart');
+        console.groupEnd()
         super();
         this.vpd_phases = [
             {upper: 0, className: 'gray-danger-zone'},
