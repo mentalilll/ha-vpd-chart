@@ -94,13 +94,7 @@ export const chart = {
 
             for (let RH = this.max_humidity; RH >= this.min_humidity; RH -= this.steps_humidity) {
                 const key = `${Tleaf}-${Tair}-${RH}`;
-                let vpd;
-                if (this.vpdCache.has(key)) {
-                    vpd = this.vpdCache.get(key);
-                } else {
-                    vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
-                    this.vpdCache.set(key, vpd);
-                }
+                let vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
                 const phaseClass = this.getPhaseClass(vpd);
                 html += `<td class="cell ${phaseClass}" data-air="${Tair}" data-leaf="${Tleaf}" data-rh="${RH}" data-vpd="${vpd}"></td>`;
             }
