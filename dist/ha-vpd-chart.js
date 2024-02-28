@@ -25,9 +25,7 @@ class HaVpdChart extends HTMLElement {
     }
 
     constructor() {
-        console.groupCollapsed("%c HA-VPD-CHART Installed", "color: green; background: black; font-weight: bold;");
-        console.log('Readme: ', 'https://github.com/mentalilll/ha-vpd-chart');
-        console.groupEnd()
+
         super();
         this.vpd_phases = [
             {upper: 0, className: 'gray-danger-zone'},
@@ -37,7 +35,6 @@ class HaVpdChart extends HTMLElement {
             {lower: 1.2, upper: 1.6, className: 'mid-late-flower'},
             {lower: 1.6, className: 'danger-zone'},
         ];
-        this.vpdCache = new Map();
         this.sensors = [];
         this.is_bar_view = false;
         this.min_temperature = 5;
@@ -98,3 +95,6 @@ window.customCards.push({
     description: "A custom card to display VPD values in a table",
     documentationURL: "https://github.com/mentalilll/ha-vpd-chart", // Adds a help link in the frontend card editor
 });
+console.groupCollapsed("%c HA-VPD-CHART Installed", "color: green; background: black; font-weight: bold;");
+console.log('Readme: ', 'https://github.com/mentalilll/ha-vpd-chart');
+console.groupEnd()

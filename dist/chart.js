@@ -83,14 +83,14 @@ export const chart = {
 
     },
     buildTable() {
-        const table = document.createElement('div');
+        const table = document.createElement('table');
         table.className = 'vpd-table';
 
         const fragment = document.createDocumentFragment();
         let html = '';
         for (let Tair = this.min_temperature; Tair <= this.max_temperature; Tair += this.steps_temperature) {
             const Tleaf = Tair - 2;
-            html += '<div class="row">';
+            html += '<tr>';
 
             for (let RH = this.max_humidity; RH >= this.min_humidity; RH -= this.steps_humidity) {
                 const key = `${Tleaf}-${Tair}-${RH}`;
@@ -102,21 +102,14 @@ export const chart = {
                     this.vpdCache.set(key, vpd);
                 }
                 const phaseClass = this.getPhaseClass(vpd);
-                html += `<div class="cell ${phaseClass}" data-air="${Tair}" data-leaf="${Tleaf}" data-rh="${RH}" data-vpd="${vpd}"></div>`;
+                html += `<td class="cell ${phaseClass}" data-air="${Tair}" data-leaf="${Tleaf}" data-rh="${RH}" data-vpd="${vpd}"></td>`;
             }
 
-            html += '</div>';
-        }
-        const tempDiv = document.createElement('div');
-        localStorage.setItem('vpd-table-card', html);
-        tempDiv.innerHTML = html;
-        while (tempDiv.firstChild) {
-            fragment.appendChild(tempDiv.firstChild);
+            html += '</tr>';
         }
 
-        table.appendChild(fragment);
 
-
+        table.innerHTML = html;
         return table;
     },
     buildTooltip() {

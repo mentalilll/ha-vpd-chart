@@ -30,15 +30,9 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     width: 100%;
     height: 100%;
 }
-
-.vpd-chart-view table,.vpd-chart-view  th,.vpd-chart-view  td {
-    border: 1px solid rgba(255, 255, 255, 0.05);
+.vpd-chart-view table {
+    border: 0;
     border-collapse: collapse;
-}
-
-.vpd-chart-view th,.vpd-chart-view  td {
-    text-align: center;
-    min-width: 2px;
 }
 .vpd-chart-view .history-circle {
     display:none;
@@ -58,7 +52,7 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     pointer-events: none;
 }
 .vpd-chart-view .highlight:hover {
-    z-index:9999;
+    z-index:2;
 }
 
 .vpd-chart-view .vertical-line {
@@ -77,7 +71,7 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     background-color:rgba(255,255,255,0.4);
 }
 .vpd-chart-view .mousePointer {
-    z-index:5;
+    z-index:2;
     width: 10px;
     height:10px;
     border-radius: 50%;
@@ -102,7 +96,7 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     font-size: 12px;
     line-height: 1.2;
     position: absolute;
-    z-index:5;
+    z-index:2;
 }
 .vpd-chart-view .mouse-custom-tooltip {
     right: 10px;
@@ -156,22 +150,13 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     border-bottom:0;
 }
 .vpd-chart-view .vpd-table {
-    display: flex !important;
-    flex-direction: column !important;
     width: 100%;
     height: 100%;
 }
-
-.vpd-chart-view .row {
-    display: flex !important;
-    flex-grow: 1 !important;
-    background-color: #ffffff;
+.vpd-chart-view .vpd-table tbody {
+    height:100%;
 }
 
-.vpd-chart-view .cell {
-    flex-grow: 1 !important;
-    display:block !important;
-}
 .vpd-chart-view #sensors,.vpd-chart-view  #ghostmap {
     width:100%;
     height:100%;

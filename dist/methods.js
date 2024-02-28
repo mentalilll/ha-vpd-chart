@@ -15,5 +15,18 @@ export const methods = {
             }
         }
         return '';
-    }
+    },
+    async getEntityHistory(entityId) {
+        const endTime = new Date();
+        const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
+        const isoStartTime = startTime.toISOString();
+        const isoEndTime = endTime.toISOString();
+
+        try {
+            const history = await this._hass.callApi('GET', `history/period/${isoStartTime}?filter_entity_id=${entityId}&end_time=${isoEndTime}&minimal_response&significant_changes_only&no_attributes`);
+            return this.filterEntriesByHour(history[0]); //this.getRandomEntries(history[0], 20);
+        } catch (error) {
+            return [];
+        }
+    },
 }

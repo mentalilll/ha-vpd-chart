@@ -8,19 +8,19 @@ export const ghostmap = {
         }
         return result;
     },
+    filterEntriesByHour(entries) {
+        const filteredEntries = [];
+        const seenHours = new Set();
+        entries.forEach(entry => {
+            const date = new Date(entry.last_changed);
+            const hourKey = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + "-" + date.getHours();
 
-    async getEntityHistory(entityId) {
-        const endTime = new Date();
-        const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
-        const isoStartTime = startTime.toISOString();
-        const isoEndTime = endTime.toISOString();
-
-        try {
-            const history = await this._hass.callApi('GET', `history/period/${isoStartTime}?filter_entity_id=${entityId}&end_time=${isoEndTime}`);
-            return this.getRandomEntries(history[0], 20);
-        } catch (error) {
-            return [];
-        }
+            if (!seenHours.has(hourKey)) {
+                seenHours.add(hourKey);
+                filteredEntries.push(entry);
+            }
+        });
+        return filteredEntries;
     },
     async fetchDataForSensors() {
         const fragment = document.createDocumentFragment();
