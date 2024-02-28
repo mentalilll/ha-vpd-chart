@@ -87,23 +87,21 @@ export const chart = {
         table.className = 'vpd-table';
 
         const fragment = document.createDocumentFragment();
-        let html = '';
+        let html = '<tbody>';
         for (let Tair = this.min_temperature; Tair <= this.max_temperature; Tair += this.steps_temperature) {
             const Tleaf = Tair - 2;
             html += '<tr>';
-
             for (let RH = this.max_humidity; RH >= this.min_humidity; RH -= this.steps_humidity) {
                 const key = `${Tleaf}-${Tair}-${RH}`;
                 let vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
                 const phaseClass = this.getPhaseClass(vpd);
                 html += `<td class="cell ${phaseClass}" data-air="${Tair}" data-leaf="${Tleaf}" data-rh="${RH}" data-vpd="${vpd}"></td>`;
             }
-
             html += '</tr>';
         }
 
 
-        table.innerHTML = html;
+        table.innerHTML = html + '</tbody>';
         return table;
     },
     buildTooltip() {

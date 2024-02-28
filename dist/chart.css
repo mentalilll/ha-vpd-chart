@@ -1,6 +1,5 @@
 ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     height: 100%;
-    min-height: 400px;
     overflow:hidden;
 }
 .vpd-chart-view .gray-danger-zone {
@@ -26,13 +25,15 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     background-color: #1a6c9c;
 }
 
+
 .vpd-chart-view table {
     width: 100%;
-    height: 100%;
-}
-.vpd-chart-view table {
+    height: 100% !important;
     border: 0;
     border-collapse: collapse;
+}
+.vpd-chart-view table tbody {
+    height:100% !important;
 }
 .vpd-chart-view .history-circle {
     display:none;
@@ -149,15 +150,8 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 .vpd-chart-view .axes .temperature-axis .temperature-axis-label:last-child {
     border-bottom:0;
 }
-.vpd-chart-view .vpd-table {
-    width: 100%;
-    height: 100%;
-}
-.vpd-chart-view .vpd-table tbody {
-    height:100%;
-}
 
-.vpd-chart-view #sensors,.vpd-chart-view  #ghostmap {
+.vpd-chart-view #sensors,.vpd-chart-view #ghostmap {
     width:100%;
     height:100%;
     position:absolute;
