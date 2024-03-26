@@ -13,6 +13,19 @@
 - Basic knowledge of YAML and Home Assistant configuration
 
 ## Installation
+### HACS Easy Installation
+1. **Currently not available - still wait for accept pull request**
+
+### HACS Installation
+1. **Add Repository**
+   
+    Click `HACS` -> `Three Dot Menu upper right` -> `Custom Repository`
+    -> `Category: Integration` | `Repositury Url: https://github.com/mentalilll/ha-vpd-chart`
+   
+3. **Install Plugin**
+   
+   Search for VPD within Integrations and install `ha-vpd-chart`
+     
 
 ### From GitHub
 
@@ -36,8 +49,6 @@
     ```
 
     **Note:** After adding the resource, you may need to restart Home Assistant.
-
-### Local Installation
 
 Follow the steps above to store the file locally and include it as a resource.
 
