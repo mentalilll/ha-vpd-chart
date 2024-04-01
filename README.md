@@ -83,6 +83,7 @@ is_bar_view: true #optional
 enable_tooltip: true #optional
 enable_axes: true #optional
 enable_ghostmap: true #optional
+enable_triangle: false #optional
 sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
@@ -111,23 +112,24 @@ vpd_phases: #optional
 ## Configuration Parameters
 
 
-| Name               | Type         | Required     | Default         | Description                                                                                         |
-| ------------------ | ------------ | ------------ |-----------------|-----------------------------------------------------------------------------------------------------|
-| type               | string       | **required** |                 | Must be `custom:ha-vpd-chart`.                                                                      |
-| air_text           | string       | optional     | `Air`           | The text used for temperature readings. Default is "Air".                                           |
-| rh_text            | string       | optional     | `RH`            | The text used for humidity readings. Default is "RH".                                               |
-| min_temperature    | number       | optional     | `5`             | Minimum temperature in the chart. Default is 5.                                                     |
-| min_humidity       | number       | optional     | `10`            | Minimum humidity in the chart. Default is 10.                                                       |
-| max_temperature    | number       | optional     | `35`            | Maximum temperature in the chart. Default is 35.                                                    |
-| max_humidity       | number       | optional     | `90`            | Maximum humidity in the chart. Default is 90.                                                       |
-| steps_temperature  | number       | optional     | `0.5`           | Temperature resolution in the chart. Default is 0.5.                                                |
-| steps_humidity     | number       | optional     | `1`             | Humidity resolution in the chart. Default is 1.                                                     |
-| sensors            | list         | **required** |                 | A list of sensors with their temperature and humidity entity IDs, and an optional name for display. |
-| vpd_phases         | list         | optional     | See description | A list of VPD phases and their classes for visual representation. See below for defaults.           |
-| enable_tooltip     | boolean      | optional     | `true`          | Tooltip enabled by default.                                                                         |
-| is_bar_view        | boolean      | optional     | `false`         | Second view of this chart for fast information of sensors                                           |
-| enable_axes        | boolean      | optional     | `true`          | Enable Axes on the Chart                                                                            |
-| enable_ghostmap    | boolean      | optional     | `true`          | Enable Ghostmap on the Chart                                                                        |
+| Name              | Type         | Required     | Default         | Description                                                                                         |
+|-------------------| ------------ | ------------ |-----------------|-----------------------------------------------------------------------------------------------------|
+| type              | string       | **required** |                 | Must be `custom:ha-vpd-chart`.                                                                      |
+| air_text          | string       | optional     | `Air`           | The text used for temperature readings. Default is "Air".                                           |
+| rh_text           | string       | optional     | `RH`            | The text used for humidity readings. Default is "RH".                                               |
+| min_temperature   | number       | optional     | `5`             | Minimum temperature in the chart. Default is 5.                                                     |
+| min_humidity      | number       | optional     | `10`            | Minimum humidity in the chart. Default is 10.                                                       |
+| max_temperature   | number       | optional     | `35`            | Maximum temperature in the chart. Default is 35.                                                    |
+| max_humidity      | number       | optional     | `90`            | Maximum humidity in the chart. Default is 90.                                                       |
+| steps_temperature | number       | optional     | `0.5`           | Temperature resolution in the chart. Default is 0.5.                                                |
+| steps_humidity    | number       | optional     | `1`             | Humidity resolution in the chart. Default is 1.                                                     |
+| sensors           | list         | **required** |                 | A list of sensors with their temperature and humidity entity IDs, and an optional name for display. |
+| vpd_phases        | list         | optional     | See description | A list of VPD phases and their classes for visual representation. See below for defaults.           |
+| enable_tooltip    | boolean      | optional     | `true`          | Tooltip enabled by default.                                                                         |
+| is_bar_view       | boolean      | optional     | `false`         | Second view of this chart for fast information of sensors                                           |
+| enable_axes       | boolean      | optional     | `true`          | Enable Axes on the Chart                                                                            |
+| enable_ghostmap   | boolean      | optional     | `true`          | Enable Ghostmap on the Chart                                                                        |
+| enable_triangle   | boolean      | optional     | `true`          | Enable Triangle instead of Circle for tooltip marker                                                |
 
 **Default `vpd_phases` Configuration:**
 - `under-transpiration`: VPD < 0.4

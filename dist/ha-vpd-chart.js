@@ -20,7 +20,8 @@ class HaVpdChart extends HTMLElement {
             enable_tooltip: {type: Boolean},
             is_bar_view: {type: Boolean},
             enable_axes: {type: Boolean},
-            enable_ghostmap: {type: Boolean}
+            enable_ghostmap: {type: Boolean},
+            enable_triangle: {type: Boolean},
         };
     }
 
@@ -48,6 +49,7 @@ class HaVpdChart extends HTMLElement {
         this.rh_text = "RH";
         this.enable_axes = true;
         this.enable_ghostmap = true;
+        this.enable_triangle = false;
     }
 
     set hass(hass) {
@@ -74,6 +76,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_axes = config.enable_axes || this.enable_axes;
         this.enable_tooltip = config.enable_tooltip || this.enable_tooltip;
         this.enable_ghostmap = config.enable_ghostmap || this.enable_ghostmap;
+        this.enable_triangle = config.enable_triangle || this.enable_triangle;
 
     }
 

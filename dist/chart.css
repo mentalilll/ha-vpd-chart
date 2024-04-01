@@ -1,6 +1,7 @@
 ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     height: 100%;
-    min-height: 400px;
+    width:100%;
+    min-height: 50px;
     overflow:hidden;
 }
 .vpd-chart-view .gray-danger-zone {
@@ -30,13 +31,13 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 .vpd-chart-view table {
     width: 100%;
     height: 100% !important;
-    min-height: 400px;
+    min-height: 50px;
     border: 0;
     border-collapse: collapse;
 }
 .vpd-chart-view table tbody {
     height:100% !important;
-    min-height: 400px;
+    min-height: 50px;
 }
 .vpd-chart-view .history-circle {
     display:none;
@@ -54,6 +55,7 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 }
 .vpd-chart-view .custom-tooltip {
     pointer-events: none;
+    transform: translate(-50%);
 }
 .vpd-chart-view .highlight:hover {
     z-index:2;
@@ -161,4 +163,29 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     top:0;
     left:0;
     pointer-events: none;
+}
+.vpd-chart-view #sensors .custom-tooltip {
+    margin-bottom: 14px;
+}
+.vpd-chart-view #sensors .sensor-triangle {
+    width:16px !important;
+    height:0 !important;
+    padding:0 !important;
+    margin: 0!important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+}
+.vpd-chart-view #sensors .sensor-triangle:after {
+    position: absolute;
+    bottom: 4px;
+    left: 49%;
+    margin-left: -10px;
+    width: 0;
+    border-top: 10px solid #444;
+    border-right: 10px solid transparent;
+    border-left: 10px solid transparent;
+    content: " ";
+    font-size: 0;
+    line-height: 0;
 }
