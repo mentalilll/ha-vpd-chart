@@ -98,48 +98,48 @@ export const bar = {
             bar.querySelector('.vpd-value').innerText = `${vpd} kPa`;
             bar.querySelector('.vpd-rh').innerText = `${this.rh_text}: ${humidity}%`;
             bar.querySelector('.vpd-temp').innerText = `${this.air_text}: ${temperature}°C`;
-            this.renderMiniHistory(sensor).then((data) => {
-                const canvas = bar.querySelector('canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.reset();
-                canvas.width = 80;
-                canvas.height = 20;
+            if (this.enable_ghostmap) {
+                this.renderMiniHistory(sensor).then((data) => {
+                    const canvas = bar.querySelector('canvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.reset();
+                    canvas.width = 80;
+                    canvas.height = 20;
 
-                const padding = 0;
-                const pointRadius = 1;
-                const width = canvas.width - 2 * padding;
-                const height = canvas.height - 2 * padding;
+                    const padding = 0;
+                    const pointRadius = 1;
+                    const width = canvas.width - 2 * padding;
+                    const height = canvas.height - 2 * padding;
+                    const sensorData = data['sensor-' + index];
+                    const maxY = Math.max(...sensorData.map(data => parseFloat(data.vpd)));
+                    const minY = Math.min(...sensorData.map(data => parseFloat(data.vpd)));
+                    const scaleX = width / (sensorData.length - 1);
+                    const scaleY = height / (maxY - minY);
 
-                const sensorData = data['sensor-' + index];
-                const maxY = Math.max(...sensorData.map(data => parseFloat(data.vpd)));
-                const minY = Math.min(...sensorData.map(data => parseFloat(data.vpd)));
-                const scaleX = width / (sensorData.length - 1);
-                const scaleY = height / (maxY - minY);
+                    var previousX;
+                    var previousY;
 
-                var previousX;
-                var previousY;
+                    sensorData.forEach((data, index) => {
+                        const x = index * scaleX + padding;
+                        const y = padding + height - (parseFloat(data.vpd) - minY) * scaleY;
+                        var color = this.getColorForVpd(parseFloat(data.vpd));
 
-                sensorData.forEach((data, index) => {
-                    const x = index * scaleX + padding;
-                    const y = padding + height - (parseFloat(data.vpd) - minY) * scaleY;
-                    var color = this.getColorForVpd(parseFloat(data.vpd));
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(previousX, previousY);
+                        ctx.strokeStyle = color;
+                        ctx.stroke();
 
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(previousX, previousY);
-                    ctx.strokeStyle = color;
-                    ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
+                        ctx.fillStyle = color;
+                        ctx.fill();
 
-                    ctx.beginPath();
-                    ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
-                    ctx.fillStyle = color;
-                    ctx.fill();
-
-                    previousX = x;
-                    previousY = y;
+                        previousX = x;
+                        previousY = y;
+                    });
                 });
-            });
-
+            }
             let vpdState = bar.querySelector('.vpd-state');
             vpdState.className = `vpd-state ${this.getPhaseClass(vpd)} tooltip`;
         });
@@ -158,7 +158,7 @@ export const bar = {
         return colorMap[this.getPhaseClass(vpd)];
     },
     async renderMiniHistory(sensor) {
-        if (this.enable_ghostmap) {
+
             const data = [];
 
             for (const [index, sensor] of this.config.sensors.entries()) {
@@ -176,7 +176,6 @@ export const bar = {
             }
 
             return data;
-        }
 
     }
 }
