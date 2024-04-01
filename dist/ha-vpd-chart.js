@@ -62,22 +62,48 @@ class HaVpdChart extends HTMLElement {
             throw new Error('You need to define sensors');
         }
 
-        this.vpd_phases = config.vpd_phases || this.vpd_phases;
-        this.sensors = config.sensors || this.sensors;
-        this.air_text = config.air_text || "Air";
-        this.rh_text = config.rh_text || "RH";
-        this.min_temperature = config.min_temperature || this.min_temperature;
-        this.max_temperature = config.max_temperature || this.max_temperature;
-        this.min_humidity = config.min_humidity || this.min_humidity;
-        this.max_humidity = config.max_humidity || this.max_humidity;
-        this.steps_temperature = config.steps_temperature || this.steps_temperature;
-        this.steps_humidity = config.steps_humidity || this.steps_humidity;
-        this.is_bar_view = config.is_bar_view || this.is_bar_view;
-        this.enable_axes = config.enable_axes || this.enable_axes;
-        this.enable_tooltip = config.enable_tooltip || this.enable_tooltip;
-        this.enable_ghostmap = config.enable_ghostmap || this.enable_ghostmap;
-        this.enable_triangle = config.enable_triangle || this.enable_triangle;
-
+        if('vpd_phases' in config) {
+            this.vpd_phases = config.vpd_phases;
+        }
+        if('sensors' in config) {
+            this.sensors = config.sensors;
+        }
+        if('air_text' in config) {
+            this.air_text = config.air_text;
+        }
+        if('rh_text' in config) {
+            this.rh_text = config.rh_text;
+        }
+        if('min_temperature' in config) {
+            this.min_temperature = config.min_temperature;
+        }
+        if('max_temperature' in config) {
+            this.max_temperature = config.max_temperature;
+        }
+        if('min_humidity' in config) {
+            this.min_humidity = config.min_humidity;
+        }
+        if('max_humidity' in config) {
+            this.max_humidity = config.max_humidity;
+        }
+        if('steps_temperature' in config) {
+            this.steps_temperature = config.steps_temperature;
+        }
+        if('steps_humidity' in config) {
+            this.steps_humidity = config.steps_humidity;
+        }
+        if('is_bar_view' in config) {
+            this.is_bar_view = config.is_bar_view;
+        }
+        if('enable_axes' in config) {
+            this.enable_axes = config.enable_axes;
+        }
+        if('enable_ghostmap' in config) {
+            this.enable_ghostmap = config.enable_ghostmap;
+        }
+        if('enable_tooltip' in config) {
+            this.enable_tooltip = config.enable_tooltip;
+        }
     }
 
     getCardSize() {

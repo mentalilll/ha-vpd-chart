@@ -57,7 +57,7 @@ export const chart = {
                     this.fetchDataForSensors();
                 }, 3600000);
             }
-            if (this.enable_tooltip) {
+
                 this.content.addEventListener('mouseover', (event) => {
                     if (event.target.classList.contains('cell')) {
                         this.buildMouseTooltip(event.target);
@@ -76,7 +76,7 @@ export const chart = {
                         }
                     }, 100);
                 });
-            }
+
         }
 
         this.buildTooltip();
@@ -145,17 +145,18 @@ export const chart = {
             verticalLine.className = 'vertical-line vertical-line-' + indexString;
             verticalLine.setAttribute('data-index', indexString);
             verticalLine.style.left = `calc(${percentageHumidity}% - 0.5px)`;
-
-            let tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
-            tooltip.className = 'custom-tooltip custom-tooltip-' + indexString;
-            tooltip.setAttribute('data-index', indexString);
-            tooltip.innerHTML = `<strong>${sensor.name}:</strong> kPa: ${vpd} | ${this.rh_text}: ${humidity}% | ${this.air_text}: ${temperature}°C`;
-            tooltip.style.left = `${percentageHumidity}%`;
-            tooltip.style.bottom = `${100 - percentageTemperature}%`;
-
-            if (!pointer.isConnected) {
-                sensors.appendChild(tooltip);
+            if (this.enable_tooltip) {
+                let tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
+                tooltip.className = 'custom-tooltip custom-tooltip-' + indexString;
+                tooltip.setAttribute('data-index', indexString);
+                tooltip.innerHTML = `<strong>${sensor.name}:</strong> kPa: ${vpd} | ${this.rh_text}: ${humidity}% | ${this.air_text}: ${temperature}°C`;
+                tooltip.style.left = `${percentageHumidity}%`;
+                tooltip.style.bottom = `${100 - percentageTemperature}%`;
+                if (!pointer.isConnected) {
+                    sensors.appendChild(tooltip);
+                }
             }
+
             if (!pointer.isConnected) {
                 sensors.appendChild(pointer);
             }
