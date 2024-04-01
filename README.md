@@ -20,7 +20,7 @@
 1. **Add Repository**
    
     Click `HACS` -> `Three Dot Menu upper right` -> `Custom Repository`
-    -> `Category: Integration` | `Repositury Url: https://github.com/mentalilll/ha-vpd-chart`
+    -> `Category: Lovelace` | `Repositury Url: https://github.com/mentalilll/ha-vpd-chart`
    
 3. **Install Plugin**
    
