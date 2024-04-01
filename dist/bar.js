@@ -74,6 +74,7 @@ export const bar = {
                 this.content.appendChild(card);
             });
         }
+
         this.updateBars();
 
     },
@@ -98,47 +99,55 @@ export const bar = {
             bar.querySelector('.vpd-value').innerText = `${vpd} kPa`;
             bar.querySelector('.vpd-rh').innerText = `${this.rh_text}: ${humidity}%`;
             bar.querySelector('.vpd-temp').innerText = `${this.air_text}: ${temperature}°C`;
+
             if (this.enable_ghostmap) {
-                this.renderMiniHistory(sensor).then((data) => {
-                    const canvas = bar.querySelector('canvas');
-                    const ctx = canvas.getContext('2d');
-                    ctx.reset();
-                    canvas.width = 80;
-                    canvas.height = 20;
+                if(!this.updateRunning) {
 
-                    const padding = 0;
-                    const pointRadius = 1;
-                    const width = canvas.width - 2 * padding;
-                    const height = canvas.height - 2 * padding;
-                    const sensorData = data['sensor-' + index];
-                    const maxY = Math.max(...sensorData.map(data => parseFloat(data.vpd)));
-                    const minY = Math.min(...sensorData.map(data => parseFloat(data.vpd)));
-                    const scaleX = width / (sensorData.length - 1);
-                    const scaleY = height / (maxY - minY);
+                    this.renderMiniHistory(sensor).then((data) => {
+                        this.updateRunning = true;
+                        const canvas = bar.querySelector('canvas');
+                        const ctx = canvas.getContext('2d');
+                        ctx.reset();
+                        canvas.width = 80;
+                        canvas.height = 20;
 
-                    var previousX;
-                    var previousY;
+                        const padding = 0;
+                        const pointRadius = 1;
+                        const width = canvas.width - 2 * padding;
+                        const height = canvas.height - 2 * padding;
+                        const sensorData = data['sensor-' + index];
+                        const maxY = Math.max(...sensorData.map(data => parseFloat(data.vpd)));
+                        const minY = Math.min(...sensorData.map(data => parseFloat(data.vpd)));
+                        const scaleX = width / (sensorData.length - 1);
+                        const scaleY = height / (maxY - minY);
 
-                    sensorData.forEach((data, index) => {
-                        const x = index * scaleX + padding;
-                        const y = padding + height - (parseFloat(data.vpd) - minY) * scaleY;
-                        var color = this.getColorForVpd(parseFloat(data.vpd));
+                        var previousX;
+                        var previousY;
 
-                        ctx.beginPath();
-                        ctx.moveTo(x, y);
-                        ctx.lineTo(previousX, previousY);
-                        ctx.strokeStyle = color;
-                        ctx.stroke();
+                        sensorData.forEach((data, index) => {
+                            const x = index * scaleX + padding;
+                            const y = padding + height - (parseFloat(data.vpd) - minY) * scaleY;
+                            var color = this.getColorForVpd(parseFloat(data.vpd));
 
-                        ctx.beginPath();
-                        ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
-                        ctx.fillStyle = color;
-                        ctx.fill();
+                            ctx.beginPath();
+                            ctx.moveTo(x, y);
+                            ctx.lineTo(previousX, previousY);
+                            ctx.strokeStyle = color;
+                            ctx.stroke();
 
-                        previousX = x;
-                        previousY = y;
+                            ctx.beginPath();
+                            ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
+                            ctx.fillStyle = color;
+                            ctx.fill();
+
+                            previousX = x;
+                            previousY = y;
+                        });
+                        setTimeout(() => {
+                            this.updateRunning = false;
+                        }, 15000);
                     });
-                });
+                }
             }
             let vpdState = bar.querySelector('.vpd-state');
             vpdState.className = `vpd-state ${this.getPhaseClass(vpd)} tooltip`;
@@ -160,7 +169,6 @@ export const bar = {
     async renderMiniHistory(sensor) {
 
             const data = [];
-
             for (const [index, sensor] of this.config.sensors.entries()) {
                 data['sensor-'+index] = [];
                 const temperaturesPromise = this.getEntityHistory(sensor.temperature);

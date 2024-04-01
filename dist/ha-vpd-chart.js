@@ -50,6 +50,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_axes = true;
         this.enable_ghostmap = true;
         this.enable_triangle = false;
+        this.updateRunning = false;
     }
 
     set hass(hass) {
@@ -100,6 +101,9 @@ class HaVpdChart extends HTMLElement {
         }
         if('enable_ghostmap' in config) {
             this.enable_ghostmap = config.enable_ghostmap;
+        }
+        if('enable_triangle' in config) {
+            this.enable_triangle = config.enable_triangle;
         }
         if('enable_tooltip' in config) {
             this.enable_tooltip = config.enable_tooltip;
