@@ -12,8 +12,7 @@ class HaVpdChart extends HTMLElement {
             max_temperature: {type: Number},
             min_humidity: {type: Number},
             max_humidity: {type: Number},
-            steps_temperature: {type: Number},
-            steps_humidity: {type: Number},
+            min_height: {type: Number},
             vpd_phases: {type: Array},
             air_text: {type: String},
             rh_text: {type: String},
@@ -42,8 +41,9 @@ class HaVpdChart extends HTMLElement {
         this.max_temperature = 35;
         this.min_humidity = 10;
         this.max_humidity = 90;
-        this.steps_temperature = .5;
-        this.steps_humidity = 1;
+        this.min_height = 200;
+        this.steps_temperature = .1;
+        this.steps_humidity = .1;
         this.enable_tooltip = true;
         this.air_text = "Air";
         this.rh_text = "RH";
@@ -87,11 +87,8 @@ class HaVpdChart extends HTMLElement {
         if('max_humidity' in config) {
             this.max_humidity = config.max_humidity;
         }
-        if('steps_temperature' in config) {
-            this.steps_temperature = config.steps_temperature;
-        }
-        if('steps_humidity' in config) {
-            this.steps_humidity = config.steps_humidity;
+        if('min_height' in config) {
+            this.min_height = config.min_height;
         }
         if('is_bar_view' in config) {
             this.is_bar_view = config.is_bar_view;

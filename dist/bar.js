@@ -61,16 +61,18 @@ export const bar = {
                     card.dataset.sensor = sensor.name;
                     card.className = 'vpd-card';
                 }
-                card.innerHTML = `
-                    <div class="bar" >
-                        <span class="vpd-title">${sensor.name}</span>
-                        <span class="vpd-value">${vpd} kPa</span>
-                        <span class="vpd-rh">${this.rh_text}: ${humidity}%</span>
-                        <span class="vpd-temp">${this.air_text}: ${temperature}°C</span>
-                        <span class="vpd-state ${this.getPhaseClass(vpd)} tooltip"></span>
-                        <span class="vpd-history" style="float:right;"><canvas></canvas></span>
-                    </div>
-                `;
+                // if sensor.name is not empty than show in the card
+                let html = `<div class="bar">`;
+                if (sensor.name !== "") {
+                    html += `<span class="vpd-title">${sensor.name}</span>`;
+                }
+                html += `<span class="vpd-value">${vpd} kPa</span>`;
+                html += `<span class="vpd-rh">${humidity}%</span>`;
+                html += `<span class="vpd-temp">${temperature}°C</span>`;
+                html += `<span class="vpd-state ${this.getPhaseClass(vpd)} tooltip"></span>`;
+                html += `<span class="vpd-history" style="float:right;"><canvas></canvas></span>`;
+                html += `</div>`;
+                card.innerHTML = html;
                 this.content.appendChild(card);
             });
         }
@@ -97,8 +99,8 @@ export const bar = {
             let bar = card.querySelector('.bar');
             bar.querySelector('.vpd-title').innerText = sensor.name;
             bar.querySelector('.vpd-value').innerText = `${vpd} kPa`;
-            bar.querySelector('.vpd-rh').innerText = `${this.rh_text}: ${humidity}%`;
-            bar.querySelector('.vpd-temp').innerText = `${this.air_text}: ${temperature}°C`;
+            bar.querySelector('.vpd-rh').innerText = `${humidity}%`;
+            bar.querySelector('.vpd-temp').innerText = `${temperature}°C`;
 
             if (this.enable_ghostmap) {
                 if(!this.updateRunning) {
@@ -168,22 +170,22 @@ export const bar = {
     },
     async renderMiniHistory(sensor) {
 
-            const data = [];
-            for (const [index, sensor] of this.config.sensors.entries()) {
-                data['sensor-'+index] = [];
-                const temperaturesPromise = this.getEntityHistory(sensor.temperature);
-                const humiditiesPromise = this.getEntityHistory(sensor.humidity);
+        const data = [];
+        for (const [index, sensor] of this.config.sensors.entries()) {
+            data['sensor-'+index] = [];
+            const temperaturesPromise = this.getEntityHistory(sensor.temperature);
+            const humiditiesPromise = this.getEntityHistory(sensor.humidity);
 
-                const [temperatures, humidities] = await Promise.all([temperaturesPromise, humiditiesPromise]);
-                temperatures.forEach((temperature, tempIndex) => {
-                    data['sensor-'+index].push({
-                        time: temperature.last_changed,
-                        vpd: this.calculateVPD(parseFloat(temperature.state) - 2, parseFloat(temperature.state), parseFloat(humidities[tempIndex].state)).toFixed(2),
-                    });
+            const [temperatures, humidities] = await Promise.all([temperaturesPromise, humiditiesPromise]);
+            temperatures.forEach((temperature, tempIndex) => {
+                data['sensor-'+index].push({
+                    time: temperature.last_changed,
+                    vpd: this.calculateVPD(parseFloat(temperature.state) - 2, parseFloat(temperature.state), parseFloat(humidities[tempIndex].state)).toFixed(2),
                 });
-            }
+            });
+        }
 
-            return data;
+        return data;
 
     }
 }

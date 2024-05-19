@@ -13,8 +13,8 @@
 }
 .vpd-bar-view .bar span {
     border-left:1px solid #999999;
-    padding-left:15px;
-    padding-right:15px;
+    padding-left:5px;
+    padding-right:5px;
 }
 .vpd-bar-view .bar span:first-child {
     border-left:0;

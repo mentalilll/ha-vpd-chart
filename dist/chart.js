@@ -1,4 +1,3 @@
-
 export const chart = {
     buildChart() {
         if (!this.content) {
@@ -16,41 +15,54 @@ export const chart = {
             this.content = this.querySelector("div.vpd-card-container");
             let table = this.buildTable();
             this.content.appendChild(table);
-            if(this.enable_axes) {
-                let axes = document.createElement('div');
-                axes.className = 'axes';
-                let temperatureAxis = document.createElement('div');
-                temperatureAxis.className = 'temperature-axis';
-                let humidityAxis = document.createElement('div');
-                humidityAxis.className = 'humidity-axis';
-
-                let range = this.max_temperature - this.min_temperature;
-                let stepSize = range / (5 - 1);
-                for (let i = 0; i < 5; i++) {
-                    let currentValue = this.min_temperature + (stepSize * i);
-                    let temp = document.createElement('div');
-                    temp.className = 'temperature-axis-label';
-                    temp.innerHTML = `${currentValue.toFixed(0)}°`;
-                    temperatureAxis.appendChild(temp);
-                }
-
-
-                range = this.max_humidity - this.min_humidity;
-                stepSize = range / (10 - 1);
-
-                for (let i = 0; i < 10; i++) {
-                    let currentValue = this.max_humidity - (stepSize * i);
-                    let hum = document.createElement('div');
-                    hum.className = 'humidity-axis-label';
-
-                    hum.innerHTML = `${currentValue.toFixed(0)}%`;
-                    humidityAxis.appendChild(hum);
-                }
-                axes.appendChild(temperatureAxis);
-                axes.appendChild(humidityAxis);
-                this.content.appendChild(axes);
+            if (this.min_height > 0) {
+                this.content.style.minHeight = `${this.min_height}px`;
+                this.querySelector("div.vpd-container").style.minHeight = `${this.min_height}px`;
+                console.log(this.min_height);
             }
-            if(this.enable_ghostmap) {
+            if (this.enable_axes) {
+                const grid = document.createElement('div');
+                grid.className = 'vpd-grid';
+
+                // Create horizontal grid lines and temperature labels
+                const temperatureSteps = 7;
+                for (let i = 0; i <= temperatureSteps; i++) {
+                    const line = document.createElement('div');
+                    line.className = 'grid-line horizontal';
+                    line.style.top = `${(i / temperatureSteps) * 100}%`;
+
+                    const label = document.createElement('div');
+                    label.className = 'temperature-axis-label';
+                    const currentValue = this.min_temperature + (i * (this.max_temperature - this.min_temperature) / temperatureSteps);
+                    label.innerHTML = `${currentValue.toFixed(0)}°C`;
+                    label.style.top = `${(i / temperatureSteps) * 100}%`;
+                    grid.appendChild(line);
+                    if(label.style.top !== '100%' && label.style.top !== '0%') {
+                        grid.appendChild(label);
+                    }
+                }
+
+                // Create vertical grid lines and humidity labels
+                const humiditySteps = 9;
+                for (let i = 0; i <= humiditySteps; i++) {
+                    const line = document.createElement('div');
+                    line.className = 'grid-line vertical';
+                    line.style.left = `${(i / humiditySteps) * 100}%`;
+
+                    const label = document.createElement('div');
+                    label.className = 'humidity-axis-label';
+                    const currentValue = this.max_humidity - (i * (this.max_humidity - this.min_humidity) / humiditySteps);
+                    label.innerHTML = `${currentValue.toFixed(0)}%`;
+                    label.style.left = `${(i / humiditySteps) * 100}%`;
+                    grid.appendChild(line);
+                    if(label.style.left !== '100%' && label.style.left !== '0%') {
+                        grid.appendChild(label);
+                    }
+                }
+                this.content.appendChild(grid);
+            }
+
+            if (this.enable_ghostmap) {
                 this.fetchDataForSensors();
                 // each hour
                 setInterval(() => {
@@ -58,48 +70,83 @@ export const chart = {
                 }, 3600000);
             }
 
-                this.content.addEventListener('mouseover', (event) => {
-                    if (event.target.classList.contains('cell')) {
-                        this.buildMouseTooltip(event.target);
+            this.content.addEventListener('mouseover', (event) => {
+                // get mouse position on the container
+                const rect = this.content.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                const target = event.target;
+
+                const xPercent = (x / rect.width) * 100;
+                const yPercent = (y / rect.height) * 100;
+
+                const temperatureRange = this.max_temperature - this.min_temperature;
+                const humidityRange = this.max_humidity - this.min_humidity;
+
+                const temperature = this.min_temperature + (temperatureRange * yPercent / 100);
+                const humidity = this.max_humidity - (humidityRange * xPercent / 100);
+                const leafTemperature = temperature - 2;
+                const vpd = this.calculateVPD(leafTemperature, temperature, humidity);
+                this.buildMouseTooltip(target, humidity, temperature, vpd);
+            });
+
+            this.addEventListener('mouseleave', () => {
+                let banner = this.querySelector('.mouse-custom-tooltip');
+                let fadeOut = setInterval(function () {
+                    if (!banner.style.opacity) {
+                        banner.style.opacity = 1;
                     }
-                });
-                this.addEventListener('mouseleave', () => {
-                    let banner = this.querySelector('.mouse-custom-tooltip');
-                    let fadeOut = setInterval(function () {
-                        if (!banner.style.opacity) {
-                            banner.style.opacity = 1;
-                        }
-                        if (banner.style.opacity > 0) {
-                            banner.style.opacity -= 0.1;
-                        } else {
-                            clearInterval(fadeOut);
-                        }
-                    }, 100);
-                });
+                    if (banner.style.opacity > 0) {
+                        banner.style.opacity -= 0.1;
+                    } else {
+                        clearInterval(fadeOut);
+                    }
+                }, 100);
+            });
 
         }
 
         this.buildTooltip();
     },
     buildTable() {
-        const table = document.createElement('table');
-        table.className = 'vpd-table';
+        const container = document.createElement('div');
+        container.className = 'vpd-container';
 
-        let html = '<tbody>';
         for (let Tair = this.min_temperature; Tair <= this.max_temperature; Tair += this.steps_temperature) {
+            const row = document.createElement('div');
+            row.className = 'vpd-row';
             const Tleaf = Tair - 2;
-            html += '<tr>';
-            for (let RH = this.max_humidity; RH >= this.min_humidity; RH -= this.steps_humidity) {
-                let vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
-                const phaseClass = this.getPhaseClass(vpd);
-                html += `<td class="cell ${phaseClass}" data-air="${Tair}" data-leaf="${Tleaf}" data-rh="${RH}" data-vpd="${vpd}"></td>`;
+            let startIndex = this.max_humidity;
+            let startClass = this.getPhaseClass(this.calculateVPD(Tleaf, Tair, startIndex).toFixed(2));
+            const totalHumidityRange = this.max_humidity; // Change this line
+
+            for (let RH = this.max_humidity; RH >= 0; RH -= this.steps_humidity) { // Change this line
+                const vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
+                const currentClass = this.getPhaseClass(vpd);
+
+                if (currentClass !== startClass) {
+                    const adjustedRH = RH + this.steps_humidity;
+                    const div = document.createElement('div');
+                    div.className = `cell ${startClass}`;
+                    div.style.width = `${(startIndex - adjustedRH) * 100 / totalHumidityRange}%`; // Change this line
+                    row.appendChild(div);
+                    startIndex = RH;
+                    startClass = currentClass;
+                }
             }
-            html += '</tr>';
+
+            // Handle the remaining segment as "danger-zone"
+            if (startIndex >= 0) { // Change this line
+                const div = document.createElement('div');
+                div.className = `cell ${startClass || 'danger-zone'} danger-zone`;
+                div.style.width = `${parseFloat((startIndex * 100) / totalHumidityRange) + 0.5}%`; // Change this line
+                row.appendChild(div);
+            }
+
+            container.appendChild(row);
         }
 
-
-        table.innerHTML = html + '</tbody>';
-        return table;
+        return container;
     },
     buildTooltip() {
         const sensors = this.querySelector('#sensors');
@@ -131,7 +178,8 @@ export const chart = {
             pointer.setAttribute('data-index', indexString);
             pointer.style.left = `${percentageHumidity}%`;
             pointer.style.bottom = `${100 - percentageTemperature}%`;
-            if(this.enable_triangle) {
+
+            if (this.enable_triangle) {
                 pointer.className = 'highlight sensor-pointer sensor-triangle sensor-pointer-' + indexString;
             } else {
                 pointer.className = 'highlight sensor-pointer sensor-circle sensor-pointer-' + indexString;
@@ -149,7 +197,7 @@ export const chart = {
                 let tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
                 tooltip.className = 'custom-tooltip custom-tooltip-' + indexString;
                 tooltip.setAttribute('data-index', indexString);
-                tooltip.innerHTML = `<strong>${sensor.name}:</strong> kPa: ${vpd} | ${this.rh_text}: ${humidity}% | ${this.air_text}: ${temperature}°C`;
+                tooltip.innerHTML = `<span><strong>${sensor.name}</strong></span> <span>kPa: ${vpd}</span><span>${this.rh_text ? this.rh_text + ':' : ''} ${humidity}%</span><span>${this.air_text ? this.air_text + ':' : ''} ${temperature}°C</span>`;
                 tooltip.style.left = `${percentageHumidity}%`;
                 tooltip.style.bottom = `${100 - percentageTemperature}%`;
                 if (!pointer.isConnected) {
@@ -166,7 +214,7 @@ export const chart = {
             if (!verticalLine.isConnected) {
                 sensors.appendChild(verticalLine);
             }
-            if(this.enable_ghostmap) {
+            if (this.enable_ghostmap) {
                 if (!pointer.hasAttribute('data-events-bound')) {
                     pointer.setAttribute('data-events-bound', 'true');
                     pointer.addEventListener('mouseover', () => {
@@ -220,14 +268,17 @@ export const chart = {
         });
     },
 
-    buildMouseTooltip(target) {
+    buildMouseTooltip(target, targetHumidity= null, targetTemperature= null, targetVpd = null) {
         if (this.tooltipTimeout) {
             clearTimeout(this.tooltipTimeout);
         }
         this.tooltipTimeout = setTimeout(() => {
-            const humidity = target.getAttribute('data-rh');
-            const temperature = target.getAttribute('data-air');
-            const vpd = parseFloat(target.getAttribute('data-vpd')).toFixed(2);
+            // get current %percent offset of container and calculate the actual value
+
+
+            const humidity = targetHumidity.toFixed(2) || parseFloat(target.getAttribute('data-rh')).toFixed(2);
+            const temperature = targetTemperature.toFixed(2) || parseFloat(target.getAttribute('data-air')).toFixed(2);
+            const vpd = targetVpd.toFixed(2) || parseFloat(target.getAttribute('data-vpd')).toFixed(2);
 
             let tooltip = this.querySelector('.mouse-custom-tooltip');
             tooltip.className = 'mouse-custom-tooltip';
