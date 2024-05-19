@@ -18,7 +18,6 @@ export const chart = {
             if (this.min_height > 0) {
                 this.content.style.minHeight = `${this.min_height}px`;
                 this.querySelector("div.vpd-container").style.minHeight = `${this.min_height}px`;
-                console.log(this.min_height);
             }
             if (this.enable_axes) {
                 const grid = document.createElement('div');
