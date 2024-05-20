@@ -4,7 +4,7 @@ export const bar = {
             this.innerHTML = `
                 <ha-card class="vpd-bar-view">
                     <style>
-                         @import '/hacsfiles/ha-vpd-chart/bar.css'
+                         @import '/hacsfiles/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}'
                     </style>
                     <div class="vpd-card-container card-content"></div>
                     <div class="highlight mousePointer" style="opacity:0">
@@ -44,7 +44,7 @@ export const bar = {
             this.config.sensors.forEach((sensor) => {
                 let humidity = this._hass.states[sensor.humidity].state;
                 let temperature = this._hass.states[sensor.temperature].state;
-                let leafTemperature = temperature - (sensor.leaf_temperature_offset || 2);
+                let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
                 if (sensor.leaf_temperature !== undefined) {
                     leafTemperature = this._hass.states[sensor.leaf_temperature].state;
                 }
@@ -84,7 +84,7 @@ export const bar = {
         this.config.sensors.forEach((sensor, index) => {
             let humidity = this._hass.states[sensor.humidity].state;
             let temperature = this._hass.states[sensor.temperature].state;
-            let leafTemperature = temperature - (sensor.leaf_temperature_offset || 2);
+            let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
             if (sensor.leaf_temperature !== undefined) {
                 leafTemperature = this._hass.states[sensor.leaf_temperature].state;
             }
@@ -180,7 +180,7 @@ export const bar = {
             temperatures.forEach((temperature, tempIndex) => {
                 data['sensor-'+index].push({
                     time: temperature.last_changed,
-                    vpd: this.calculateVPD(parseFloat(temperature.state) - 2, parseFloat(temperature.state), parseFloat(humidities[tempIndex].state)).toFixed(2),
+                    vpd: this.calculateVPD(parseFloat(temperature.state) - (this.config.leaf_temperature_offset || 2), parseFloat(temperature.state), parseFloat(humidities[tempIndex].state)).toFixed(2),
                 });
             });
         }

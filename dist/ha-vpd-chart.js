@@ -1,10 +1,14 @@
-import { methods } from './methods.js';
-import { chart } from './chart.js';
-import { bar } from './bar.js';
-import { ghostmap } from './ghostmap.js';
+// Set version for the card
+window.vpdChartVersion = "1.2.2";
+
+import {methods} from './methods.js';
+import {chart} from './chart.js';
+import {bar} from './bar.js';
+import {ghostmap} from './ghostmap.js';
 
 class HaVpdChart extends HTMLElement {
     _hass = {};
+
     static get properties() {
         return {
             sensors: {type: Array},
@@ -25,7 +29,6 @@ class HaVpdChart extends HTMLElement {
     }
 
     constructor() {
-
         super();
         this.vpd_phases = [
             {upper: 0, className: 'gray-danger-zone'},
@@ -55,63 +58,32 @@ class HaVpdChart extends HTMLElement {
 
     set hass(hass) {
         this._hass = hass;
+        hass.call
         this.is_bar_view ? this.buildBarChart() : this.buildChart();
     }
+
     setConfig(config) {
         this.config = config;
         if (!config.sensors) {
             throw new Error('You need to define sensors');
         }
 
-        if('vpd_phases' in config) {
-            this.vpd_phases = config.vpd_phases;
-        }
-        if('sensors' in config) {
-            this.sensors = config.sensors;
-        }
-        if('air_text' in config) {
-            this.air_text = config.air_text;
-        }
-        if('rh_text' in config) {
-            this.rh_text = config.rh_text;
-        }
-        if('min_temperature' in config) {
-            this.min_temperature = config.min_temperature;
-        }
-        if('max_temperature' in config) {
-            this.max_temperature = config.max_temperature;
-        }
-        if('min_humidity' in config) {
-            this.min_humidity = config.min_humidity;
-        }
-        if('max_humidity' in config) {
-            this.max_humidity = config.max_humidity;
-        }
-        if('min_height' in config) {
-            this.min_height = config.min_height;
-        }
-        if('is_bar_view' in config) {
-            this.is_bar_view = config.is_bar_view;
-        }
-        if('enable_axes' in config) {
-            this.enable_axes = config.enable_axes;
-        }
-        if('enable_ghostmap' in config) {
-            this.enable_ghostmap = config.enable_ghostmap;
-        }
-        if('enable_triangle' in config) {
-            this.enable_triangle = config.enable_triangle;
-        }
-        if('enable_tooltip' in config) {
-            this.enable_tooltip = config.enable_tooltip;
-        }
-    }
+        const configKeys = [
+            'vpd_phases', 'sensors', 'air_text', 'rh_text', 'min_temperature',
+            'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
+            'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
+            'enable_tooltip'
+        ];
 
-    getCardSize() {
-        return 3;
+        configKeys.forEach(key => {
+            if (key in config) {
+                this[key] = config[key];
+            }
+        });
     }
 }
-Object.assign(HaVpdChart.prototype, methods );
+
+Object.assign(HaVpdChart.prototype, methods);
 Object.assign(HaVpdChart.prototype, chart);
 Object.assign(HaVpdChart.prototype, bar);
 Object.assign(HaVpdChart.prototype, ghostmap);
@@ -125,6 +97,6 @@ window.customCards.push({
     description: "A custom card to display VPD values in a table",
     documentationURL: "https://github.com/mentalilll/ha-vpd-chart", // Adds a help link in the frontend card editor
 });
-console.groupCollapsed("%c HA-VPD-CHART Installed", "color: green; background: black; font-weight: bold;");
+console.groupCollapsed(`%c HA-VPD-CHART v${window.vpdChartVersion} Installed`, "color: green; background: black; font-weight: bold;");
 console.log('Readme: ', 'https://github.com/mentalilll/ha-vpd-chart');
 console.groupEnd()
