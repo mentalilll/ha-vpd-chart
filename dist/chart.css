@@ -4,6 +4,9 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     min-height: 50px;
     overflow:hidden;
 }
+.vpd-chart-view {
+    display:grid;
+}
 .vpd-chart-view .gray-danger-zone {
     background-color: #999999;
 }
