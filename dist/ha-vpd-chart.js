@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.2.2";
+window.vpdChartVersion = "1.2.3";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -99,4 +99,4 @@ window.customCards.push({
 });
 console.groupCollapsed(`%c HA-VPD-CHART v${window.vpdChartVersion} Installed`, "color: green; background: black; font-weight: bold;");
 console.log('Readme: ', 'https://github.com/mentalilll/ha-vpd-chart');
-console.groupEnd()
+console.groupEnd();
