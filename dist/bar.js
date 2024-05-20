@@ -66,7 +66,7 @@ export const bar = {
                 if (sensor.name !== "") {
                     html += `<span class="vpd-title">${sensor.name}</span>`;
                 }
-                html += `<span class="vpd-value">${vpd} kPa</span>`;
+                html += `<span class="vpd-value">${vpd} ${this.kpa_text || ''}</span>`;
                 html += `<span class="vpd-rh">${humidity}%</span>`;
                 html += `<span class="vpd-temp">${temperature}°C</span>`;
                 html += `<span class="vpd-state ${this.getPhaseClass(vpd)} tooltip"></span>`;
@@ -98,7 +98,7 @@ export const bar = {
             // get the bar from card
             let bar = card.querySelector('.bar');
             bar.querySelector('.vpd-title').innerText = sensor.name;
-            bar.querySelector('.vpd-value').innerText = `${vpd} kPa`;
+            bar.querySelector('.vpd-value').innerText = `${vpd} ${this.kpa_text}`;
             bar.querySelector('.vpd-rh').innerText = `${humidity}%`;
             bar.querySelector('.vpd-temp').innerText = `${temperature}°C`;
 

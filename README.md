@@ -132,6 +132,7 @@ vpd_phases: #optional
 | type                    | string  | **required** |                 | Must be `custom:ha-vpd-chart`.                                                                      |
 | air_text                | string  | optional     | `Air`           | The text used for temperature readings. Default is "Air".                                           |
 | rh_text                 | string  | optional     | `RH`            | The text used for humidity readings. Default is "RH".                                               |
+| kpa_text                | string  | optional     | `kPa`           | The text used for kPa readings. Default is "kPa".                                                   |
 | min_temperature         | number  | optional     | `5`             | Minimum temperature in the chart. Default is 5.                                                     |
 | min_humidity            | number  | optional     | `10`            | Minimum humidity in the chart. Default is 10.                                                       |
 | max_temperature         | number  | optional     | `35`            | Maximum temperature in the chart. Default is 35.                                                    |

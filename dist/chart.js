@@ -228,7 +228,7 @@ export const chart = {
             tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
             tooltip.className = `custom-tooltip custom-tooltip-${index}`;
             tooltip.setAttribute('data-index', index.toString());
-            tooltip.innerHTML = `<span><strong>${sensorName}</strong></span> <span>kPa: ${vpd}</span><span>${this.rh_text ? this.rh_text + ':' : ''} ${humidity}%</span><span>${this.air_text ? this.air_text + ':' : ''} ${temperature}°C</span>`;
+            tooltip.innerHTML = `<span><strong>${sensorName}</strong></span> <span>${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd}</span><span>${this.rh_text ? this.rh_text + ':' : ''} ${humidity}%</span><span>${this.air_text ? this.air_text + ':' : ''} ${temperature}°C</span>`;
             tooltip.style.left = `${percentageHumidity}%`;
             tooltip.style.bottom = `${100 - percentageTemperature}%`;
         }
@@ -270,7 +270,7 @@ export const chart = {
         const vpd = targetVpd?.toFixed(2) || parseFloat(target.getAttribute('data-vpd')).toFixed(2);
 
         const tooltip = this.querySelector('.mouse-custom-tooltip');
-        tooltip.innerHTML = `kPa: ${vpd} | ${this.rh_text}: ${humidity}% | ${this.air_text}: ${temperature}°C | ${target.classList[1]}`;
+        tooltip.innerHTML = `${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd} | ${this.rh_text ? this.rh_text + ':' : ''} ${humidity}% | ${this.air_text ? this.air_text + ':' : ''} ${temperature}°C | ${target.classList[1]}`;
         tooltip.style.opacity = '1';
     },
 };

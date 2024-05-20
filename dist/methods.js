@@ -16,6 +16,22 @@ export const methods = {
         }
         return '';
     },
+    hasConfigOrEntityChanged(element, changedProps) {
+        if (changedProps.has("_config")) {
+            return true;
+        }
+
+        const oldHass = changedProps.get("hass");
+        if (oldHass) {
+            return (
+                oldHass.states[element._config.entity] !==
+                element.hass.states[element._config.entity] ||
+                oldHass.states["sun.sun"] !== element.hass.states["sun.sun"]
+            );
+        }
+
+        return true;
+    },
     async getEntityHistory(entityId) {
         const endTime = new Date();
         const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);

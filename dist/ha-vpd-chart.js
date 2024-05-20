@@ -1,10 +1,11 @@
 // Set version for the card
-window.vpdChartVersion = "1.2.3";
+window.vpdChartVersion = "1.2.4";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
 import {bar} from './bar.js';
 import {ghostmap} from './ghostmap.js';
+import { HaVpdChartEditor } from './ha-vpd-chart-editor.js';
 
 class HaVpdChart extends HTMLElement {
     _hass = {};
@@ -20,6 +21,7 @@ class HaVpdChart extends HTMLElement {
             vpd_phases: {type: Array},
             air_text: {type: String},
             rh_text: {type: String},
+            kpa_text: {type: String},
             enable_tooltip: {type: Boolean},
             is_bar_view: {type: Boolean},
             enable_axes: {type: Boolean},
@@ -27,7 +29,9 @@ class HaVpdChart extends HTMLElement {
             enable_triangle: {type: Boolean},
         };
     }
-
+    static getConfigElement() {
+        return document.createElement("ha-vpd-chart-editor");
+    }
     constructor() {
         super();
         this.vpd_phases = [
@@ -50,6 +54,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_tooltip = true;
         this.air_text = "Air";
         this.rh_text = "RH";
+        this.kpa_text = "kPa";
         this.enable_axes = true;
         this.enable_ghostmap = true;
         this.enable_triangle = false;
@@ -58,10 +63,9 @@ class HaVpdChart extends HTMLElement {
 
     set hass(hass) {
         this._hass = hass;
-        hass.call
         this.is_bar_view ? this.buildBarChart() : this.buildChart();
     }
-
+    // if config updated
     setConfig(config) {
         this.config = config;
         if (!config.sensors) {
@@ -69,7 +73,7 @@ class HaVpdChart extends HTMLElement {
         }
 
         const configKeys = [
-            'vpd_phases', 'sensors', 'air_text', 'rh_text', 'min_temperature',
+            'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
             'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
             'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
             'enable_tooltip'
