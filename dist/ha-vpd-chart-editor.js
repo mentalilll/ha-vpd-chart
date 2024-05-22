@@ -60,7 +60,7 @@ export class HaVpdChartEditor extends HTMLElement {
         return this._config.min_height !== undefined ? this._config.min_height : 200;
     }
     get _leaf_temperature_offset() {
-        return this._config.leaf_temperature_offset !== undefined ? this._config.leaf_temperature_offset : 200;
+        return this._config.leaf_temperature_offset !== undefined ? this._config.leaf_temperature_offset : 2;
     }
 
     get _is_bar_view() {
@@ -77,6 +77,9 @@ export class HaVpdChartEditor extends HTMLElement {
 
     get _enable_triangle() {
         return this._config.enable_triangle || false;
+    }
+    get _enable_crosshair() {
+        return this._config.enable_crosshair || true;
     }
 
     get _enable_tooltip() {
@@ -168,7 +171,7 @@ export class HaVpdChartEditor extends HTMLElement {
             <td>
                 <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Max Humidity" id="max_humidity" configvalue="max_humidity"></ha-textfield>
             </td>
-        </tr>        
+        </tr>
         <tr>
             <td>
                 <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Leaf Temperature offset" id="leaf_temperature_offset" configvalue="leaf_temperature_offset"></ha-textfield>
@@ -216,9 +219,16 @@ export class HaVpdChartEditor extends HTMLElement {
                     <label for="enable_tooltip">Enable Tooltip</label>
                 </div>
             </td>
+            <td>
+                <div class="switch-item">
+                    <input type="checkbox" id="enable_crosshair" configvalue="enable_crosshair">
+                    <label for="enable_crosshair">Enable Mousehover Crosshair</label>
+                </div>
+            </td>
         </tr>
     </table>
 </div>
+
         `;
 
         this.shadowRoot.querySelectorAll('ha-textfield, ha-checkbox, label, input').forEach(input => {
@@ -242,6 +252,7 @@ export class HaVpdChartEditor extends HTMLElement {
         const enableAxes = this.shadowRoot.querySelector('#enable_axes');
         const enableGhostmap = this.shadowRoot.querySelector('#enable_ghostmap');
         const enableTriangle = this.shadowRoot.querySelector('#enable_triangle');
+        const enableCrosshair = this.shadowRoot.querySelector('#enable_crosshair');
         const enableTooltip = this.shadowRoot.querySelector('#enable_tooltip');
 
 
@@ -259,6 +270,7 @@ export class HaVpdChartEditor extends HTMLElement {
         if (enableAxes) enableAxes.checked = this._enable_axes;
         if (enableGhostmap) enableGhostmap.checked = this._enable_ghostmap;
         if (enableTriangle) enableTriangle.checked = this._enable_triangle;
+        if (enableCrosshair) enableCrosshair.checked = this._enable_crosshair;
         if (enableTooltip) enableTooltip.checked = this._enable_tooltip;
 
     }

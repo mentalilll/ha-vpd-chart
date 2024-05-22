@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.2.4";
+window.vpdChartVersion = "1.2.5";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -17,6 +17,7 @@ class HaVpdChart extends HTMLElement {
             max_temperature: {type: Number},
             min_humidity: {type: Number},
             max_humidity: {type: Number},
+            leaf_temperature_offset: {type: Number},
             min_height: {type: Number},
             vpd_phases: {type: Array},
             air_text: {type: String},
@@ -27,6 +28,7 @@ class HaVpdChart extends HTMLElement {
             enable_axes: {type: Boolean},
             enable_ghostmap: {type: Boolean},
             enable_triangle: {type: Boolean},
+            enable_crosshair: {type: Boolean},
         };
     }
     static getConfigElement() {
@@ -49,6 +51,7 @@ class HaVpdChart extends HTMLElement {
         this.min_humidity = 10;
         this.max_humidity = 90;
         this.min_height = 200;
+        this.leaf_temperature_offset = 2;
         this.steps_temperature = .1;
         this.steps_humidity = .1;
         this.enable_tooltip = true;
@@ -58,6 +61,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_axes = true;
         this.enable_ghostmap = true;
         this.enable_triangle = false;
+        this.enable_crosshair = false;
         this.updateRunning = false;
     }
 
@@ -76,7 +80,7 @@ class HaVpdChart extends HTMLElement {
             'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
             'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
             'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
-            'enable_tooltip'
+            'enable_tooltip', 'enable_crosshair'
         ];
 
         configKeys.forEach(key => {

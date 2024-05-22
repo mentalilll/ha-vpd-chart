@@ -10,6 +10,8 @@ export const chart = {
                     <div id="ghostmap"></div>
                     <div id="sensors"></div>
                     <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
+                    <div class="horizontal-line mouse-horizontal-line" style="opacity: 0;"></div>
+                    <div class="vertical-line mouse-vertical-line" style="opacity: 0;"></div>
                 </ha-card>
             `;
             this.content = this.querySelector("div.vpd-card-container");
@@ -151,12 +153,18 @@ export const chart = {
 
     handleMouseLeave() {
         const banner = this.querySelector('.mouse-custom-tooltip');
+        const verticalLine = this.querySelector('.mouse-vertical-line');
+        const horizontalLine = this.querySelector('.mouse-horizontal-line');
         const fadeOut = setInterval(() => {
             if (!banner.style.opacity) {
                 banner.style.opacity = 1;
+                verticalLine.style.opacity = 1;
+                horizontalLine.style.opacity = 1;
             }
             if (banner.style.opacity > 0) {
                 banner.style.opacity -= 0.1;
+                verticalLine.style.opacity -= 0.1;
+                horizontalLine.style.opacity -= 0.1;
             } else {
                 clearInterval(fadeOut);
             }
@@ -272,5 +280,29 @@ export const chart = {
         const tooltip = this.querySelector('.mouse-custom-tooltip');
         tooltip.innerHTML = `${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd} | ${this.rh_text ? this.rh_text + ':' : ''} ${humidity}% | ${this.air_text ? this.air_text + ':' : ''} ${temperature}°C | ${target.classList[1]}`;
         tooltip.style.opacity = '1';
+        if (this.enable_crosshair) {
+            let mouseHorizontalLine = this.querySelector(`.mouse-horizontal-line`) || document.createElement('div');
+            mouseHorizontalLine.className = `horizontal-line mouse-horizontal-line`;
+
+            let mouseVerticalLine = this.querySelector(`.mouse-vertical-line`) || document.createElement('div');
+            mouseVerticalLine.className = `vertical-line mouse-vertical-line`;
+
+            let container = this.querySelector('.vpd-card-container');
+
+            const moveHandler = (event) => {
+                const {clientX, clientY} = event;
+                // offset from vpd card container
+                const rect = container.getBoundingClientRect();
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+
+                mouseHorizontalLine.style.top = `${y}px`;
+                mouseVerticalLine.style.left = `${x}px`;
+                mouseVerticalLine.style.opacity = `1`;
+                mouseHorizontalLine.style.opacity = `1`;
+
+            };
+            target.addEventListener('mousemove', moveHandler);
+        }
     },
 };

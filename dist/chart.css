@@ -30,7 +30,12 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     background-color: #1a6c9c;
 }
 
-
+.vpd-card-container, .mouse-horizontal-line, .mouse-vertical-line {
+    cursor:crosshair;
+}
+.mouse-horizontal-line, .mouse-vertical-line {
+    pointer-events: none;
+}
 .vpd-chart-view table {
     width: 100%;
     height: 100% !important;

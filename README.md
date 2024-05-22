@@ -100,6 +100,7 @@ enable_tooltip: true #optional
 enable_axes: true #optional
 enable_ghostmap: true #optional
 enable_triangle: false #optional
+enable_crosshair: true #optional
 sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
@@ -146,6 +147,7 @@ vpd_phases: #optional
 | enable_axes             | boolean | optional     | `true`          | Enable Axes on the Chart                                                                            |
 | enable_ghostmap         | boolean | optional     | `true`          | Enable Ghostmap on the Chart                                                                        |
 | enable_triangle         | boolean | optional     | `true`          | Enable Triangle instead of Circle for tooltip marker                                                |
+| enable_crosshair        | boolean | optional     | `true`          | Enable MouseHover Crosshair                                                                         |      
 
 **Default `vpd_phases` Configuration:**
 
