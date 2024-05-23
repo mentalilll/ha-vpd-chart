@@ -79,9 +79,6 @@ export const chart = {
                 div.className = `cell ${segment.className}`;
                 div.style.width = `${adjustedWidth}%`;
 
-                // Debugging output
-                console.log(`Creating div with adjusted width: ${adjustedWidth}% for class: ${segment.className}`);
-
                 rowElement.appendChild(div);
             });
 
