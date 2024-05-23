@@ -17,68 +17,79 @@ export const chart = {
             this.content = this.querySelector("div.vpd-card-container");
             const table = this.buildTable();
             this.content.appendChild(table);
-
-            if (this.min_height > 0) {
-                this.content.style.minHeight = `${this.min_height}px`;
-                this.querySelector("div.vpd-container").style.minHeight = `${this.min_height}px`;
-            }
-
             if (this.enable_axes) {
                 this.addGridLines();
             }
 
-            if (this.enable_ghostmap) {
-                this.updateGhostMap();
-                setInterval(() => this.updateGhostMap(), 3600000); // Update every hour
-            }
 
             this.content.addEventListener('mouseover', this.handleMouseOver.bind(this));
             this.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
-
-            this.buildTooltip();
         }
-    },
+        if (this.min_height > 0) {
+            this.content.style.minHeight = `${this.min_height}px`;
+            this.querySelector("div.vpd-container").style.minHeight = `${this.min_height}px`;
+        }
 
+        if (this.enable_ghostmap) {
+            this.updateGhostMap();
+            setInterval(() => this.updateGhostMap(), 3600000); // Update every hour
+        }
+        this.buildTooltip();
+    },
     buildTable() {
         const container = document.createElement('div');
         container.className = 'vpd-container';
+        let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity);
+        const maxHumidity = this.max_humidity;
+        const stepsHumidity = this.steps_humidity;
+        vpdMatrix.forEach(row => {
+            const rowElement = document.createElement('div');
+            rowElement.className = 'vpd-row';
 
-        for (let Tair = this.min_temperature; Tair <= this.max_temperature; Tair += this.steps_temperature) {
-            const row = document.createElement('div');
-            row.className = 'vpd-row';
-            const Tleaf = Tair - 2;
-            let startIndex = this.max_humidity;
-            let startClass = this.getPhaseClass(this.calculateVPD(Tleaf, Tair, startIndex).toFixed(2));
-            const totalHumidityRange = this.max_humidity;
+            let segments = [];
+            let currentClass = null;
+            let startIndex = 0;
 
-            for (let RH = this.max_humidity; RH >= 0; RH -= this.steps_humidity) {
-                const vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
-                const currentClass = this.getPhaseClass(vpd);
-
-                if (currentClass !== startClass) {
-                    const adjustedRH = RH + this.steps_humidity;
-                    const div = document.createElement('div');
-                    div.className = `cell ${startClass}`;
-                    div.style.width = `${(startIndex - adjustedRH) * 100 / totalHumidityRange}%`;
-                    row.appendChild(div);
-                    startIndex = RH;
-                    startClass = currentClass;
+            // Collect segments and their widths
+            row.forEach((cell, index) => {
+                if (currentClass === null) {
+                    currentClass = cell.className;
+                    startIndex = index;
+                } else if (cell.className !== currentClass) {
+                    const segmentWidth = (index - startIndex) * stepsHumidity * 100 / maxHumidity;
+                    segments.push({ className: currentClass, width: segmentWidth });
+                    currentClass = cell.className;
+                    startIndex = index;
                 }
+            });
+
+            // Add the last segment
+            if (startIndex < row.length) {
+                const segmentWidth = (row.length - startIndex) * stepsHumidity * 100 / maxHumidity;
+                segments.push({ className: currentClass, width: segmentWidth });
             }
 
-            if (startIndex >= 0) {
+            // Calculate total width and adjust segments
+            const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
+            const widthAdjustmentFactor = 100 / totalWidth;
+
+            segments.forEach(segment => {
+                const adjustedWidth = (segment.width * widthAdjustmentFactor).toFixed(2);
                 const div = document.createElement('div');
-                div.className = `cell ${startClass || 'danger-zone'} danger-zone`;
-                div.style.width = `${parseFloat((startIndex * 100) / totalHumidityRange) + 0.5}%`;
-                row.appendChild(div);
-            }
+                div.className = `cell ${segment.className}`;
+                div.style.width = `${adjustedWidth}%`;
 
-            container.appendChild(row);
-        }
+                // Debugging output
+                console.log(`Creating div with adjusted width: ${adjustedWidth}% for class: ${segment.className}`);
+
+                rowElement.appendChild(div);
+            });
+
+            container.appendChild(rowElement);
+        });
 
         return container;
     },
-
     addGridLines() {
         const grid = document.createElement('div');
         grid.className = 'vpd-grid';
@@ -278,7 +289,7 @@ export const chart = {
         const vpd = targetVpd?.toFixed(2) || parseFloat(target.getAttribute('data-vpd')).toFixed(2);
 
         const tooltip = this.querySelector('.mouse-custom-tooltip');
-        tooltip.innerHTML = `${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd} | ${this.rh_text ? this.rh_text + ':' : ''} ${humidity}% | ${this.air_text ? this.air_text + ':' : ''} ${temperature}°C | ${target.classList[1]}`;
+        tooltip.innerHTML = `${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd} | ${this.rh_text ? this.rh_text + ':' : ''} ${humidity}% | ${this.air_text ? this.air_text + ':' : ''} ${temperature}°C | ${this.getPhaseClass(vpd)}`;
         tooltip.style.opacity = '1';
         if (this.enable_crosshair) {
             let mouseHorizontalLine = this.querySelector(`.mouse-horizontal-line`) || document.createElement('div');

@@ -16,22 +16,6 @@ export const methods = {
         }
         return '';
     },
-    hasConfigOrEntityChanged(element, changedProps) {
-        if (changedProps.has("_config")) {
-            return true;
-        }
-
-        const oldHass = changedProps.get("hass");
-        if (oldHass) {
-            return (
-                oldHass.states[element._config.entity] !==
-                element.hass.states[element._config.entity] ||
-                oldHass.states["sun.sun"] !== element.hass.states["sun.sun"]
-            );
-        }
-
-        return true;
-    },
     async getEntityHistory(entityId) {
         const endTime = new Date();
         const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
@@ -45,4 +29,25 @@ export const methods = {
             return [];
         }
     },
+    createVPDMatrix(minTemperature, maxTemperature, stepsTemperature, maxHumidity, minHumidity, stepsHumidity) {
+        const vpdMatrix = [];
+
+        for (let Tair = minTemperature; Tair <= maxTemperature; Tair += stepsTemperature) {
+            const row = [];
+            const Tleaf = Tair - (this.config.leaf_temperature_offset || 2);
+
+            for (let RH = minHumidity; RH <= maxHumidity; RH += stepsHumidity) {
+                const vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
+                const className = this.getPhaseClass(vpd);
+                row.push({vpd: parseFloat(vpd), className: className});
+            }
+            // mirror row array
+            const mirroredRow = row.slice().reverse();
+
+            vpdMatrix.push(mirroredRow);
+        }
+
+        return vpdMatrix;
+    }
+
 }
