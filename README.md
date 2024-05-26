@@ -111,8 +111,13 @@ sensors:
     vpd: sensor.vpd #optional
     name: Tent 2
 vpd_phases: #optional
-  - upper: 0.4
+  - upper: 0.0
+    className: gray-danger-zone
+    color: #999999
+  - lower: 0.0
+    upper: 0.4
     className: under-transpiration
+    color: #0000FF
   - lower: 0.4
     upper: 0.8
     className: early-veg
@@ -124,6 +129,10 @@ vpd_phases: #optional
     className: mid-late-flower
   - lower: 1.6
     className: danger-zone
+calculateVPD: |2-
+          const VPleaf = 610.7 * Math.exp(17.27 * Tleaf / (Tleaf + 237.3)) / 1000; 
+          const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000 * RH / 100;
+          return VPleaf - VPair;
 ```
 
 ## Configuration Parameters
@@ -147,7 +156,8 @@ vpd_phases: #optional
 | enable_axes             | boolean | optional     | `true`          | Enable Axes on the Chart                                                                            |
 | enable_ghostmap         | boolean | optional     | `true`          | Enable Ghostmap on the Chart                                                                        |
 | enable_triangle         | boolean | optional     | `true`          | Enable Triangle instead of Circle for tooltip marker                                                |
-| enable_crosshair        | boolean | optional     | `true`          | Enable MouseHover Crosshair                                                                         |      
+| enable_crosshair        | boolean | optional     | `true`          | Enable MouseHover Crosshair                                                                         |
+| calculateVPD            | string  | optional     | See description | Custom function to calculate VPD.                                                                   |
 
 **Default `vpd_phases` Configuration:**
 

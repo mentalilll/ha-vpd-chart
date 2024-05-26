@@ -123,13 +123,13 @@ export const bar = {
                         const scaleX = width / (sensorData.length - 1);
                         const scaleY = height / (maxY - minY);
 
-                        var previousX;
-                        var previousY;
+                        let previousX;
+                        let previousY;
 
                         sensorData.forEach((data, index) => {
                             const x = index * scaleX + padding;
                             const y = padding + height - (parseFloat(data.vpd) - minY) * scaleY;
-                            var color = this.getColorForVpd(parseFloat(data.vpd));
+                            const color = this.getColorForVpd(parseFloat(data.vpd));
 
                             ctx.beginPath();
                             ctx.moveTo(x, y);
@@ -156,17 +156,16 @@ export const bar = {
         });
     },
     getColorForVpd(vpd) {
-        const colorMap = {
-            'gray-danger-zone': '#999999',
-            'under-transpiration': '#1a6c9c',
-            'early-veg': '#22ab9c',
-            'late-veg': '#9cc55b',
-            'mid-late-flower': '#e7c12b',
-            'danger-zone': '#ce4234',
-        };
-
-
-        return colorMap[this.getPhaseClass(vpd)];
+        for (const phase of this.vpd_phases) {
+            if (phase.upper === undefined) {
+                if (vpd >= phase.lower) {
+                    return phase.color;
+                }
+            } else if (vpd <= phase.upper && (!phase.lower || vpd >= phase.lower)) {
+                return phase.color;
+            }
+        }
+        return '';
     },
     async renderMiniHistory(sensor) {
 

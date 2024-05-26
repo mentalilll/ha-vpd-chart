@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.2.6";
+window.vpdChartVersion = "1.3.0";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -29,6 +29,8 @@ class HaVpdChart extends HTMLElement {
             enable_ghostmap: {type: Boolean},
             enable_triangle: {type: Boolean},
             enable_crosshair: {type: Boolean},
+            configMemory: {type: Object},
+            calculateVPD: {type: Function},
         };
     }
     static getConfigElement() {
@@ -37,12 +39,12 @@ class HaVpdChart extends HTMLElement {
     constructor() {
         super();
         this.vpd_phases = [
-            {upper: 0, className: 'gray-danger-zone'},
-            {lower: 0, upper: 0.4, className: 'under-transpiration'},
-            {lower: 0.4, upper: 0.8, className: 'early-veg'},
-            {lower: 0.8, upper: 1.2, className: 'late-veg'},
-            {lower: 1.2, upper: 1.6, className: 'mid-late-flower'},
-            {lower: 1.6, className: 'danger-zone'},
+            {lower: -0.6, upper: 0, className: 'gray-danger-zone', color: '#999999'},
+            {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
+            {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'},
+            {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'},
+            {lower: 1.2, upper: 1.6, className: 'mid-late-flower', color: '#e7c12b'},
+            {lower: 1.6, className: 'danger-zone', color: '#ce4234'},
         ];
         this.sensors = [];
         this.is_bar_view = false;
@@ -63,6 +65,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_triangle = false;
         this.enable_crosshair = false;
         this.updateRunning = false;
+        this.configMemory = {};
     }
 
     set hass(hass) {
@@ -72,6 +75,7 @@ class HaVpdChart extends HTMLElement {
     // if config updated
     setConfig(config) {
         this.config = config;
+
         if (!config.sensors) {
             throw new Error('You need to define sensors');
         }
@@ -88,6 +92,10 @@ class HaVpdChart extends HTMLElement {
                 this[key] = config[key];
             }
         });
+
+        if(this.config.calculateVPD) {
+            this.calculateVPD = new Function('Tleaf', 'Tair', 'RH', this.config.calculateVPD);
+        }
     }
 }
 

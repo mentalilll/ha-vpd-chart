@@ -10,11 +10,33 @@ export const methods = {
                 if (vpd >= phase.lower) {
                     return phase.className;
                 }
-            } else if (vpd < phase.upper && (!phase.lower || vpd >= phase.lower)) {
+            } else if (vpd <= phase.upper && (!phase.lower || vpd >= phase.lower)) {
                 return phase.className;
             }
         }
         return '';
+    },
+    toFixedNumber(value, digits = 2) {
+        return parseFloat(parseFloat(value).toFixed(digits));
+    },
+    getColorByClassName(className) {
+        for (const phase of this.vpd_phases) {
+            if (phase.className === className) {
+                return phase.color;
+            }
+        }
+        return '';
+    },
+
+    shouldUpdate() {
+        for (let key in this.config) {
+            if (this.config[key] !== this.configMemory[key]) {
+                this.configMemory = this.config;
+                return true;
+            }
+        }
+
+        return false;
     },
     async getEntityHistory(entityId) {
         const endTime = new Date();
@@ -39,7 +61,7 @@ export const methods = {
             for (let RH = minHumidity; RH <= maxHumidity; RH += stepsHumidity) {
                 const vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
                 const className = this.getPhaseClass(vpd);
-                row.push({vpd: parseFloat(vpd), className: className});
+                row.push({vpd: parseFloat(vpd), className: className, color: this.getColorForVpd(vpd)});
             }
             // mirror row array
             const mirroredRow = row.slice().reverse();

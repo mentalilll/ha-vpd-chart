@@ -16,24 +16,31 @@ export const chart = {
             `;
             this.content = this.querySelector("div.vpd-card-container");
             const table = this.buildTable();
-            this.content.appendChild(table);
-            if (this.enable_axes) {
-                this.addGridLines();
+            if (!table.isConnected) {
+                this.content.appendChild(table);
+                this.content.addEventListener('mouseover', this.handleMouseOver.bind(this));
+                this.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
             }
+            if (this.enable_ghostmap) {
+                this.updateGhostMap();
+                setInterval(() => this.updateGhostMap(), 3600000); // Update every hour
+            }
+        } else {
+            this.refreshTable();
+        }
 
-
-            this.content.addEventListener('mouseover', this.handleMouseOver.bind(this));
-            this.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+        if (this.enable_axes) {
+            this.addGridLines();
+        } else {
+            this.removeGridLines();
         }
         if (this.min_height > 0) {
             this.content.style.minHeight = `${this.min_height}px`;
             this.querySelector("div.vpd-container").style.minHeight = `${this.min_height}px`;
         }
 
-        if (this.enable_ghostmap) {
-            this.updateGhostMap();
-            setInterval(() => this.updateGhostMap(), 3600000); // Update every hour
-        }
+
+
         this.buildTooltip();
     },
     buildTable() {
@@ -42,6 +49,8 @@ export const chart = {
         let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity);
         const maxHumidity = this.max_humidity;
         const stepsHumidity = this.steps_humidity;
+
+        const fragment = document.createDocumentFragment();
         vpdMatrix.forEach(row => {
             const rowElement = document.createElement('div');
             rowElement.className = 'vpd-row';
@@ -49,27 +58,25 @@ export const chart = {
             let segments = [];
             let currentClass = null;
             let startIndex = 0;
-
-            // Collect segments and their widths
             row.forEach((cell, index) => {
                 if (currentClass === null) {
                     currentClass = cell.className;
                     startIndex = index;
                 } else if (cell.className !== currentClass) {
                     const segmentWidth = (index - startIndex) * stepsHumidity * 100 / maxHumidity;
-                    segments.push({ className: currentClass, width: segmentWidth });
+                    let customColor = this.getColorByClassName(currentClass);
+                    segments.push({ className: currentClass, width: segmentWidth, color: customColor });
+
                     currentClass = cell.className;
                     startIndex = index;
                 }
             });
-
-            // Add the last segment
             if (startIndex < row.length) {
                 const segmentWidth = (row.length - startIndex) * stepsHumidity * 100 / maxHumidity;
-                segments.push({ className: currentClass, width: segmentWidth });
+                let customColor = this.getColorByClassName(currentClass);
+                segments.push({ className: currentClass, width: segmentWidth, color: customColor });
             }
 
-            // Calculate total width and adjust segments
             const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
             const widthAdjustmentFactor = 100 / totalWidth;
 
@@ -77,26 +84,41 @@ export const chart = {
                 const adjustedWidth = (segment.width * widthAdjustmentFactor).toFixed(2);
                 const div = document.createElement('div');
                 div.className = `cell ${segment.className}`;
+                div.style.backgroundColor = segment.color;
                 div.style.width = `${adjustedWidth}%`;
 
                 rowElement.appendChild(div);
             });
 
-            container.appendChild(rowElement);
+            fragment.appendChild(rowElement);
         });
+
+        container.appendChild(fragment);
 
         return container;
     },
+    refreshTable() {
+        if(this.shouldUpdate()) {
+            const table = this.buildTable();
+            this.content.replaceChildren(table);
+        }
+    },
     addGridLines() {
-        const grid = document.createElement('div');
+        const grid = this.querySelector('.vpd-grid') || document.createElement('div');
         grid.className = 'vpd-grid';
 
-        this.addHorizontalGridLines(grid);
-        this.addVerticalGridLines(grid);
-
-        this.content.appendChild(grid);
+        if(!grid.isConnected) {
+            this.addHorizontalGridLines(grid);
+            this.addVerticalGridLines(grid);
+            this.content.appendChild(grid);
+        }
     },
-
+    removeGridLines() {
+      const grid = this.querySelector('.vpd-grid');
+        if (grid) {
+            grid.remove();
+        }
+    },
     addHorizontalGridLines(grid) {
         const temperatureSteps = 7;
         for (let i = 0; i <= temperatureSteps; i++) {

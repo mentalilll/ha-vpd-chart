@@ -1,0 +1,227 @@
+.card-config {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-config .input-item {
+    margin-bottom: 8px;
+}
+
+.card-config .switch-item {
+    padding: 8px 0;
+}
+
+.slider-container {
+    width: 100%;
+    position: relative;
+    margin: 20px 0;
+    height: 50px;
+}
+
+.slider-segment {
+    position: absolute;
+    top: 20px;
+    height: 15px;
+}
+
+.slider-handle {
+    position: absolute;
+    top: 15px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4caf50;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.slider-handle:active {
+    z-index: 3;
+}
+
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    font-size: 12px;
+}
+
+.vpd-chart-config .gray-danger-zone {
+    background-color: #999999;
+}
+
+.vpd-chart-config .danger-zone {
+    background-color: #ce4234;
+}
+
+.vpd-chart-config .early-veg {
+    background-color: #22ab9c;
+}
+
+.vpd-chart-config .late-veg {
+    background-color: #9cc55b;
+}
+
+.vpd-chart-config .mid-late-flower {
+    background-color: #e7c12b;
+}
+
+.vpd-chart-config .under-transpiration {
+    background-color: #1a6c9c;
+}
+
+
+.multiRange {
+    margin: 3em 0;
+    width: 100%;
+    min-width: 150px;
+}
+
+body.multiRange-grabbing {
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+}
+
+.multiRange {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.multiRange__rangeWrap {
+    height: 28px;
+    background: #999999;
+    border-radius: 3px;
+    position: relative;
+    z-index: 5;
+}
+
+.multiRange__range {
+    height: 100%;
+    position: absolute;
+    right: 0;
+    background: currentColor;
+}
+
+
+
+.multiRange__range.grabbed > .handle {
+    background: #ffffff;
+}
+
+.multiRange__range .multiRange__handle {
+    width: 5px;
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    left: -1px;
+    cursor: -webkit-grab;
+    cursor: grab;
+    background: #ffffff;
+    box-shadow: 1px 0 white, -1px 0 white;
+    transition: 0.2s;
+}
+
+.multiRange__range .multiRange__handle:active {
+    cursor: inherit;
+}
+
+.multiRange__range .multiRange__handle__value {
+    position: absolute;
+    transform: translate(-50%, -6px);
+    min-width: 10px;
+    background: #333333;
+    color: white;
+    padding: 2px 6px;
+    top: -100%;
+    left: 0;
+    white-space: nowrap;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 4px;
+    cursor: default;
+}
+
+.multiRange__range .multiRange__handle__value::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -3px;
+    border-color: #333333 transparent transparent;
+    border-style: solid;
+    border-width: 3px 4px;
+    transform: translate(-50%, 50%);
+    color: #333333;
+    font-size: 15px;
+}
+
+.multiRange__ticks {
+    display: flex;
+    justify-content: space-between;
+    height: 6px;
+    margin: 2px 0 0 0;
+    font: 10px Arial;
+    cursor: default;
+}
+
+.multiRange__ticks > div {
+    height: 100%;
+    width: 1px;
+    background: #dddddd;
+    color: #888888;
+}
+
+.multiRange__ticks > div:nth-child(5n-4) {
+    height: 200%;
+}
+
+.multiRange__ticks > div:nth-child(5n-4)::before {
+    display: block;
+    content: attr(data-value);
+    transform: translate(-50%, 100%);
+    text-align: center;
+    width: 40px;
+}
+.removeButton {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin:5px;
+    float:right;
+    padding:5px;
+    width:10%;
+}
+.addButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin:5px;
+    float:right;
+    padding:5px;
+    height: 40px;
+    width:100%;
+}
+.colorPicker {
+    width: 80%;
+    border: 0;
+    background-color: transparent;
+    margin-top: 5px;
+    float: left;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
