@@ -38,15 +38,15 @@ export const methods = {
 
         return false;
     },
-    async getEntityHistory(entityId) {
+    async getEntityHistory(entityId, hours = 24) {
         const endTime = new Date();
-        const startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
+        const startTime = new Date(endTime.getTime() - hours * 60 * 60 * 1000);
         const isoStartTime = startTime.toISOString();
         const isoEndTime = endTime.toISOString();
 
         try {
             const history = await this._hass.callApi('GET', `history/period/${isoStartTime}?filter_entity_id=${entityId}&end_time=${isoEndTime}&minimal_response&significant_changes_only&no_attributes`);
-            return this.filterEntriesByHour(history[0]); //this.getRandomEntries(history[0], 20);
+            return this.filterEntriesByHour(history[0]);
         } catch (error) {
             return [];
         }
@@ -61,7 +61,7 @@ export const methods = {
             for (let RH = minHumidity; RH <= maxHumidity; RH += stepsHumidity) {
                 const vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
                 const className = this.getPhaseClass(vpd);
-                row.push({vpd: parseFloat(vpd), className: className, color: this.getColorForVpd(vpd)});
+                row.push({vpd: this.toFixedNumber(vpd), className: className, color: this.getColorForVpd(vpd)});
             }
             // mirror row array
             const mirroredRow = row.slice().reverse();

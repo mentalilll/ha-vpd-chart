@@ -1,41 +1,13 @@
 // Set version for the card
-window.vpdChartVersion = "1.3.0";
+window.vpdChartVersion = "1.3.5";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
 import {bar} from './bar.js';
 import {ghostmap} from './ghostmap.js';
-import { HaVpdChartEditor } from './ha-vpd-chart-editor.js';
+import {HaVpdChartEditor} from './ha-vpd-chart-editor.js';
 
 class HaVpdChart extends HTMLElement {
-    _hass = {};
-
-    static get properties() {
-        return {
-            sensors: {type: Array},
-            min_temperature: {type: Number},
-            max_temperature: {type: Number},
-            min_humidity: {type: Number},
-            max_humidity: {type: Number},
-            leaf_temperature_offset: {type: Number},
-            min_height: {type: Number},
-            vpd_phases: {type: Array},
-            air_text: {type: String},
-            rh_text: {type: String},
-            kpa_text: {type: String},
-            enable_tooltip: {type: Boolean},
-            is_bar_view: {type: Boolean},
-            enable_axes: {type: Boolean},
-            enable_ghostmap: {type: Boolean},
-            enable_triangle: {type: Boolean},
-            enable_crosshair: {type: Boolean},
-            configMemory: {type: Object},
-            calculateVPD: {type: Function},
-        };
-    }
-    static getConfigElement() {
-        return document.createElement("ha-vpd-chart-editor");
-    }
     constructor() {
         super();
         this.vpd_phases = [
@@ -64,14 +36,58 @@ class HaVpdChart extends HTMLElement {
         this.enable_ghostmap = true;
         this.enable_triangle = false;
         this.enable_crosshair = false;
+        this.enable_fahrenheit = false;
         this.updateRunning = false;
         this.configMemory = {};
+        this.ghostmap_hours = 24;
+        this.unit_temperature = '°C';
+
     }
+
+    static get properties() {
+        return {
+            sensors: {type: Array},
+            min_temperature: {type: Number},
+            max_temperature: {type: Number},
+            min_humidity: {type: Number},
+            max_humidity: {type: Number},
+            leaf_temperature_offset: {type: Number},
+            min_height: {type: Number},
+            vpd_phases: {type: Array},
+            air_text: {type: String},
+            rh_text: {type: String},
+            kpa_text: {type: String},
+            enable_tooltip: {type: Boolean},
+            is_bar_view: {type: Boolean},
+            enable_axes: {type: Boolean},
+            enable_ghostmap: {type: Boolean},
+            enable_triangle: {type: Boolean},
+            enable_crosshair: {type: Boolean},
+            enable_fahrenheit: {type: Boolean},
+            configMemory: {type: Object},
+            calculateVPD: {type: Function},
+            ghostmap_hours: {type: Number},
+            unit_temperature: {type: String},
+        };
+    }
+
+    _hass = {};
 
     set hass(hass) {
         this._hass = hass;
         this.is_bar_view ? this.buildBarChart() : this.buildChart();
+
+        if (this.config.enable_fahrenheit) {
+            this.unit_temperature = '°F';
+        } else {
+            this.unit_temperature = '°C';
+        }
     }
+
+    static getConfigElement() {
+        return document.createElement("ha-vpd-chart-editor");
+    }
+
     // if config updated
     setConfig(config) {
         this.config = config;
@@ -84,7 +100,8 @@ class HaVpdChart extends HTMLElement {
             'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
             'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
             'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
-            'enable_tooltip', 'enable_crosshair'
+            'enable_tooltip', 'enable_crosshair', 'enable_fahrenheit', 'ghostmap_hours',
+            'unit_temperature'
         ];
 
         configKeys.forEach(key => {
@@ -93,7 +110,7 @@ class HaVpdChart extends HTMLElement {
             }
         });
 
-        if(this.config.calculateVPD) {
+        if (this.config.calculateVPD) {
             this.calculateVPD = new Function('Tleaf', 'Tair', 'RH', this.config.calculateVPD);
         }
     }
@@ -103,6 +120,7 @@ Object.assign(HaVpdChart.prototype, methods);
 Object.assign(HaVpdChart.prototype, chart);
 Object.assign(HaVpdChart.prototype, bar);
 Object.assign(HaVpdChart.prototype, ghostmap);
+Object.assign(HaVpdChart.prototype, HaVpdChartEditor);
 
 customElements.define('ha-vpd-chart', HaVpdChart);
 window.customCards = window.customCards || [];

@@ -40,7 +40,6 @@ export const chart = {
         }
 
 
-
         this.buildTooltip();
     },
     buildTable() {
@@ -65,7 +64,7 @@ export const chart = {
                 } else if (cell.className !== currentClass) {
                     const segmentWidth = (index - startIndex) * stepsHumidity * 100 / maxHumidity;
                     let customColor = this.getColorByClassName(currentClass);
-                    segments.push({ className: currentClass, width: segmentWidth, color: customColor });
+                    segments.push({className: currentClass, width: segmentWidth, color: customColor});
 
                     currentClass = cell.className;
                     startIndex = index;
@@ -74,7 +73,7 @@ export const chart = {
             if (startIndex < row.length) {
                 const segmentWidth = (row.length - startIndex) * stepsHumidity * 100 / maxHumidity;
                 let customColor = this.getColorByClassName(currentClass);
-                segments.push({ className: currentClass, width: segmentWidth, color: customColor });
+                segments.push({className: currentClass, width: segmentWidth, color: customColor});
             }
 
             const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
@@ -98,7 +97,7 @@ export const chart = {
         return container;
     },
     refreshTable() {
-        if(this.shouldUpdate()) {
+        if (this.shouldUpdate()) {
             const table = this.buildTable();
             this.content.replaceChildren(table);
         }
@@ -107,14 +106,14 @@ export const chart = {
         const grid = this.querySelector('.vpd-grid') || document.createElement('div');
         grid.className = 'vpd-grid';
 
-        if(!grid.isConnected) {
+        if (!grid.isConnected) {
             this.addHorizontalGridLines(grid);
             this.addVerticalGridLines(grid);
             this.content.appendChild(grid);
         }
     },
     removeGridLines() {
-      const grid = this.querySelector('.vpd-grid');
+        const grid = this.querySelector('.vpd-grid');
         if (grid) {
             grid.remove();
         }
@@ -129,7 +128,7 @@ export const chart = {
             const label = document.createElement('div');
             label.className = 'temperature-axis-label';
             const currentValue = this.min_temperature + (i * (this.max_temperature - this.min_temperature) / temperatureSteps);
-            label.innerHTML = `${currentValue.toFixed(0)}°C`;
+            label.innerHTML = `${currentValue.toFixed(0)}${this.unit_temperature}`;
             label.style.top = `${(i / temperatureSteps) * 100}%`;
 
             grid.appendChild(line);
@@ -206,39 +205,41 @@ export const chart = {
         let vpd = 0;
 
         this.config.sensors.forEach((sensor, index) => {
-            const humidity = parseFloat(this._hass.states[sensor.humidity].state);
-            const temperature = parseFloat(this._hass.states[sensor.temperature].state);
-            let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
-            if (sensor.leaf_temperature !== undefined) {
-                leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
-            }
-            if (sensor.vpd !== undefined) {
-                vpd = parseFloat(this._hass.states[sensor.vpd].state);
-            } else {
-                vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
-            }
+            if (this._hass.states[sensor.humidity] && this._hass.states[sensor.temperature]) {
+                const humidity = parseFloat(this._hass.states[sensor.humidity].state);
+                const temperature = parseFloat(this._hass.states[sensor.temperature].state);
+                let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
+                if (sensor.leaf_temperature !== undefined) {
+                    leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
+                }
+                if (sensor.vpd !== undefined) {
+                    vpd = parseFloat(this._hass.states[sensor.vpd].state);
+                } else {
+                    vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
+                }
 
-            const relativeHumidity = this.max_humidity - humidity;
-            const totalHumidityRange = this.max_humidity - this.min_humidity;
-            const percentageHumidity = (relativeHumidity / totalHumidityRange) * 100;
-            const relativeTemperature = temperature - this.min_temperature;
-            const totalTemperatureRange = this.max_temperature - this.min_temperature;
-            const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
+                const relativeHumidity = this.max_humidity - humidity;
+                const totalHumidityRange = this.max_humidity - this.min_humidity;
+                const percentageHumidity = (relativeHumidity / totalHumidityRange) * 100;
+                const relativeTemperature = temperature - this.min_temperature;
+                const totalTemperatureRange = this.max_temperature - this.min_temperature;
+                const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
 
-            const pointerElements = this.createPointer(index, percentageHumidity, percentageTemperature, sensor.name, vpd, humidity, temperature);
+                const pointerElements = this.createPointer(index, percentageHumidity, percentageTemperature, sensor.name, vpd, humidity, temperature);
 
-            // Check and append only if elements are Nodes
-            if (pointerElements.pointer instanceof Node) {
-                sensors.appendChild(pointerElements.pointer);
-            }
-            if (pointerElements.horizontalLine instanceof Node) {
-                sensors.appendChild(pointerElements.horizontalLine);
-            }
-            if (pointerElements.verticalLine instanceof Node) {
-                sensors.appendChild(pointerElements.verticalLine);
-            }
-            if (pointerElements.tooltip instanceof Node) {
-                sensors.appendChild(pointerElements.tooltip);
+                // Check and append only if elements are Nodes
+                if (pointerElements.pointer instanceof Node) {
+                    sensors.appendChild(pointerElements.pointer);
+                }
+                if (pointerElements.horizontalLine instanceof Node) {
+                    sensors.appendChild(pointerElements.horizontalLine);
+                }
+                if (pointerElements.verticalLine instanceof Node) {
+                    sensors.appendChild(pointerElements.verticalLine);
+                }
+                if (pointerElements.tooltip instanceof Node) {
+                    sensors.appendChild(pointerElements.tooltip);
+                }
             }
         });
     },
@@ -266,7 +267,7 @@ export const chart = {
             tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
             tooltip.className = `custom-tooltip custom-tooltip-${index}`;
             tooltip.setAttribute('data-index', index.toString());
-            tooltip.innerHTML = `<span><strong>${sensorName}</strong></span> <span>${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd}</span><span>${this.rh_text ? this.rh_text + ':' : ''} ${humidity}%</span><span>${this.air_text ? this.air_text + ':' : ''} ${temperature}°C</span>`;
+            tooltip.innerHTML = `<span><strong>${sensorName}</strong></span> <span>${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd}</span><span>${this.rh_text ? this.rh_text + ':' : ''} ${humidity}%</span><span>${this.air_text ? this.air_text + ':' : ''} ${temperature}${this.unit_temperature}</span>`;
             tooltip.style.left = `${percentageHumidity}%`;
             tooltip.style.bottom = `${100 - percentageTemperature}%`;
         }
@@ -308,7 +309,7 @@ export const chart = {
         const vpd = targetVpd?.toFixed(2) || parseFloat(target.getAttribute('data-vpd')).toFixed(2);
 
         const tooltip = this.querySelector('.mouse-custom-tooltip');
-        tooltip.innerHTML = `${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd} | ${this.rh_text ? this.rh_text + ':' : ''} ${humidity}% | ${this.air_text ? this.air_text + ':' : ''} ${temperature}°C | ${this.getPhaseClass(vpd)}`;
+        tooltip.innerHTML = `${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd} | ${this.rh_text ? this.rh_text + ':' : ''} ${humidity}% | ${this.air_text ? this.air_text + ':' : ''} ${temperature}${this.unit_temperature} | ${this.getPhaseClass(vpd)}`;
         tooltip.style.opacity = '1';
         if (this.enable_crosshair) {
             let mouseHorizontalLine = this.querySelector(`.mouse-horizontal-line`) || document.createElement('div');

@@ -7,8 +7,8 @@
     margin-bottom: 8px;
 }
 
-.card-config .switch-item {
-    padding: 8px 0;
+.vpd-chart-config .switch-item {
+    padding: 10px;
 }
 
 .slider-container {
@@ -73,6 +73,77 @@
     background-color: #1a6c9c;
 }
 
+.vpd-chart-config table {
+    width: 100%;
+}
+
+.vpd-chart-config .collapsible {
+    background-color: var(--mdc-text-field-fill-color, #f5f5f5);
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    border-top: 1px solid rgba(126, 126, 126, 0.3);
+}
+
+input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none;
+    font: inherit;
+    width: 15px;
+    height: 15px;
+    border: 0.15em solid rgba(126, 126, 126, 0.3);
+    border-radius: 0.15em;
+    transform: translateY(-0.075em);
+    float: left;
+    margin: 3px 10px 3px 4px;
+    /* ...existing styles */
+    display: grid;
+    place-content: center;
+}
+
+input[type="checkbox"]::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 14px 14px var(--success-color);
+}
+
+input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
+.vpd-chart-config .active, .collapsible:hover {
+    background-color: var(--mdc-text-field-fill-color, #f5f5f5);
+}
+
+.vpd-chart-config .content {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.vpd-chart-config .content > div {
+    padding: 15px;
+
+}
+
+.vpd-chart-config .collapsible:after {
+    content: '\02795'; /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    float: right;
+    margin-left: 5px;
+    color: var(--mdc-text-field-fill-color, #f5f5f5);
+}
+
+.vpd-chart-config .active:after {
+    content: "\2796"; /* Unicode character for "minus" sign (-) */
+    color: var(--mdc-text-field-fill-color, #f5f5f5);
+}
 
 .multiRange {
     margin: 3em 0;
@@ -106,7 +177,6 @@ body.multiRange-grabbing {
     right: 0;
     background: currentColor;
 }
-
 
 
 .multiRange__range.grabbed > .handle {
@@ -186,29 +256,32 @@ body.multiRange-grabbing {
     text-align: center;
     width: 40px;
 }
+
 .removeButton {
     background-color: #f44336;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin:5px;
-    float:right;
-    padding:5px;
-    width:10%;
+    margin: 5px;
+    float: right;
+    padding: 5px;
+    width: 10%;
 }
+
 .addButton {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin:5px;
-    float:right;
-    padding:5px;
+    margin: 5px;
+    float: right;
+    padding: 5px;
     height: 40px;
-    width:100%;
+    width: 100%;
 }
+
 .colorPicker {
     width: 80%;
     border: 0;
