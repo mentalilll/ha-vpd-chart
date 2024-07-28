@@ -120,6 +120,10 @@ export class HaVpdChartEditor extends HTMLElement {
         return this._config.unit_temperature || 'C';
     }
 
+    get _enable_zoom() {
+        return this._config.enable_zoom || false;
+    }
+
     setConfig(config) {
         this._config = config;
     }
@@ -279,7 +283,12 @@ export class HaVpdChartEditor extends HTMLElement {
                             Enable Fahrenheit
                         </label>
                     </td>
-                    <td></td>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="enable_zoom" configvalue="enable_zoom">
+                            Enable Zoom
+                        </label>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -333,6 +342,7 @@ export class HaVpdChartEditor extends HTMLElement {
             {id: 'enable_crosshair', prop: '_enable_crosshair', type: 'checked'},
             {id: 'enable_tooltip', prop: '_enable_tooltip', type: 'checked'},
             {id: 'enable_fahrenheit', prop: '_enable_fahrenheit', type: 'checked'},
+            {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'},
             {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'},
             {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}
         ];

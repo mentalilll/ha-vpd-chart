@@ -177,10 +177,12 @@ export const bar = {
 
             const [temperatures, humidities] = await Promise.all([temperaturesPromise, humiditiesPromise]);
             temperatures.forEach((temperature, tempIndex) => {
-                data['sensor-' + index].push({
-                    time: temperature.last_changed,
-                    vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - (this.config.leaf_temperature_offset || 2), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)).toFixed(2),
-                });
+                if (humidities[tempIndex]) {
+                    data['sensor-' + index].push({
+                        time: temperature.last_changed,
+                        vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - (this.config.leaf_temperature_offset || 2), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)).toFixed(2),
+                    });
+                }
             });
         }
 

@@ -1,15 +1,18 @@
 ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     height: 100%;
-    width:100%;
+    width: 100%;
     min-height: 50px;
-    overflow:hidden;
+    overflow: hidden;
 }
+
 .vpd-chart-view {
-    display:grid;
+    display: grid;
 }
+
 .vpd-chart-view .gray-danger-zone {
     background-color: #999999;
 }
+
 .vpd-chart-view .danger-zone {
     background-color: #ce4234;
 }
@@ -31,82 +34,86 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 }
 
 .vpd-card-container, .mouse-horizontal-line, .mouse-vertical-line {
-    cursor:crosshair;
+    cursor: crosshair;
 }
+
+.vpd-card-container:active {
+    cursor: grabbing !important;
+}
+
 .mouse-horizontal-line, .mouse-vertical-line {
     pointer-events: none;
 }
-.vpd-chart-view table {
-    width: 100%;
-    height: 100% !important;
-    min-height: 50px;
-    border: 0;
-    border-collapse: collapse;
-}
-.vpd-chart-view table tbody {
-    height:100% !important;
-    min-height: 50px;
-}
+
 .vpd-chart-view .history-circle {
-    display:none;
+    display: none;
 }
+
 .vpd-chart-view .highlight {
     position: absolute;
-    z-index: 2;
-    cursor:pointer;
-    width:10px;
-    height:10px;
+    z-index: 3;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    transform: translate(-50%);
+    transform: translate(-50%, 5px);
     pointer-events: all;
-    background-color:#ffffff;
+    background-color: #ffffff;
 }
+
 .vpd-chart-view .custom-tooltip {
     pointer-events: none;
     transform: translate(-50%);
 }
+
 .vpd-chart-view .highlight:hover {
-    z-index:2;
+    z-index: 4;
 }
 
 .vpd-chart-view .vertical-line {
-    top:0;
-    bottom:0;
-    position:absolute;
+    top: 0;
+    bottom: 0;
+    position: absolute;
     width: 1px;
-    background:rgba(255,255,255,0.4);
+    background: rgba(255, 255, 255, 0.4);
 }
+
 .vpd-chart-view .horizontal-line {
-    left:0;
-    right:0;
-    position:absolute;
+    left: 0;
+    right: 0;
+    position: absolute;
     height: 1px;
     pointer-events: none;
-    background-color:rgba(255,255,255,0.4);
+    background-color: rgba(255, 255, 255, 0.4);
 }
+
 .vpd-chart-view .mousePointer {
-    z-index:2;
+    z-index: 2;
     width: 10px;
-    height:10px;
+    height: 10px;
     border-radius: 50%;
-    position:absolute;
+    position: absolute;
     opacity: 1;
     transform: translate(-50%);
 }
+
 .vpd-chart-view .vpd-container {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
+
 .vpd-chart-view .vpd-row {
-    display:flex;
-    width:100%;
-    height:100%;
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
+
 .vpd-chart-view .cell {
-    height:100%;
+    height: 100%;
 }
+
 .vpd-chart-view .mouse-custom-tooltip,
 .vpd-chart-view .custom-tooltip {
     bottom: 70%;
@@ -123,60 +130,66 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     font-size: 12px;
     line-height: 1.2;
     position: absolute;
-    z-index:2;
+    z-index: 2;
 }
+
 .vpd-chart-view .mouse-custom-tooltip {
     right: 10px;
     top: 10px;
-    bottom:auto;
+    bottom: auto;
     pointer-events: none;
 }
+
 .vpd-chart-view .axes {
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    pointer-events: none;
-    font-size:10px;
-    font-family: "Segoe UI", Arial, sans-serif;
-}
-.vpd-chart-view .axes .humidity-axis {
-    position:absolute;
-    width:100%;
-    top:10px;
+    position: absolute;
+    top: 0;
     left: 0;
     right: 0;
-    display:flex;
+    bottom: 0;
+    pointer-events: none;
+    font-size: 10px;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
+
+.vpd-chart-view .axes .humidity-axis {
+    position: absolute;
+    width: 100%;
+    top: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+}
+
 .vpd-chart-view .axes .humidity-axis .humidity-axis-label {
     flex-grow: 1;
-    display:inline;
-    text-align:center;
-    border-right:1px solid rgba(255,255,255,0.4);
+    display: inline;
+    text-align: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .vpd-chart-view .axes .temperature-axis {
-    position:absolute;
-    height:100%;
-    top:0;
-    bottom:0;
-    left:10px;
-    display:flex;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    left: 10px;
+    display: flex;
     flex-direction: column;
 
 }
+
 .vpd-chart-view .axes .temperature-axis .temperature-axis-label {
     flex-grow: 1;
-    display:flex;
+    display: flex;
     align-items: center; /* Zentriert den Inhalt vertikal */
     justify-content: center; /* Zentriert den Inhalt horizontal */
-    border-bottom:1px solid rgba(255,255,255,0.4);
-    color:#000000;
-    font-weight:bold;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    color: #000000;
+    font-weight: bold;
 }
+
 .vpd-chart-view .axes .temperature-axis .temperature-axis-label:last-child {
-    border-bottom:0;
+    border-bottom: 0;
 }
 
 .vpd-chart-view .vpd-grid {
@@ -202,22 +215,27 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     height: 100%;
     width: 1px;
 }
+
 .humidity-axis-label:first-child {
-    display:none;
+    display: none;
 }
+
 .vpd-chart-view .temperature-axis-label, .humidity-axis-label {
     position: absolute;
     font-size: 12px;
-    color: #fff;
+    color: #ffffff;
 }
+
 .vpd-chart-view .custom-tooltip span {
-    padding-left:5px;
-    padding-right:5px;
-    border-right: 1px solid #999;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-right: 1px solid #999999;
 }
+
 .vpd-chart-view .custom-tooltip span:last-child {
     border-right: 0;
 }
+
 .vpd-chart-view .temperature-axis-label {
     transform: translateY(-50%);
     left: 20px; /* Adjust to position outside the chart */
@@ -227,34 +245,37 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     transform: translateX(-50%);
     top: 20px; /* Adjust to position outside the chart */
 }
-.vpd-chart-view #sensors,.vpd-chart-view #ghostmap {
-    width:100%;
-    height:100%;
-    position:absolute;
-    top:0;
-    left:0;
+
+.vpd-chart-view #sensors, .vpd-chart-view #ghostmap {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
     pointer-events: none;
 }
 
 .vpd-chart-view #sensors .custom-tooltip {
-    margin-bottom: 14px;
+    margin-bottom: 9px;
 }
+
 .vpd-chart-view #sensors .sensor-triangle {
-    width:16px !important;
-    height:0 !important;
-    padding:0 !important;
-    margin: 0!important;
-    border:0 !important;
-    border-radius:0 !important;
-    background:transparent !important;
+    width: 16px !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
 }
+
 .vpd-chart-view #sensors .sensor-triangle:after {
     position: absolute;
     bottom: 4px;
     left: 49%;
     margin-left: -10px;
     width: 0;
-    border-top: 10px solid #444;
+    border-top: 10px solid #444444;
     border-right: 10px solid transparent;
     border-left: 10px solid transparent;
     content: " ";

@@ -37,9 +37,11 @@ export const ghostmap = {
     processSensorData(fragment, temperatures, humidities, index) {
         let opacityFade = 1;
         temperatures.forEach((temperature, tempIndex) => {
-            opacityFade -= 0.05;
-            const circle = this.createCircle(index, tempIndex, temperature, humidities[tempIndex].state, opacityFade);
-            fragment.appendChild(circle);
+            if (humidities[tempIndex]) {
+                opacityFade -= 0.05;
+                const circle = this.createCircle(index, tempIndex, temperature, humidities[tempIndex].state, opacityFade);
+                fragment.appendChild(circle);
+            }
         });
     },
 

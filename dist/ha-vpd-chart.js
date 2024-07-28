@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.3.5";
+window.vpdChartVersion = "1.3.6";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -37,6 +37,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_triangle = false;
         this.enable_crosshair = false;
         this.enable_fahrenheit = false;
+        this.enable_zoom = false;
         this.updateRunning = false;
         this.configMemory = {};
         this.ghostmap_hours = 24;
@@ -64,6 +65,7 @@ class HaVpdChart extends HTMLElement {
             enable_triangle: {type: Boolean},
             enable_crosshair: {type: Boolean},
             enable_fahrenheit: {type: Boolean},
+            enable_zoom: {type: Boolean},
             configMemory: {type: Object},
             calculateVPD: {type: Function},
             ghostmap_hours: {type: Number},
@@ -101,7 +103,7 @@ class HaVpdChart extends HTMLElement {
             'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
             'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
             'enable_tooltip', 'enable_crosshair', 'enable_fahrenheit', 'ghostmap_hours',
-            'unit_temperature'
+            'unit_temperature', 'enable_zoom'
         ];
 
         configKeys.forEach(key => {

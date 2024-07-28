@@ -95,12 +95,15 @@ max_temperature: 35 #optional
 min_humidity: 10 #optional
 max_humidity: 100 #optional
 min_height: 200 #optional (minimum height of the chart as px)
-is_bar_view: true #optional
+is_bar_view: false #optional
 enable_tooltip: true #optional
 enable_axes: true #optional
 enable_ghostmap: true #optional
 enable_triangle: false #optional
 enable_crosshair: true #optional
+enable_fahrenheit: false #optional
+enable_zoom: false #optional
+leaf_temperature_offset: 2 #optional
 sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
@@ -108,7 +111,6 @@ sensors:
     name: Tent 1
   - temperature: sensor.temperature_tent_2
     humidity: sensor.humidity_tent_2
-    vpd: sensor.vpd #optional
     name: Tent 2
 vpd_phases: #optional
   - upper: 0.0
@@ -157,6 +159,8 @@ calculateVPD: |2-
 | enable_ghostmap         | boolean | optional     | `true`          | Enable Ghostmap on the Chart                                                                        |
 | enable_triangle         | boolean | optional     | `true`          | Enable Triangle instead of Circle for tooltip marker                                                |
 | enable_crosshair        | boolean | optional     | `true`          | Enable MouseHover Crosshair                                                                         |
+| enable_fahrenheit       | boolean | optional     | `false`         | Enable Fahrenheit instead of Celsius                                                                |
+| enable_zoom             | boolean | optional     | `false`         | Enable zoom function for chart                                                                      |
 | calculateVPD            | string  | optional     | See description | Custom function to calculate VPD.                                                                   |
 
 **Default `vpd_phases` Configuration:**
