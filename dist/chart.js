@@ -265,8 +265,8 @@ export const chart = {
                 } else {
                     vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
                 }
-                const min_vpd = this.calculateVPD(temperature - 2, temperature, this.max_humidity);
-                const max_vpd = this.calculateVPD(temperature - 2, temperature, this.min_humidity);
+                const min_vpd = this.calculateVPD(temperature - (this.config.leaf_temperature_offset || 2), temperature, this.max_humidity);
+                const max_vpd = this.calculateVPD(temperature - (this.config.leaf_temperature_offset || 2), temperature, this.min_humidity);
                 const relativeVpd = vpd - min_vpd;
                 const totalVpdRange = max_vpd - min_vpd;
                 const percentageVpd = (relativeVpd / totalVpdRange) * 100;
@@ -274,7 +274,7 @@ export const chart = {
                 const relativeTemperature = temperature - this.min_temperature;
                 const totalTemperatureRange = this.max_temperature - this.min_temperature;
                 const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
-                
+
                 const pointerElements = this.createPointer(index, percentageVpd, percentageTemperature, sensor.name, vpd, humidity, temperature);
 
                 // Check and append only if elements are Nodes
