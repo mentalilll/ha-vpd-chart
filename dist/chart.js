@@ -53,7 +53,6 @@ export const chart = {
         this.buildTooltip();
 
     },
-
     handleZoom(event) {
         event.preventDefault();
         const zoomDirection = event.deltaY > 0 ? -0.1 : 0.1;
@@ -94,6 +93,7 @@ export const chart = {
         const temperature = this.min_temperature + (temperatureRange * yPercent / 100);
         const humidity = this.max_humidity - (humidityRange * xPercent / 100);
         const leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
+
         const vpd = this.calculateVPD(leafTemperature, temperature, humidity);
 
         this.buildMouseTooltip(event, humidity, temperature, vpd);
@@ -103,10 +103,7 @@ export const chart = {
         const offsetY = (event.clientY - rect.top) / this.zoomLevel;
         this.content.style.transformOrigin = `${offsetX}px ${offsetY}px`;
         this.sensordom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-
-
     },
-
     buildTable() {
         const container = document.createElement('div');
         container.className = 'vpd-container';
@@ -268,15 +265,17 @@ export const chart = {
                 } else {
                     vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
                 }
+                const min_vpd = this.calculateVPD(temperature - 2, temperature, this.max_humidity);
+                const max_vpd = this.calculateVPD(temperature - 2, temperature, this.min_humidity);
+                const relativeVpd = vpd - min_vpd;
+                const totalVpdRange = max_vpd - min_vpd;
+                const percentageVpd = (relativeVpd / totalVpdRange) * 100;
 
-                const relativeHumidity = this.max_humidity - humidity;
-                const totalHumidityRange = this.max_humidity - this.min_humidity;
-                const percentageHumidity = (relativeHumidity / totalHumidityRange) * 100;
                 const relativeTemperature = temperature - this.min_temperature;
                 const totalTemperatureRange = this.max_temperature - this.min_temperature;
                 const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
-
-                const pointerElements = this.createPointer(index, percentageHumidity, percentageTemperature, sensor.name, vpd, humidity, temperature);
+                
+                const pointerElements = this.createPointer(index, percentageVpd, percentageTemperature, sensor.name, vpd, humidity, temperature);
 
                 // Check and append only if elements are Nodes
                 if (pointerElements.pointer instanceof Node) {
