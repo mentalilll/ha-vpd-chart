@@ -17,43 +17,46 @@ export const bar = {
                 </ha-card>
             `;
             this.content = this.querySelector("div.card-content");
+            if (this._hass) {
+                this.config.sensors.forEach((sensor) => {
+                    let humidity = this._hass.states[sensor.humidity].state;
+                    let temperature = this._hass.states[sensor.temperature].state;
+                    let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
+                    if (sensor.leaf_temperature !== undefined) {
+                        if (this._hass.states[sensor.leaf_temperature] !== undefined) {
+                            leafTemperature = this._hass.states[sensor.leaf_temperature].state;
+                        }
+                    }
+                    let vpd;
+                    if (sensor.vpd !== undefined) {
+                        vpd = this._hass.states[sensor.vpd].state;
+                    } else {
+                        vpd = this.calculateVPD(this.toFixedNumber(leafTemperature), this.toFixedNumber(temperature), this.toFixedNumber(humidity)).toFixed(2);
+                    }
 
-            this.config.sensors.forEach((sensor) => {
-                let humidity = this._hass.states[sensor.humidity].state;
-                let temperature = this._hass.states[sensor.temperature].state;
-                let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
-                if (sensor.leaf_temperature !== undefined) {
-                    leafTemperature = this._hass.states[sensor.leaf_temperature].state;
-                }
-                let vpd;
-                if (sensor.vpd !== undefined) {
-                    vpd = this._hass.states[sensor.vpd].state;
-                } else {
-                    vpd = this.calculateVPD(this.toFixedNumber(leafTemperature), this.toFixedNumber(temperature), this.toFixedNumber(humidity)).toFixed(2);
-                }
-
-                let card = this.content.querySelector(`ha-card[data-sensor="${sensor.name}"]`);
-                if (!card) {
-                    card = document.createElement('ha-card');
-                    card.dataset.sensor = sensor.name;
-                    card.className = 'vpd-card';
-                }
-                // if sensor.name is not empty than show in the card
-                let html = `<div class="bar">`;
-                if (sensor.name !== "") {
-                    html += `<span class="vpd-title">${sensor.name}</span>`;
-                }
-                html += `<span class="vpd-value">${vpd} ${this.kpa_text || ''}</span>`;
-                html += `<span class="vpd-rh">${humidity}%</span>`;
-                html += `<span class="vpd-temp">${temperature} ${this.unit_temperature}</span>`;
-                html += `<span style="background: ${this.getColorForVpd(vpd)}" class="vpd-state ${this.getPhaseClass(vpd)}"><span>${this.getPhaseClass(vpd)}</span></span>`;
-                html += `<span class="vpd-history" style="float:right;"><canvas></canvas></span>`;
-                html += `</div>`;
-                card.innerHTML = html;
-                this.content.appendChild(card);
-            });
+                    let card = this.content.querySelector(`ha-card[data-sensor="${sensor.name}"]`);
+                    if (!card) {
+                        card = document.createElement('ha-card');
+                        card.dataset.sensor = sensor.name;
+                        card.className = 'vpd-card';
+                    }
+                    // if sensor.name is not empty than show in the card
+                    let html = `<div class="bar">`;
+                    if (sensor.name !== "") {
+                        html += `<span class="vpd-title">${sensor.name}</span>`;
+                    }
+                    html += `<span class="vpd-value">${vpd} ${this.kpa_text || ''}</span>`;
+                    html += `<span class="vpd-rh">${humidity}%</span>`;
+                    html += `<span class="vpd-temp">${temperature} ${this.unit_temperature}</span>`;
+                    html += `<span style="background: ${this.getColorForVpd(vpd)}" class="vpd-state ${this.getPhaseClass(vpd)}"><span>${this.getPhaseClass(vpd)}</span></span>`;
+                    html += `<span class="vpd-history" style="float:right;"><canvas></canvas></span>`;
+                    html += `</div>`;
+                    card.innerHTML = html;
+                    this.content.appendChild(card);
+                });
+            }
         }
-
+        console.log()
         this.updateBars();
         this.updateVPDLegend();
 

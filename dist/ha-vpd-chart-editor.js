@@ -165,7 +165,11 @@ export class HaVpdChartEditor extends HTMLElement {
         const index = target.getAttribute('data-index');
         let value = target.value;
         if (this._vpd_phases[index].className !== value) {
-            this._config.vpd_phases[index].className = value;
+            if (Object.isExtensible(this._config.vpd_phases[index])) {
+                this._config.vpd_phases[index].className = value;
+            } else {
+                console.warn('Cannot define property on a non-extensible object');
+            }
             fireEvent(this, 'config-changed', {config: this._config});
         }
     }
@@ -356,7 +360,13 @@ export class HaVpdChartEditor extends HTMLElement {
 
         configValues.forEach(({id, prop, type}) => {
             const element = this.shadowRoot.querySelector(`#${id}`);
-            if (element) element[type] = this[prop];
+            if (element) {
+                if (Object.isExtensible(element)) {
+                    element[type] = this[prop];
+                } else {
+                    console.warn('Cannot define property on a non-extensible object');
+                }
+            }
         });
 
         const minVPD = this.toFixedNumber(this.calculateVPD(this._max_temperature - this._leaf_temperature_offset, this._max_temperature, this._max_humidity));
