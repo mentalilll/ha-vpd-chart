@@ -1,44 +1,39 @@
 export const chart = {
+    initializeChart() {
+        this.zoomLevel = 1;
+        this.minZoom = 1;
+        this.maxZoom = 2;
+        this.innerHTML = `
+        <ha-card class="vpd-chart-view">
+            <style>
+                @import '/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}'
+            </style>
+            <div id="vpd-card-container" class="vpd-card-container"></div>
+            <div id="ghostmap"></div>
+            <div id="sensors"></div>
+            <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
+            <div id="mouse-tooltip">
+                <div class="horizontal-line mouse-horizontal-line" style="opacity: 0;"></div>
+                <div class="vertical-line mouse-vertical-line" style="opacity: 0;"></div>
+            </div>
+        </ha-card>
+    `;
+        this.content = this.querySelector("div.vpd-card-container");
+        this.sensordom = this.querySelector("div#sensors");
+        this.ghostmapDom = this.querySelector("div#ghostmap");
+        this.mouseTooltip = this.querySelector("div#mouse-tooltip");
+    },
     buildChart() {
         if (!this.content) {
-            this.zoomLevel = 1;
-            this.minZoom = 1;
-            this.maxZoom = 2;
-            this.innerHTML = `
-                <ha-card class="vpd-chart-view">
-                    <style>
-                        @import '/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}'
-                    </style>
-                    <div id="vpd-card-container" class="vpd-card-container"></div>
-                    <div id="ghostmap"></div>
-                    <div id="sensors"></div>
-                    <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
-                    <div class="horizontal-line mouse-horizontal-line" style="opacity: 0;"></div>
-                    <div class="vertical-line mouse-vertical-line" style="opacity: 0;"></div>
-                </ha-card>
-            `;
-            this.content = this.querySelector("div.vpd-card-container");
-            this.sensordom = this.querySelector("div#sensors");
+            this.initializeChart.call(this);
             const table = this.buildTable();
             if (!table.isConnected) {
                 this.content.appendChild(table);
-                this.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
-                this.addEventListener('mousemove', this.handleMouseMove.bind(this));
-
-                if (this.enable_zoom) {
-                    this.addEventListener('wheel', this.handleZoom.bind(this));
-                    this.addEventListener('mousedown', this.handleMouseDown.bind(this));
-                    this.addEventListener('mouseup', this.handleMouseUp.bind(this));
-                }
-
+                this.setupEventListeners.call(this);
             }
-            if (this.enable_ghostmap) {
-                this.updateGhostMap();
-                setInterval(() => this.updateGhostMap(), 3600000); // Update every hour
-            }
-
+            this.updateGhostMapPeriodically.call(this);
         } else {
-            this.refreshTable();
+            this.refreshTable.call(this);
         }
 
         if (this.enable_axes) {
@@ -46,12 +41,13 @@ export const chart = {
         } else {
             this.removeGridLines();
         }
+
         if (this.min_height > 0) {
             this.content.style.minHeight = `${this.min_height}px`;
             this.querySelector("div.vpd-container").style.minHeight = `${this.min_height}px`;
         }
-        this.buildTooltip();
 
+        this.buildTooltip();
     },
     handleZoom(event) {
         event.preventDefault();
@@ -67,12 +63,33 @@ export const chart = {
             if (zoomDirection > 0) {
                 this.content.style.transformOrigin = `${offsetX}px ${offsetY}px`;
                 this.sensordom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+                this.ghostmapDom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+                this.mouseTooltip.style.transformOrigin = `${offsetX}px ${offsetY}px`;
             }
 
             this.content.style.transform = `scale(${this.zoomLevel})`;
             this.sensordom.style.transform = `scale(${this.zoomLevel})`;
+            this.ghostmapDom.style.transform = `scale(${this.zoomLevel})`;
+            this.mouseTooltip.style.transform = `scale(${this.zoomLevel})`;
         }
     },
+
+    setupEventListeners() {
+        this.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+        this.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        if (this.enable_zoom) {
+            this.addEventListener('wheel', this.handleZoom.bind(this));
+            this.addEventListener('mousedown', this.handleMouseDown.bind(this));
+            this.addEventListener('mouseup', this.handleMouseUp.bind(this));
+        }
+    },
+    updateGhostMapPeriodically() {
+        if (this.enable_ghostmap) {
+            this.updateGhostMap();
+            setInterval(() => this.updateGhostMap(), 3600000); // Update every hour
+        }
+    },
+
     handleMouseDown(event) {
         this.isPanning = true;
     },
@@ -103,6 +120,8 @@ export const chart = {
         const offsetY = (event.clientY - rect.top) / this.zoomLevel;
         this.content.style.transformOrigin = `${offsetX}px ${offsetY}px`;
         this.sensordom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+        this.ghostmapDom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+        this.mouseTooltip.style.transformOrigin = `${offsetX}px ${offsetY}px`;
     },
     buildTable() {
         const container = document.createElement('div');
@@ -275,7 +294,10 @@ export const chart = {
                 const totalTemperatureRange = this.max_temperature - this.min_temperature;
                 const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
 
-                const pointerElements = this.createPointer(index, percentageVpd, percentageTemperature, sensor.name, vpd, humidity, temperature);
+                const totalHumidityRange = this.max_humidity - this.min_humidity;
+
+                const currentHumidity = (this.max_humidity - (percentageVpd * totalHumidityRange / 100)).toFixed(1);
+                const pointerElements = this.createPointer(index, percentageVpd, percentageTemperature, sensor.name, vpd, currentHumidity, temperature);
 
                 // Check and append only if elements are Nodes
                 if (pointerElements.pointer instanceof Node) {
@@ -293,7 +315,6 @@ export const chart = {
             }
         });
     },
-
     createPointer(index, percentageHumidity, percentageTemperature, sensorName, vpd, humidity, temperature) {
         const pointer = this.querySelector(`.sensor-pointer[data-index="${index}"]`) || document.createElement('div');
         pointer.setAttribute('data-index', index.toString());

@@ -246,7 +246,7 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     top: 20px; /* Adjust to position outside the chart */
 }
 
-.vpd-chart-view #sensors, .vpd-chart-view #ghostmap {
+.vpd-chart-view #sensors, .vpd-chart-view #ghostmap, .vpd-chart-view #mouse-tooltip {
     width: 100%;
     height: 100%;
     position: absolute;

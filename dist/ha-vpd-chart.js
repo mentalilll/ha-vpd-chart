@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.3.7";
+window.vpdChartVersion = "1.3.8";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -7,9 +7,23 @@ import {bar} from './bar.js';
 import {ghostmap} from './ghostmap.js';
 import {HaVpdChartEditor} from './ha-vpd-chart-editor.js';
 
+const DEFAULT_UNIT_TEMPERATURE = '°C';
+const FAHRENHEIT_UNIT_TEMPERATURE = '°F';
+const CONFIG_KEYS = [
+    'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
+    'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
+    'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
+    'enable_tooltip', 'enable_crosshair', 'enable_fahrenheit', 'ghostmap_hours',
+    'unit_temperature', 'enable_zoom'
+];
+
 class HaVpdChart extends HTMLElement {
     constructor() {
         super();
+        this.initializeDefaults();
+    }
+
+    initializeDefaults() {
         this.vpd_phases = [
             {lower: -0.6, upper: 0, className: 'gray-danger-zone', color: '#999999'},
             {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
@@ -41,8 +55,7 @@ class HaVpdChart extends HTMLElement {
         this.updateRunning = false;
         this.configMemory = {};
         this.ghostmap_hours = 24;
-        this.unit_temperature = '°C';
-
+        this.unit_temperature = DEFAULT_UNIT_TEMPERATURE;
     }
 
     static get properties() {
@@ -77,20 +90,22 @@ class HaVpdChart extends HTMLElement {
 
     set hass(hass) {
         this._hass = hass;
-        this.is_bar_view ? this.buildBarChart() : this.buildChart();
+        this.updateChartView();
+        this.updateTemperatureUnit();
+    }
 
-        if (this.config.enable_fahrenheit) {
-            this.unit_temperature = '°F';
-        } else {
-            this.unit_temperature = '°C';
-        }
+    updateChartView() {
+        this.is_bar_view ? this.buildBarChart() : this.buildChart();
+    }
+
+    updateTemperatureUnit() {
+        this.unit_temperature = this.config.enable_fahrenheit ? FAHRENHEIT_UNIT_TEMPERATURE : DEFAULT_UNIT_TEMPERATURE;
     }
 
     static getConfigElement() {
         return document.createElement("ha-vpd-chart-editor");
     }
 
-    // if config updated
     setConfig(config) {
         this.config = config;
 
@@ -98,15 +113,7 @@ class HaVpdChart extends HTMLElement {
             throw new Error('You need to define sensors');
         }
 
-        const configKeys = [
-            'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
-            'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
-            'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
-            'enable_tooltip', 'enable_crosshair', 'enable_fahrenheit', 'ghostmap_hours',
-            'unit_temperature', 'enable_zoom'
-        ];
-
-        configKeys.forEach(key => {
+        CONFIG_KEYS.forEach(key => {
             if (key in config) {
                 this[key] = config[key];
             }

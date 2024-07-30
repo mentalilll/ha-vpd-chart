@@ -4,7 +4,14 @@ export const fireEvent = (node, type, detail = {}, options = {}) => {
         cancelable: Boolean(options.cancelable),
         composed: options.composed === undefined ? true : options.composed,
     });
-
+    if (detail.config.vpd_phases !== undefined) {
+        if (detail.config.vpd_phases[0] !== undefined) {
+            detail.config.vpd_phases[0].lower = undefined;
+        }
+        if (detail.config.vpd_phases[detail.config.vpd_phases.length - 1] !== undefined) {
+            detail.config.vpd_phases[detail.config.vpd_phases.length - 1].upper = undefined;
+        }
+    }
     event.detail = detail;
     node.dispatchEvent(event);
     return event;
@@ -51,7 +58,7 @@ export class HaVpdChartEditor extends HTMLElement {
 
     get _vpd_phases() {
         return this._config.vpd_phases !== undefined ? this._config.vpd_phases : [
-            {lower: -0.6, upper: 0, className: 'gray-danger-zone', color: '#999999'},
+            {upper: 0, className: 'gray-danger-zone', color: '#999999'},
             {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
             {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'},
             {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'},

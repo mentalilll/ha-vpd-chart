@@ -36,9 +36,10 @@ export const ghostmap = {
 
     processSensorData(fragment, temperatures, humidities, index) {
         let opacityFade = 1;
+        let fadeStep = (1 / (temperatures.length - 1)).toFixed(2);
         temperatures.forEach((temperature, tempIndex) => {
             if (humidities[tempIndex]) {
-                opacityFade -= 0.05;
+                opacityFade -= fadeStep;
                 const circle = this.createCircle(index, tempIndex, temperature, humidities[tempIndex].state, opacityFade);
                 fragment.appendChild(circle);
             }
@@ -46,11 +47,11 @@ export const ghostmap = {
     },
 
     createCircle(index, tempIndex, temperature, humidity, opacityFade) {
-        const relativeHumidity = this.max_humidity - humidity;
+        const relativeHumidity = this.max_humidity - (humidity * this.zoomLevel);
         const totalHumidityRange = this.max_humidity - this.min_humidity;
         const percentageHumidity = (relativeHumidity / totalHumidityRange) * 100;
 
-        const relativeTemperature = temperature.state - this.min_temperature;
+        const relativeTemperature = (temperature.state * this.zoomLevel) - this.min_temperature;
         const totalTemperatureRange = this.max_temperature - this.min_temperature;
         const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
 
@@ -59,7 +60,7 @@ export const ghostmap = {
         circle.style.left = `${percentageHumidity}%`;
         circle.style.bottom = `${100 - percentageTemperature}%`;
         circle.style.opacity = opacityFade;
-        circle.style.boxShadow = `0 0 25px 5px rgba(255, 255, 255, ${opacityFade})`;
+        //  circle.style.boxShadow = `0 0 25px 5px rgba(255, 255, 255, ${opacityFade})`;
 
         return circle;
     }
