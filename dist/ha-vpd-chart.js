@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.3.9";
+window.vpdChartVersion = "1.4.0";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -56,6 +56,7 @@ class HaVpdChart extends HTMLElement {
         this.configMemory = {};
         this.ghostmap_hours = 24;
         this.unit_temperature = DEFAULT_UNIT_TEMPERATURE;
+        this.clickedTooltip = false;
     }
 
     static get properties() {

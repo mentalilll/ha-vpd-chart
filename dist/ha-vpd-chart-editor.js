@@ -137,8 +137,9 @@ export class HaVpdChartEditor extends HTMLElement {
 
     handleValueChange = (ev) => {
         const target = ev.target;
-        const configValue = target.getAttribute('configvalue');
+        const configValue = target.getAttribute('data-configvalue');
         let value = target.type === 'checkbox' ? target.checked : target.value;
+
         if (typeof value === 'string' && !isNaN(value)) {
             value = this.toFixedNumber(value);
         }
@@ -154,8 +155,14 @@ export class HaVpdChartEditor extends HTMLElement {
         if (value === "off") {
             value = false;
         }
-        if (this._config[configValue] !== value) {
-            this._config[configValue] = value;
+
+        if (Object.isExtensible(this._config)) {
+            if (this._config[configValue] !== value) {
+                this._config[configValue] = value;
+                fireEvent(this, 'config-changed', {config: this._config});
+            }
+        } else {
+            this._config = {...this._config, [configValue]: value};
             fireEvent(this, 'config-changed', {config: this._config});
         }
     }
@@ -200,42 +207,42 @@ export class HaVpdChartEditor extends HTMLElement {
             <table>
                 <tr>
                     <td>
-                        <ha-textfield style="width:100%;" label="Air Text" id="air_text" configvalue="air_text"></ha-textfield>
+                        <ha-textfield style="width:100%;" label="Air Text" id="air_text" data-configvalue="air_text"></ha-textfield>
                     </td>
                     <td>
-                        <ha-textfield style="width:100%;" label="RH Text" id="rh_text" configvalue="rh_text"></ha-textfield>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <ha-textfield style="width:100%;" label="kPa Text" id="kpa_text" configvalue="kpa_text"></ha-textfield>
-                    </td>
-                    <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Height of Table" id="min_height" configvalue="min_height"></ha-textfield>
+                        <ha-textfield style="width:100%;" label="RH Text" id="rh_text" data-configvalue="rh_text"></ha-textfield>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Temperature" id="min_temperature" configvalue="min_temperature"></ha-textfield>
+                        <ha-textfield style="width:100%;" label="kPa Text" id="kpa_text" data-configvalue="kpa_text"></ha-textfield>
                     </td>
                     <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Max Temperature" id="max_temperature" configvalue="max_temperature"></ha-textfield>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Humidity" id="min_humidity" configvalue="min_humidity"></ha-textfield>
-                    </td>
-                    <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Max Humidity" id="max_humidity" configvalue="max_humidity"></ha-textfield>
+                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Height of Table" id="min_height" data-configvalue="min_height"></ha-textfield>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <ha-textfield style="width:100%;" type="number" label="Leaf Temperature offset" id="leaf_temperature_offset" configvalue="leaf_temperature_offset"></ha-textfield>
+                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Temperature" id="min_temperature" data-configvalue="min_temperature"></ha-textfield>
                     </td>
                     <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Ghostmap Hours" id="ghostmap_hours" configvalue="ghostmap_hours"></ha-textfield>
+                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Max Temperature" id="max_temperature" data-configvalue="max_temperature"></ha-textfield>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Humidity" id="min_humidity" data-configvalue="min_humidity"></ha-textfield>
+                    </td>
+                    <td>
+                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Max Humidity" id="max_humidity" data-configvalue="max_humidity"></ha-textfield>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <ha-textfield style="width:100%;" type="number" label="Leaf Temperature offset" id="leaf_temperature_offset" data-configvalue="leaf_temperature_offset"></ha-textfield>
+                    </td>
+                    <td>
+                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Ghostmap Hours" id="ghostmap_hours" data-configvalue="ghostmap_hours"></ha-textfield>
                     </td>
                 </tr>
             </table>
@@ -248,13 +255,13 @@ export class HaVpdChartEditor extends HTMLElement {
                 <tr>
                     <td>
                         <label>
-                            <input type="checkbox" id="is_bar_view" configvalue="is_bar_view">
+                            <input type="checkbox" id="is_bar_view" data-configvalue="is_bar_view">
                             Bar View
                         </label>
                     </td>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_axes" configvalue="enable_axes">
+                            <input type="checkbox" id="enable_axes" data-configvalue="enable_axes">
                             Enable Axes
                         </label>
                     </td>
@@ -262,13 +269,13 @@ export class HaVpdChartEditor extends HTMLElement {
                 <tr>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_ghostmap" configvalue="enable_ghostmap">
+                            <input type="checkbox" id="enable_ghostmap" data-configvalue="enable_ghostmap">
                             Enable Ghostmap
                         </label>
                     </td>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_triangle" configvalue="enable_triangle">
+                            <input type="checkbox" id="enable_triangle" data-configvalue="enable_triangle">
                             Enable Triangle
                         </label>
                     </td>
@@ -276,13 +283,13 @@ export class HaVpdChartEditor extends HTMLElement {
                 <tr>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_tooltip" configvalue="enable_tooltip">
+                            <input type="checkbox" id="enable_tooltip" data-configvalue="enable_tooltip">
                             Enable Tooltip
                         </label>
                     </td>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_crosshair" configvalue="enable_crosshair">
+                            <input type="checkbox" id="enable_crosshair" data-configvalue="enable_crosshair">
                             Enable Mousehover Crosshair
                         </label>
                     </td>
@@ -290,13 +297,13 @@ export class HaVpdChartEditor extends HTMLElement {
                 <tr>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_fahrenheit" configvalue="enable_fahrenheit">
+                            <input type="checkbox" id="enable_fahrenheit" data-configvalue="enable_fahrenheit">
                             Enable Fahrenheit
                         </label>
                     </td>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_zoom" configvalue="enable_zoom">
+                            <input type="checkbox" id="enable_zoom" data-data-configvalue="enable_zoom">
                             Enable Zoom
                         </label>
                     </td>
@@ -369,14 +376,7 @@ export class HaVpdChartEditor extends HTMLElement {
             }
         });
 
-        const minVPD = this.toFixedNumber(this.calculateVPD(this._max_temperature - this._leaf_temperature_offset, this._max_temperature, this._max_humidity));
-        const maxVPD = this.toFixedNumber(this.calculateVPD(this._max_temperature - this._leaf_temperature_offset, this._max_temperature, this._min_humidity));
-
         let vpdPhases = this._vpd_phases;
-        vpdPhases[0].lower = this.toFixedNumber(minVPD);
-        vpdPhases[vpdPhases.length - 1].upper = maxVPD;
-
-        this.vpd_phases = vpdPhases;
         const sliderContainer = this.shadowRoot.querySelector('#slider-container');
 
         let rangesArray = this.generateRangesArray(vpdPhases);

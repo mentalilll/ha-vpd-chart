@@ -90,7 +90,7 @@ export const chart = {
         }
     },
 
-    handleMouseDown(event) {
+    handleMouseDown() {
         this.isPanning = true;
     },
     handleMouseUp() {
@@ -351,11 +351,18 @@ export const chart = {
         if (!pointer.isConnected) {
             pointer.addEventListener('mouseover', this.showSensorDetails.bind(this, index));
             pointer.addEventListener('mouseleave', this.hideSensorDetails.bind(this, index));
+            pointer.addEventListener('click', this.toggleSensorDetails.bind(this, index));
         }
-
         return {pointer, horizontalLine, verticalLine, tooltip};
     },
-
+    toggleSensorDetails(index) {
+        this.clickedTooltip = !this.clickedTooltip;
+        if (this.clickedTooltip) {
+            this.hideSensorDetails(index);
+        } else {
+            this.showSensorDetails(index);
+        }
+    },
     showSensorDetails(index) {
         this.querySelectorAll(`.history-circle-${index}`).forEach(circle => circle.style.display = 'block');
         this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
@@ -373,9 +380,11 @@ export const chart = {
         });
     },
     hideSensorDetails(index) {
-        this.querySelectorAll(`.history-circle-${index}`).forEach(circle => circle.style.display = 'none');
-        this.querySelectorAll('.custom-tooltip, .horizontal-line, .vertical-line, .sensor-pointer').forEach(el => el.style.display = 'block');
-        this.querySelectorAll('.custom-tooltip').forEach(tooltip => tooltip.style.opacity = '1');
+        if (!this.clickedTooltip) {
+            this.querySelectorAll(`.history-circle-${index}`).forEach(circle => circle.style.display = 'none');
+            this.querySelectorAll('.custom-tooltip, .horizontal-line, .vertical-line, .sensor-pointer').forEach(el => el.style.display = 'block');
+            this.querySelectorAll('.custom-tooltip').forEach(tooltip => tooltip.style.opacity = '1');
+        }
     },
     buildMouseTooltip(target, targetHumidity = null, targetTemperature = null, targetVpd = null) {
         const humidity = targetHumidity?.toFixed(1) || parseFloat(target.getAttribute('data-rh')).toFixed(1);
