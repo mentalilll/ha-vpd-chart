@@ -51,7 +51,7 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 
 .vpd-chart-view .highlight {
     position: absolute;
-    z-index: 3;
+    z-index: 2;
     cursor: pointer;
     width: 10px;
     height: 10px;
@@ -64,10 +64,6 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 .vpd-chart-view .custom-tooltip {
     pointer-events: none;
     transform: translate(-50%);
-}
-
-.vpd-chart-view .highlight:hover {
-    z-index: 4;
 }
 
 .vpd-chart-view .vertical-line {
@@ -130,7 +126,7 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     font-size: 12px;
     line-height: 1.2;
     position: absolute;
-    z-index: 2;
+    z-index: 3;
 }
 
 .vpd-chart-view .mouse-custom-tooltip {
@@ -261,12 +257,17 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 
 .vpd-chart-view #sensors .sensor-triangle {
     width: 16px !important;
-    height: 0 !important;
+    height: 16px !important;
     padding: 0 !important;
     margin: 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
     background: transparent !important;
+    z-index: 3;
+}
+
+.vpd-chart-view #sensors .sensor-pointer {
+    z-index: 3;
 }
 
 .vpd-chart-view #sensors .sensor-triangle:after {
@@ -281,4 +282,20 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     content: " ";
     font-size: 0;
     line-height: 0;
+}
+
+.vpd-chart-view .ghostmapClick {
+    display: inline-block;
+    vertical-align: text-bottom;
+    cursor: pointer;
+    pointer-events: all;
+    fill: #ffffff;
+}
+
+.vpd-chart-view .ghostmapClick:hover {
+    fill: #00aa00;
+}
+
+.vpd-chart-view .ghostmapClick:active, .vpd-chart-view .ghostmapClick.active {
+    fill: #00ff00;
 }

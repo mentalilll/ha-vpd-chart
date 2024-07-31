@@ -21,7 +21,7 @@ export const bar = {
                 this.config.sensors.forEach((sensor) => {
                     let humidity = this._hass.states[sensor.humidity].state;
                     let temperature = this._hass.states[sensor.temperature].state;
-                    let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
+                    let leafTemperature = temperature - this.getLeafTemperatureOffset();
                     if (sensor.leaf_temperature !== undefined) {
                         if (this._hass.states[sensor.leaf_temperature] !== undefined) {
                             leafTemperature = this._hass.states[sensor.leaf_temperature].state;
@@ -86,7 +86,7 @@ export const bar = {
         this.config.sensors.forEach((sensor, index) => {
             let humidity = this._hass.states[sensor.humidity].state;
             let temperature = this._hass.states[sensor.temperature].state;
-            let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
+            let leafTemperature = temperature - this.getLeafTemperatureOffset();
             if (sensor.leaf_temperature !== undefined) {
                 leafTemperature = this._hass.states[sensor.leaf_temperature].state;
             }
@@ -183,7 +183,7 @@ export const bar = {
                 if (humidities[tempIndex]) {
                     data['sensor-' + index].push({
                         time: temperature.last_changed,
-                        vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - (this.config.leaf_temperature_offset || 2), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)).toFixed(2),
+                        vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - this.getLeafTemperatureOffset(), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)).toFixed(2),
                     });
                 }
             });

@@ -56,7 +56,7 @@ export const methods = {
 
         for (let Tair = minTemperature; Tair <= maxTemperature; Tair += stepsTemperature) {
             const row = [];
-            const Tleaf = Tair - (this.config.leaf_temperature_offset || 2);
+            const Tleaf = Tair - 2;
 
             for (let RH = minHumidity; RH <= maxHumidity; RH += stepsHumidity) {
                 const vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
@@ -70,6 +70,19 @@ export const methods = {
         }
 
         return vpdMatrix;
-    }
+    },
+    getLeafTemperatureOffset() {
+        let offset = 2;
+        if (typeof this.config.leaf_temperature_offset === 'number') {
+            return this.config.leaf_temperature_offset;
+        }
+        if (typeof this.config.leaf_temperature_offset === 'string') {
+            offset = this._hass.states[this.config.leaf_temperature_offset].state;
+            if (!isNaN(offset)) {
+                return offset;
+            }
+        }
+        return offset;
+    },
 
 }

@@ -96,15 +96,19 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     get _enable_axes() {
-        return this._config.enable_axes !== undefined ? this._config.enable_axes : false;
+        return this._config.enable_axes !== undefined ? this._config.enable_axes : true;
+    }
+
+    get _enable_ghostclick() {
+        return this._config.enable_ghostclick !== undefined ? this._config.enable_ghostclick : true;
     }
 
     get _enable_ghostmap() {
-        return this._config.enable_ghostmap !== undefined ? this._config.enable_ghostmap : false;
+        return this._config.enable_ghostmap !== undefined ? this._config.enable_ghostmap : true;
     }
 
     get _enable_triangle() {
-        return this._config.enable_triangle || false;
+        return this._config.enable_triangle || true;
     }
 
     get _enable_crosshair() {
@@ -112,7 +116,7 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     get _enable_tooltip() {
-        return this._config.enable_tooltip !== undefined ? this._config.enable_tooltip : false;
+        return this._config.enable_tooltip !== undefined ? this._config.enable_tooltip : true;
     }
 
     get _ghostmap_hours() {
@@ -155,7 +159,10 @@ export class HaVpdChartEditor extends HTMLElement {
         if (value === "off") {
             value = false;
         }
-
+        // if empty value
+        if (value === "") {
+            value = undefined;
+        }
         if (Object.isExtensible(this._config)) {
             if (this._config[configValue] !== value) {
                 this._config[configValue] = value;
@@ -239,7 +246,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 </tr>
                 <tr>
                     <td>
-                        <ha-textfield style="width:100%;" type="number" label="Leaf Temperature offset" id="leaf_temperature_offset" data-configvalue="leaf_temperature_offset"></ha-textfield>
+                        <ha-textfield style="width:100%;" type="text" label="Leaf Temperature offset" id="leaf_temperature_offset" data-configvalue="leaf_temperature_offset"></ha-textfield>
                     </td>
                     <td>
                         <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Ghostmap Hours" id="ghostmap_hours" data-configvalue="ghostmap_hours"></ha-textfield>
@@ -275,38 +282,47 @@ export class HaVpdChartEditor extends HTMLElement {
                     </td>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_triangle" data-configvalue="enable_triangle">
-                            Enable Triangle
+                            <input type="checkbox" id="enable_ghostclick" data-configvalue="enable_ghostclick">
+                            Enable Ghostclick
                         </label>
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="enable_triangle" data-configvalue="enable_triangle">
+                            Enable Triangle
+                        </label>
+                    </td>
                     <td>
                         <label>
                             <input type="checkbox" id="enable_tooltip" data-configvalue="enable_tooltip">
                             Enable Tooltip
                         </label>
                     </td>
+                </tr>
+                <tr>         
                     <td>
                         <label>
                             <input type="checkbox" id="enable_crosshair" data-configvalue="enable_crosshair">
                             Enable Mousehover Crosshair
                         </label>
                     </td>
-                </tr>
-                <tr>
                     <td>
                         <label>
                             <input type="checkbox" id="enable_fahrenheit" data-configvalue="enable_fahrenheit">
                             Enable Fahrenheit
                         </label>
                     </td>
+                </tr>
+                <tr>
                     <td>
                         <label>
                             <input type="checkbox" id="enable_zoom" data-data-configvalue="enable_zoom">
                             Enable Zoom
                         </label>
                     </td>
+                    <td></td>
                 </tr>
             </table>
         </div>
@@ -355,6 +371,7 @@ export class HaVpdChartEditor extends HTMLElement {
             {id: 'min_height', prop: '_min_height', type: 'value'},
             {id: 'is_bar_view', prop: '_is_bar_view', type: 'checked'},
             {id: 'enable_axes', prop: '_enable_axes', type: 'checked'},
+            {id: 'enable_ghostclick', prop: '_enable_ghostclick', type: 'checked'},
             {id: 'enable_ghostmap', prop: '_enable_ghostmap', type: 'checked'},
             {id: 'enable_triangle', prop: '_enable_triangle', type: 'checked'},
             {id: 'enable_crosshair', prop: '_enable_crosshair', type: 'checked'},
@@ -369,7 +386,15 @@ export class HaVpdChartEditor extends HTMLElement {
             const element = this.shadowRoot.querySelector(`#${id}`);
             if (element) {
                 if (Object.isExtensible(element)) {
-                    element[type] = this[prop];
+                    if (type === "checked") {
+                        if (this[prop]) {
+                            element[type] = 'checked';
+                        } else {
+                            element[type] = '';
+                        }
+                    } else {
+                        element[type] = this[prop];
+                    }
                 } else {
                     console.warn('Cannot define property on a non-extensible object');
                 }

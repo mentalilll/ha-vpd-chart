@@ -12,7 +12,7 @@ const FAHRENHEIT_UNIT_TEMPERATURE = '°F';
 const CONFIG_KEYS = [
     'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
     'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
-    'is_bar_view', 'enable_axes', 'enable_ghostmap', 'enable_triangle',
+    'is_bar_view', 'enable_axes', 'enable_ghostclick', 'enable_ghostmap', 'enable_triangle',
     'enable_tooltip', 'enable_crosshair', 'enable_fahrenheit', 'ghostmap_hours',
     'unit_temperature', 'enable_zoom'
 ];
@@ -25,7 +25,7 @@ class HaVpdChart extends HTMLElement {
 
     initializeDefaults() {
         this.vpd_phases = [
-            {lower: -0.6, upper: 0, className: 'gray-danger-zone', color: '#999999'},
+            {upper: 0, className: 'gray-danger-zone', color: '#999999'},
             {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
             {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'},
             {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'},
@@ -47,6 +47,7 @@ class HaVpdChart extends HTMLElement {
         this.rh_text = "RH";
         this.kpa_text = "kPa";
         this.enable_axes = true;
+        this.enable_ghostclick = true;
         this.enable_ghostmap = true;
         this.enable_triangle = false;
         this.enable_crosshair = false;
@@ -75,6 +76,7 @@ class HaVpdChart extends HTMLElement {
             enable_tooltip: {type: Boolean},
             is_bar_view: {type: Boolean},
             enable_axes: {type: Boolean},
+            enable_ghostclick: {type: Boolean},
             enable_ghostmap: {type: Boolean},
             enable_triangle: {type: Boolean},
             enable_crosshair: {type: Boolean},

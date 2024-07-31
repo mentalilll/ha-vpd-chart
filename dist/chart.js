@@ -109,7 +109,7 @@ export const chart = {
 
         const temperature = this.min_temperature + (temperatureRange * yPercent / 100);
         const humidity = this.max_humidity - (humidityRange * xPercent / 100);
-        const leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
+        const leafTemperature = temperature - this.getLeafTemperatureOffset();
 
         const vpd = this.calculateVPD(leafTemperature, temperature, humidity);
 
@@ -275,7 +275,7 @@ export const chart = {
             if (this._hass.states[sensor.humidity] && this._hass.states[sensor.temperature]) {
                 const humidity = parseFloat(this._hass.states[sensor.humidity].state);
                 const temperature = parseFloat(this._hass.states[sensor.temperature].state);
-                let leafTemperature = temperature - (this.config.leaf_temperature_offset || 2);
+                let leafTemperature = temperature - this.getLeafTemperatureOffset();
                 if (sensor.leaf_temperature !== undefined) {
                     leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
                 }
@@ -284,8 +284,8 @@ export const chart = {
                 } else {
                     vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
                 }
-                const min_vpd = this.calculateVPD(temperature - (this.config.leaf_temperature_offset || 2), temperature, this.max_humidity);
-                const max_vpd = this.calculateVPD(temperature - (this.config.leaf_temperature_offset || 2), temperature, this.min_humidity);
+                const min_vpd = this.calculateVPD(temperature - this.getLeafTemperatureOffset(), temperature, this.max_humidity);
+                const max_vpd = this.calculateVPD(temperature - this.getLeafTemperatureOffset(), temperature, this.min_humidity);
                 const relativeVpd = vpd - min_vpd;
                 const totalVpdRange = max_vpd - min_vpd;
                 const percentageVpd = (relativeVpd / totalVpdRange) * 100;
@@ -302,6 +302,15 @@ export const chart = {
                 // Check and append only if elements are Nodes
                 if (pointerElements.pointer instanceof Node) {
                     sensors.appendChild(pointerElements.pointer);
+                    if (this.enable_ghostclick) {
+                        let ghostmapClick = this.querySelector(`.ghostmapClick_${index}`) || document.createElement('div');
+                        let classes = `ghostmapClick ghostmapClick_${index}`;
+                        if (this.clickedTooltip) {
+                            classes += ' active';
+                        }
+                        ghostmapClick.setAttribute('class', classes);
+                        ghostmapClick.addEventListener('click', this.toggleSensorDetails.bind(this, index));
+                    }
                 }
                 if (pointerElements.horizontalLine instanceof Node) {
                     sensors.appendChild(pointerElements.horizontalLine);
@@ -334,30 +343,46 @@ export const chart = {
         verticalLine.style.left = `calc(${percentageHumidity}% - 0.5px)`;
 
         let tooltip = null;
-        if (this.enable_tooltip) {
-            tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
-            tooltip.className = `custom-tooltip custom-tooltip-${index}`;
-            tooltip.setAttribute('data-index', index.toString());
-            tooltip.innerHTML = `<span><strong>${sensorName}</strong></span> <span>${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd}</span><span>${this.rh_text ? this.rh_text + ':' : ''} ${humidity}%</span><span>${this.air_text ? this.air_text + ':' : ''} ${temperature}${this.unit_temperature}</span>`;
-            tooltip.style.bottom = `${100 - percentageTemperature}%`;
-            tooltip.style.left = `${percentageHumidity}%`;
-            if ((tooltip.offsetLeft + (tooltip.offsetWidth / 2)) > this.content.offsetWidth) {
-                const containerWidth = this.content.offsetWidth;
-                const overflowWidth = (tooltip.offsetLeft + (tooltip.offsetWidth / 2)) - containerWidth;
-                tooltip.style.left = `calc(${percentageHumidity}% - ${overflowWidth}px)`;
-            }
+        tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
+        tooltip.className = `custom-tooltip custom-tooltip-${index}`;
+        tooltip.setAttribute('data-index', index.toString());
+        // if sensorName not undefined or empty then show in tooltip
+        let innerHTML = '';
+        if (sensorName !== undefined && sensorName !== '') {
+            innerHTML += `<span><strong>${sensorName}</strong></span>`;
+        }
+        innerHTML += `<span>${this.kpa_text ? this.kpa_text + ': ' : ''}${vpd}</span>`;
+        innerHTML += `<span>${this.rh_text ? this.rh_text + ': ' : ''}${humidity}%</span>`;
+        innerHTML += `<span>${this.air_text ? this.air_text + ': ' : ''}${temperature}${this.unit_temperature}</span>`;
+        innerHTML += `<span>${this.getPhaseClass(vpd)}</span>`;
+        if (this.enable_ghostclick) {
+            innerHTML += `<span><svg class="ghostmapClick ghostmapClick_${index}" fill="#fff" height="13px" width="13px" id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M255.633,0C145.341,0.198,55.994,89.667,55.994,200.006v278.66c0,14.849,17.953,22.285,28.453,11.786l38.216-39.328 l54.883,55.994c6.51,6.509,17.063,6.509,23.572,0L256,451.124l54.883,55.994c6.509,6.509,17.062,6.509,23.571,0l54.884-55.994 l38.216,39.327c10.499,10.499,28.453,3.063,28.453-11.786V201.719C456.006,91.512,365.84-0.197,255.633,0z M172.664,266.674 c-27.572,0-50.001-22.429-50.001-50.001s22.43-50.001,50.001-50.001s50.001,22.43,50.001,50.001S200.236,266.674,172.664,266.674z M339.336,266.674c-27.572,0-50.001-22.429-50.001-50.001s22.43-50.001,50.001-50.001s50.001,22.43,50.001,50.001 S366.908,266.674,339.336,266.674z"></path> </g> </g> </g></svg></span>`;
+        }
+        tooltip.innerHTML = innerHTML;
+
+
+        tooltip.style.bottom = `${100 - percentageTemperature}%`;
+        tooltip.style.left = `${percentageHumidity}%`;
+        if ((tooltip.offsetLeft + (tooltip.offsetWidth / 2)) > this.content.offsetWidth) {
+            const containerWidth = this.content.offsetWidth;
+            const overflowWidth = (tooltip.offsetLeft + (tooltip.offsetWidth / 2)) - containerWidth + 5;
+            tooltip.style.left = `calc(${percentageHumidity}% - ${overflowWidth}px)`;
+        }
+        if ((tooltip.offsetLeft - (tooltip.offsetWidth / 2)) < 0) {
+            const overflowWidth = (tooltip.offsetWidth / 2) - tooltip.offsetLeft + 5;
+            tooltip.style.left = `calc(${percentageHumidity}% + ${overflowWidth}px)`;
+
         }
 
         if (!pointer.isConnected) {
             pointer.addEventListener('mouseover', this.showSensorDetails.bind(this, index));
             pointer.addEventListener('mouseleave', this.hideSensorDetails.bind(this, index));
-            pointer.addEventListener('click', this.toggleSensorDetails.bind(this, index));
         }
         return {pointer, horizontalLine, verticalLine, tooltip};
     },
     toggleSensorDetails(index) {
         this.clickedTooltip = !this.clickedTooltip;
-        if (this.clickedTooltip) {
+        if (!this.clickedTooltip) {
             this.hideSensorDetails(index);
         } else {
             this.showSensorDetails(index);
