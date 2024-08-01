@@ -284,8 +284,8 @@ export const chart = {
                 } else {
                     vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
                 }
-                const min_vpd = this.calculateVPD(temperature - this.getLeafTemperatureOffset(), temperature, this.max_humidity);
-                const max_vpd = this.calculateVPD(temperature - this.getLeafTemperatureOffset(), temperature, this.min_humidity);
+                const min_vpd = this.calculateVPD(temperature - 2, temperature, this.max_humidity);
+                const max_vpd = this.calculateVPD(temperature - 2, temperature, this.min_humidity);
                 const relativeVpd = vpd - min_vpd;
                 const totalVpdRange = max_vpd - min_vpd;
                 const percentageVpd = (relativeVpd / totalVpdRange) * 100;
