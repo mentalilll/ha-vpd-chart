@@ -40,7 +40,8 @@ export const ghostmap = {
         temperatures.forEach((temperature, tempIndex) => {
             if (humidities[tempIndex]) {
                 opacityFade -= fadeStep;
-                const circle = this.createCircle(index, tempIndex, temperature, humidities[tempIndex].state, opacityFade);
+                let humidity = (humidities[tempIndex].state - this.getLeafTemperatureOffset());
+                const circle = this.createCircle(index, tempIndex, temperature, humidity, opacityFade);
                 fragment.appendChild(circle);
             }
         });

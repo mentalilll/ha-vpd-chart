@@ -4,6 +4,11 @@ export const methods = {
         const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000 * RH / 100;
         return VPleaf - VPair;
     },
+    calculateRH(Tleaf, Tair, VPD) {
+        const VPleaf = 610.7 * Math.exp(17.27 * Tleaf / (Tleaf + 237.3)) / 1000;
+        const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000;
+        return ((VPleaf - VPD) / VPair) * 100;
+    },
     getPhaseClass(vpd) {
         for (const phase of this.vpd_phases) {
             if (phase.upper === undefined) {
@@ -71,16 +76,48 @@ export const methods = {
 
         return vpdMatrix;
     },
+    stringToColor(str) {
+        // Erweiterte Hash-Funktion zur Erhöhung der Zufälligkeit
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        // Zufallsmodifikation basierend auf der Länge und einem Pseudozufallswert
+        let randomFactor = Math.sin(hash) * 10000;
+        randomFactor = randomFactor - Math.floor(randomFactor);
+
+        // Kombiniere Hash und Zufallsfaktor
+        hash = (hash + Math.floor(randomFactor * 0xFFFFFF)) & 0xFFFFFF;
+
+        // Konvertiere den numerischen Hash-Wert in einen Hex-Farbcode
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+            const value = (hash >> (i * 8)) & 0xFF;
+            color += ('00' + value.toString(16)).slice(-2);
+        }
+
+        return color;
+    },
     getLeafTemperatureOffset() {
         let offset = 2;
         if (typeof this.config.leaf_temperature_offset === 'number') {
+            if (this.config.leaf_temperature_offset < 2) {
+                return 2;
+            }
             return this.config.leaf_temperature_offset;
         }
         if (typeof this.config.leaf_temperature_offset === 'string') {
             offset = this._hass.states[this.config.leaf_temperature_offset].state;
             if (!isNaN(offset)) {
+                if (offset < 2) {
+                    return 2;
+                }
                 return offset;
             }
+        }
+        if (offset < 2) {
+            offset = 2;
         }
         return offset;
     },

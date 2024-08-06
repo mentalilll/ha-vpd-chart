@@ -1,4 +1,8 @@
-ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
+ha-card {
+    overflow: hidden;
+}
+
+div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
     height: 100%;
     width: 100%;
     min-height: 50px;
@@ -62,7 +66,6 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 }
 
 .vpd-chart-view .custom-tooltip {
-    pointer-events: none;
     transform: translate(-50%);
 }
 
@@ -225,11 +228,20 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 .vpd-chart-view .custom-tooltip span {
     padding-left: 5px;
     padding-right: 5px;
-    border-right: 1px solid #999999;
+    border-left: 1px solid #999999;
 }
 
-.vpd-chart-view .custom-tooltip span:last-child {
-    border-right: 0;
+.vpd-chart-view .custom-tooltip span:first-child {
+    border-left: 0;
+}
+
+.vpd-chart-view .custom-tooltip.active {
+    background-color: #000000;
+    background-color: hsla(0, 0%, 20%, 0.9);
+    border-top: 3px solid #ffffff;
+    /* box shadow top */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    color: #ffffff;
 }
 
 .vpd-chart-view .temperature-axis-label {
@@ -251,8 +263,13 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
     pointer-events: none;
 }
 
+.vpd-chart-view #sensors {
+    pointer-events: all;
+}
+
 .vpd-chart-view #sensors .custom-tooltip {
     margin-bottom: 9px;
+    cursor: pointer;
 }
 
 .vpd-chart-view #sensors .sensor-triangle {
@@ -298,4 +315,31 @@ ha-card.vpd-chart-view, ha-card.vpd-chart-view .vpd-card-container {
 
 .vpd-chart-view .ghostmapClick:active, .vpd-chart-view .ghostmapClick.active {
     fill: #00ff00;
+}
+
+.vpd-chart-view .tooltipAdditionalInformations {
+    display: none;
+}
+
+.vpd-chart-view .vpd-legend {
+    display: block;
+    position: absolute;
+    width: 99%;
+    bottom: 10px;
+    z-index: 3;
+}
+
+.vpd-chart-view .vpd-legend .sensor-legend {
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    float: right;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    font-size: 10px;
+    border-radius: 3px;
+    z-index: 3;
+    display: inline;
+    cursor: pointer;
+    margin-right: 5px;
 }

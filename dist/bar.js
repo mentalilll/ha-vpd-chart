@@ -18,20 +18,33 @@ export const bar = {
             `;
             this.content = this.querySelector("div.card-content");
             if (this._hass) {
+                let vpd = 0;
+
                 this.config.sensors.forEach((sensor) => {
-                    let humidity = this._hass.states[sensor.humidity].state;
-                    let temperature = this._hass.states[sensor.temperature].state;
+                    const humidity = parseFloat(this._hass.states[sensor.humidity].state);
+                    const temperature = parseFloat(this._hass.states[sensor.temperature].state);
                     let leafTemperature = temperature - this.getLeafTemperatureOffset();
                     if (sensor.leaf_temperature !== undefined) {
-                        if (this._hass.states[sensor.leaf_temperature] !== undefined) {
-                            leafTemperature = this._hass.states[sensor.leaf_temperature].state;
-                        }
+                        leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
                     }
-                    let vpd;
                     if (sensor.vpd !== undefined) {
-                        vpd = this._hass.states[sensor.vpd].state;
+                        vpd = parseFloat(this._hass.states[sensor.vpd].state);
                     } else {
-                        vpd = this.calculateVPD(this.toFixedNumber(leafTemperature), this.toFixedNumber(temperature), this.toFixedNumber(humidity)).toFixed(2);
+                        vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
+                    }
+                    const min_vpd = this.calculateVPD(temperature - 2, temperature, this.max_humidity);
+                    const max_vpd = this.calculateVPD(temperature - 2, temperature, this.min_humidity);
+                    const relativeVpd = vpd - min_vpd;
+
+                    const totalVpdRange = max_vpd - min_vpd;
+                    const percentageVpd = (relativeVpd / totalVpdRange) * 100;
+
+                    const totalHumidityRange = this.max_humidity - this.min_humidity;
+
+                    let showHumidity = humidity;
+                    let calculatedHumidity = (this.max_humidity - (percentageVpd * totalHumidityRange / 100)).toFixed(1);
+                    if (sensor.show_calculated_rh === true) {
+                        showHumidity = calculatedHumidity;
                     }
 
                     let card = this.content.querySelector(`ha-card[data-sensor="${sensor.name}"]`);
@@ -46,7 +59,7 @@ export const bar = {
                         html += `<span class="vpd-title">${sensor.name}</span>`;
                     }
                     html += `<span class="vpd-value">${vpd} ${this.kpa_text || ''}</span>`;
-                    html += `<span class="vpd-rh">${humidity}%</span>`;
+                    html += `<span class="vpd-rh">${showHumidity}%</span>`;
                     html += `<span class="vpd-temp">${temperature} ${this.unit_temperature}</span>`;
                     html += `<span style="background: ${this.getColorForVpd(vpd)}" class="vpd-state ${this.getPhaseClass(vpd)}"><span>${this.getPhaseClass(vpd)}</span></span>`;
                     html += `<span class="vpd-history" style="float:right;"><canvas></canvas></span>`;
@@ -56,7 +69,6 @@ export const bar = {
                 });
             }
         }
-        console.log()
         this.updateBars();
         this.updateVPDLegend();
 
@@ -83,25 +95,34 @@ export const bar = {
         }
     },
     updateBars() {
+        let vpd = 0;
         this.config.sensors.forEach((sensor, index) => {
-            let humidity = this._hass.states[sensor.humidity].state;
-            let temperature = this._hass.states[sensor.temperature].state;
-            let leafTemperature = temperature - this.getLeafTemperatureOffset();
+            const humidity = this.toFixedNumber(this._hass.states[sensor.humidity].state, 1);
+            const temperature = this.toFixedNumber(this._hass.states[sensor.temperature].state, 1);
+            let leafTemperature = this.toFixedNumber(temperature - this.getLeafTemperatureOffset());
             if (sensor.leaf_temperature !== undefined) {
-                leafTemperature = this._hass.states[sensor.leaf_temperature].state;
+                leafTemperature = this.toFixedNumber(this._hass.states[sensor.leaf_temperature].state);
             }
-            let vpd;
             if (sensor.vpd !== undefined) {
-                vpd = this._hass.states[sensor.vpd].state;
+                vpd = this.toFixedNumber(this._hass.states[sensor.vpd].state);
             } else {
-                vpd = this.calculateVPD(this.toFixedNumber(leafTemperature), this.toFixedNumber(temperature), this.toFixedNumber(humidity)).toFixed(2);
+                vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
+            }
+
+            let showHumidity = humidity;
+            if (sensor.show_calculated_rh === true) {
+                showHumidity = this.calculateRH(temperature - 2, temperature, vpd).toFixed(1);
+            }
+            let sensorName = sensor.name;
+            if (sensorName === undefined) {
+                sensorName = 'Sensor ' + (index + 1);
             }
             let card = this.content.querySelector(`ha-card[data-sensor="${sensor.name}"]`);
             // get the bar from card
             let bar = card.querySelector('.bar');
-            bar.querySelector('.vpd-title').innerText = sensor.name;
+            bar.querySelector('.vpd-title').innerText = sensorName;
             bar.querySelector('.vpd-value').innerText = `${vpd} ${this.kpa_text}`;
-            bar.querySelector('.vpd-rh').innerText = `${humidity}%`;
+            bar.querySelector('.vpd-rh').innerText = `${showHumidity}%`;
             bar.querySelector('.vpd-temp').innerText = `${temperature}${this.unit_temperature}`;
             bar.querySelector('.vpd-state span').innerText = this.getPhaseClass(vpd);
             bar.querySelector('.vpd-state').style.background = this.getColorForVpd(vpd);

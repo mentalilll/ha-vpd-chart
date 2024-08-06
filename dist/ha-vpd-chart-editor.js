@@ -132,7 +132,11 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     get _enable_zoom() {
-        return this._config.enable_zoom || false;
+        return this._config.enable_zoom || true;
+    }
+
+    get _enable_legend() {
+        return this._config.enable_legend || true;
     }
 
     setConfig(config) {
@@ -322,7 +326,12 @@ export class HaVpdChartEditor extends HTMLElement {
                             Enable Zoom
                         </label>
                     </td>
-                    <td></td>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="enable_legend" data-data-configvalue="enable_legend">
+                            Enable Legend
+                        </label>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -345,10 +354,8 @@ export class HaVpdChartEditor extends HTMLElement {
             input.addEventListener('input', this.handleValueChange);
         });
         this.shadowRoot.querySelectorAll('.collapsible').forEach(collapsible => {
-
             collapsible.onclick = () => {
                 collapsible.classList.toggle("active");
-
                 let content = collapsible.nextElementSibling;
                 content.style.maxHeight = content.style.maxHeight ? null : `fit-content`;
 
@@ -378,6 +385,7 @@ export class HaVpdChartEditor extends HTMLElement {
             {id: 'enable_tooltip', prop: '_enable_tooltip', type: 'checked'},
             {id: 'enable_fahrenheit', prop: '_enable_fahrenheit', type: 'checked'},
             {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'},
+            {id: 'enable_legend', prop: '_enable_legend', type: 'checked'},
             {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'},
             {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}
         ];
@@ -422,15 +430,19 @@ export class HaVpdChartEditor extends HTMLElement {
             const idx = event.detail.idx;
             let value = this.toFixedNumber(event.detail.value);
             let newVpdPhases = [...this._vpd_phases];
-            newVpdPhases[idx + 1] = {
-                ...newVpdPhases[idx + 1],
-                lower: this.toFixedNumber(value),
-            };
+            if (newVpdPhases[idx + 1] !== undefined) {
+                newVpdPhases[idx + 1] = {
+                    ...newVpdPhases[idx + 1],
+                    lower: this.toFixedNumber(value),
+                };
+            }
 
-            newVpdPhases[idx] = {
-                ...newVpdPhases[idx],
-                upper: this.toFixedNumber(value),
-            };
+            if (newVpdPhases[idx] !== undefined) {
+                newVpdPhases[idx] = {
+                    ...newVpdPhases[idx],
+                    upper: this.toFixedNumber(value),
+                };
+            }
 
             this.vpd_phases = newVpdPhases;
             this._config.vpd_phases = this.vpd_phases;
@@ -455,8 +467,46 @@ export class HaVpdChartEditor extends HTMLElement {
             return textField;
         };
 
-        const updateSensors = (index, property, value) => {
+        const createCheckbox = (label, index, value, property) => {
+            const divElement = document.createElement('div');
+            divElement.style = 'display: flex; align-items: center; padding:13px;';
+            const labelElement = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = property;
+            if (value) {
+                checkbox.setAttribute('checked', 'checked');
+            }
+            checkbox.setAttribute('data-configvalue', property);
+            labelElement.appendChild(checkbox);
+            labelElement.innerHTML += label;
+            divElement.appendChild(labelElement);
+            return divElement;
+        }
+
+        const updateSensors = (index, property, target) => {
             let newSensors = [...this._sensors];
+            let value = target.type === 'checkbox' ? target.checked : target.value;
+
+            if (typeof value === 'string' && !isNaN(value)) {
+                value = this.toFixedNumber(value);
+            }
+
+            if (isNaN(value)) {
+                value = target.value;
+            }
+
+            if (value === "on") {
+                value = true;
+            }
+
+            if (value === "off") {
+                value = false;
+            }
+            // if empty value
+            if (value === "") {
+                value = undefined;
+            }
             newSensors[index][property] = value;
             this._config.sensors = newSensors;
             fireEvent(this, 'config-changed', {config: this._config});
@@ -468,12 +518,18 @@ export class HaVpdChartEditor extends HTMLElement {
             const container = document.createElement('div');
             container.style = "border: 1px solid rgba(127,127,127,0.3); padding: 5px; border-radius: 15px;";
 
-            const fields = ['Name', 'Temperature Sensor*', 'Leaf Temperature Sensor', 'Humidity Sensor*'];
-            const properties = ['name', 'temperature', 'leaf_temperature', 'humidity'];
+            const fields = ['Name', 'Temperature Sensor*', 'Leaf Temperature Sensor', 'Humidity Sensor*', 'Calculated RH?'];
+            const properties = ['name', 'temperature', 'leaf_temperature', 'humidity', 'show_calculated_rh'];
 
             fields.forEach((field, i) => {
-                const element = createTextField(field, index, sensor[properties[i]]);
-                element.addEventListener('input', (ev) => updateSensors(index, properties[i], ev.target.value));
+                let element;
+                if (properties[i] === 'show_calculated_rh') {
+                    element = createCheckbox(field, index, sensor[properties[i]], properties[i]);
+                } else {
+                    element = createTextField(field, index, sensor[properties[i]]);
+                }
+
+                element.addEventListener('input', (ev) => updateSensors(index, properties[i], ev.target));
                 container.appendChild(element);
             });
             const removeButton = document.createElement('button');

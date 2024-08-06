@@ -101,10 +101,11 @@ is_bar_view: false #optional
 enable_tooltip: true #optional
 enable_axes: true #optional
 enable_ghostmap: true #optional
-enable_triangle: false #optional
+enable_triangle: true #optional
 enable_crosshair: true #optional
 enable_fahrenheit: false #optional
-enable_zoom: false #optional
+enable_zoom: true #optional
+enable_legend: true #optional
 leaf_temperature_offset: 2 || input_number.leaf_offset_example #optional
 sensors:
   - temperature: sensor.temperature_2
@@ -156,13 +157,14 @@ calculateVPD: |2-
 | sensors                 | list           | **required** |                                         | A list of sensors with their temperature and humidity entity IDs, and an optional name for display. |
 | vpd_phases              | list           | optional     | See description                         | A list of VPD phases and their classes for visual representation. See below for defaults.           |
 | enable_tooltip          | boolean        | optional     | `true`                                  | Tooltip enabled by default.                                                                         |
-| is_bar_view             | boolean        | optional     | `false`                                 | Second view of this chart for fast information of sensors                                           |
+| is_bar_view             | boolean        | optional     | `true`                                  | Enable Bar view of this chart for fast information of sensors                                       |
 | enable_axes             | boolean        | optional     | `true`                                  | Enable Axes on the Chart                                                                            |
 | enable_ghostmap         | boolean        | optional     | `true`                                  | Enable Ghostmap on the Chart                                                                        |
 | enable_triangle         | boolean        | optional     | `true`                                  | Enable Triangle instead of Circle for tooltip marker                                                |
 | enable_crosshair        | boolean        | optional     | `true`                                  | Enable MouseHover Crosshair                                                                         |
 | enable_fahrenheit       | boolean        | optional     | `false`                                 | Enable Fahrenheit instead of Celsius                                                                |
-| enable_zoom             | boolean        | optional     | `false`                                 | Enable zoom function for chart                                                                      |
+| enable_zoom             | boolean        | optional     | `true`                                  | Enable zoom function for chart                                                                      |
+| enable_legend           | boolean        | optional     | `true`                                  | Enable Legend function for chart                                                                    |
 | calculateVPD            | string         | optional     | See description                         | Custom function to calculate VPD.                                                                   |
 
 **Default `vpd_phases` Configuration:**
