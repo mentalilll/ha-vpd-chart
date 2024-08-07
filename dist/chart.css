@@ -1,5 +1,6 @@
 ha-card {
     overflow: hidden;
+    height: 100%;
 }
 
 div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {

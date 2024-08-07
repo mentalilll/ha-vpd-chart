@@ -23,16 +23,14 @@ export class HaVpdChartEditor extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
-        this._config = {};
-        this.handles = {};
-        this.segments = {};
+        this.config = {};
         this.vpd_phases = {};
     }
 
     static get properties() {
         return {
             hass: {},
-            _config: {},
+            config: {},
         };
     }
 
@@ -41,23 +39,23 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     get _sensors() {
-        return this._config.sensors || '';
+        return this.config.sensors || '';
     }
 
     get _air_text() {
-        return this._config.air_text || '';
+        return this.config.air_text || '';
     }
 
     get _rh_text() {
-        return this._config.rh_text || '';
+        return this.config.rh_text || '';
     }
 
     get _kpa_text() {
-        return this._config.kpa_text || '';
+        return this.config.kpa_text || '';
     }
 
     get _vpd_phases() {
-        return this._config.vpd_phases !== undefined ? this._config.vpd_phases : [
+        return this.config.vpd_phases !== undefined ? this.config.vpd_phases : [
             {upper: 0, className: 'gray-danger-zone', color: '#999999'},
             {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
             {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'},
@@ -68,79 +66,83 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     get _min_temperature() {
-        return this._config.min_temperature !== undefined ? this._config.min_temperature : 5;
+        return this.config.min_temperature !== undefined ? this.config.min_temperature : 5;
     }
 
     get _max_temperature() {
-        return this._config.max_temperature !== undefined ? this._config.max_temperature : 35;
+        return this.config.max_temperature !== undefined ? this.config.max_temperature : 35;
     }
 
     get _min_humidity() {
-        return this._config.min_humidity !== undefined ? this._config.min_humidity : 0;
+        return this.config.min_humidity !== undefined ? this.config.min_humidity : 0;
     }
 
     get _max_humidity() {
-        return this._config.max_humidity !== undefined ? this._config.max_humidity : 100;
+        return this.config.max_humidity !== undefined ? this.config.max_humidity : 100;
     }
 
     get _min_height() {
-        return this._config.min_height !== undefined ? this._config.min_height : 200;
+        return this.config.min_height !== undefined ? this.config.min_height : 200;
     }
 
     get _leaf_temperature_offset() {
-        return this._config.leaf_temperature_offset !== undefined ? this._config.leaf_temperature_offset : 2;
+        return this.config.leaf_temperature_offset !== undefined ? this.config.leaf_temperature_offset : 2;
     }
 
     get _is_bar_view() {
-        return this._config.is_bar_view || false;
+        return this.config.is_bar_view || false;
     }
 
     get _enable_axes() {
-        return this._config.enable_axes !== undefined ? this._config.enable_axes : true;
+        return this.config.enable_axes !== undefined ? this.config.enable_axes : true;
     }
 
     get _enable_ghostclick() {
-        return this._config.enable_ghostclick !== undefined ? this._config.enable_ghostclick : true;
+        return this.config.enable_ghostclick !== undefined ? this.config.enable_ghostclick : true;
     }
 
     get _enable_ghostmap() {
-        return this._config.enable_ghostmap !== undefined ? this._config.enable_ghostmap : true;
+        return this.config.enable_ghostmap !== undefined ? this.config.enable_ghostmap : true;
     }
 
     get _enable_triangle() {
-        return this._config.enable_triangle || true;
+        return this.config.enable_triangle !== undefined ? this.config.enable_triangle : true;
     }
 
     get _enable_crosshair() {
-        return this._config.enable_crosshair || true;
+        return this.config.enable_crosshair !== undefined ? this.config.enable_crosshair : true;
     }
 
     get _enable_tooltip() {
-        return this._config.enable_tooltip !== undefined ? this._config.enable_tooltip : true;
+        return this.config.enable_tooltip !== undefined ? this.config.enable_tooltip : true;
     }
 
     get _ghostmap_hours() {
-        return this._config.ghostmap_hours !== undefined ? this._config.ghostmap_hours : 24;
+        return this.config.ghostmap_hours !== undefined ? this.config.ghostmap_hours : 24;
     }
 
     get _enable_fahrenheit() {
-        return this._config.enable_fahrenheit || false;
+        return this.config.enable_fahrenheit !== undefined ? this.config.enable_fahrenheit : false;
     }
 
     get _unit_temperature() {
-        return this._config.unit_temperature || 'C';
+        return this.config.unit_temperature || 'C';
     }
 
     get _enable_zoom() {
-        return this._config.enable_zoom || true;
+        return this.config.enable_zoom !== undefined ? this.config.enable_zoom : true;
+    }
+
+    get _enable_show_always_informations() {
+        return this.config.enable_show_always_informations !== undefined ? this.config.enable_show_always_informations : true;
     }
 
     get _enable_legend() {
-        return this._config.enable_legend || true;
+        return this.config.enable_legend !== undefined ? this.config.enable_legend : true;
     }
 
     setConfig(config) {
-        this._config = config;
+        this.config = config;
     }
 
     handleValueChange = (ev) => {
@@ -167,14 +169,14 @@ export class HaVpdChartEditor extends HTMLElement {
         if (value === "") {
             value = undefined;
         }
-        if (Object.isExtensible(this._config)) {
-            if (this._config[configValue] !== value) {
-                this._config[configValue] = value;
-                fireEvent(this, 'config-changed', {config: this._config});
+        if (Object.isExtensible(this.config)) {
+            if (this.config[configValue] !== value) {
+                this.config[configValue] = value;
+                fireEvent(this, 'config-changed', {config: this.config});
             }
         } else {
-            this._config = {...this._config, [configValue]: value};
-            fireEvent(this, 'config-changed', {config: this._config});
+            this.config = {...this.config, [configValue]: value};
+            fireEvent(this, 'config-changed', {config: this.config});
         }
     }
 
@@ -183,12 +185,12 @@ export class HaVpdChartEditor extends HTMLElement {
         const index = target.getAttribute('data-index');
         let value = target.value;
         if (this._vpd_phases[index].className !== value) {
-            if (Object.isExtensible(this._config.vpd_phases[index])) {
-                this._config.vpd_phases[index].className = value;
+            if (Object.isExtensible(this.config.vpd_phases[index])) {
+                this.config.vpd_phases[index].className = value;
             } else {
                 console.warn('Cannot define property on a non-extensible object');
             }
-            fireEvent(this, 'config-changed', {config: this._config});
+            fireEvent(this, 'config-changed', {config: this.config});
         }
     }
 
@@ -322,15 +324,25 @@ export class HaVpdChartEditor extends HTMLElement {
                 <tr>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_zoom" data-data-configvalue="enable_zoom">
+                            <input type="checkbox" id="enable_zoom" data-configvalue="enable_zoom">
                             Enable Zoom
                         </label>
                     </td>
                     <td>
                         <label>
-                            <input type="checkbox" id="enable_legend" data-data-configvalue="enable_legend">
+                            <input type="checkbox" id="enable_legend" data-configvalue="enable_legend">
                             Enable Legend
                         </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="enable_show_always_informations" data-configvalue="enable_show_always_informations">
+                            Always Show Info 
+                        </label>
+                    </td>
+                    <td>
                     </td>
                 </tr>
             </table>
@@ -386,6 +398,7 @@ export class HaVpdChartEditor extends HTMLElement {
             {id: 'enable_fahrenheit', prop: '_enable_fahrenheit', type: 'checked'},
             {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'},
             {id: 'enable_legend', prop: '_enable_legend', type: 'checked'},
+            {id: 'enable_show_always_informations', prop: '_enable_show_always_informations', type: 'checked'},
             {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'},
             {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}
         ];
@@ -445,8 +458,8 @@ export class HaVpdChartEditor extends HTMLElement {
             }
 
             this.vpd_phases = newVpdPhases;
-            this._config.vpd_phases = this.vpd_phases;
-            fireEvent(this, 'config-changed', {config: this._config});
+            this.config.vpd_phases = this.vpd_phases;
+            fireEvent(this, 'config-changed', {config: this.config});
         });
 
     }
@@ -508,11 +521,11 @@ export class HaVpdChartEditor extends HTMLElement {
                 value = undefined;
             }
             newSensors[index][property] = value;
-            this._config.sensors = newSensors;
-            fireEvent(this, 'config-changed', {config: this._config});
+            this.config.sensors = newSensors;
+            fireEvent(this, 'config-changed', {config: this.config});
         };
         if (this._sensors.length === 0) {
-            this._config.sensors = [{temperature: '', humidity: '', name: ''}];
+            this.config.sensors = [{temperature: '', humidity: '', name: ''}];
         }
         this._sensors.forEach((sensor, index) => {
             const container = document.createElement('div');
@@ -537,8 +550,8 @@ export class HaVpdChartEditor extends HTMLElement {
             removeButton.className = "removeButton";
             removeButton.addEventListener('click', () => {
                 if (this._sensors.length === 1) return;
-                this._config.sensors.splice(index, 1);
-                fireEvent(this, 'config-changed', {config: this._config});
+                this.config.sensors.splice(index, 1);
+                fireEvent(this, 'config-changed', {config: this.config});
                 this.initSensors();
             });
             container.appendChild(removeButton);
@@ -551,8 +564,8 @@ export class HaVpdChartEditor extends HTMLElement {
         addButton.innerHTML = 'Add Sensor';
         addButton.className = 'addButton';
         addButton.addEventListener('click', () => {
-            this._config.sensors.push({temperature: '', leaf_temperature: null, humidity: '', name: ''});
-            fireEvent(this, 'config-changed', {config: this._config});
+            this.config.sensors.push({temperature: '', leaf_temperature: null, humidity: '', name: ''});
+            fireEvent(this, 'config-changed', {config: this.config});
             this.initSensors();
             sensorEditor.parentElement.parentElement.style.maxHeight = `fit-content`;
         });
@@ -589,8 +602,8 @@ export class HaVpdChartEditor extends HTMLElement {
                 let newVpdPhases = [...this._vpd_phases];
                 newVpdPhases.splice(index, 1);
                 this.vpd_phases = newVpdPhases;
-                this._config.vpd_phases = this.vpd_phases;
-                fireEvent(this, 'config-changed', {config: this._config});
+                this.config.vpd_phases = this.vpd_phases;
+                fireEvent(this, 'config-changed', {config: this.config});
 
                 let rangesArray = this.generateRangesArray(newVpdPhases);
                 this.multiRange.update(rangesArray);
@@ -599,8 +612,8 @@ export class HaVpdChartEditor extends HTMLElement {
                     let newVpdPhases = [...this._vpd_phases];
                     delete newVpdPhases[index - 1].upper;
                     this.vpd_phases = newVpdPhases;
-                    this._config.vpd_phases = this.vpd_phases;
-                    fireEvent(this, 'config-changed', {config: this._config});
+                    this.config.vpd_phases = this.vpd_phases;
+                    fireEvent(this, 'config-changed', {config: this.config});
                 }
                 this.initColorEditor();
                 this.resortPhases();
@@ -623,9 +636,9 @@ export class HaVpdChartEditor extends HTMLElement {
                 this.vpd_phases = newVpdPhases;
                 let vpdPhases = [...newVpdPhases];
                 let rangesArray = this.generateRangesArray(vpdPhases);
-                this._config.vpd_phases = this.vpd_phases;
+                this.config.vpd_phases = this.vpd_phases;
                 this.multiRange.update(rangesArray);
-                fireEvent(this, 'config-changed', {config: this._config});
+                fireEvent(this, 'config-changed', {config: this.config});
             });
             input.addEventListener('input', this.handleVPDPhaseChange);
 
@@ -650,7 +663,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 console.error('No phases exist');
                 return;
             }
-            const maxVPD = this.toFixedNumber(this.calculateVPD(this._max_temperature - this._leaf_temperature_offset, this._max_temperature, this._min_humidity));
+            const maxVPD = this.toFixedNumber(this.calculateVPD(this.max_temperature - this.leaf_temperature_offset, this.max_temperature, this.min_humidity));
             let lastPhase = newVpdPhases[newVpdPhases.length - 1];
             let lowerValue = this.toFixedNumber(lastPhase.lower);
 
@@ -669,12 +682,12 @@ export class HaVpdChartEditor extends HTMLElement {
 
             let rangesArray = this.generateRangesArray(newVpdPhases);
 
-            this._config.vpd_phases = newVpdPhases;
+            this.config.vpd_phases = newVpdPhases;
             this.multiRange.update(rangesArray);
             this.vpd_phases = newVpdPhases;
-            this._config.vpd_phases = this.vpd_phases;
+            this.config.vpd_phases = this.vpd_phases;
             fireEvent(this, 'config-changed', {
-                config: this._config
+                config: this.config
             });
 
             this.initColorEditor();
@@ -707,8 +720,8 @@ export class HaVpdChartEditor extends HTMLElement {
         });
 
         this.vpd_phases = newVpdPhases;
-        this._config.vpd_phases = this.vpd_phases;
-        fireEvent(this, 'config-changed', {config: this._config});
+        this.config.vpd_phases = this.vpd_phases;
+        fireEvent(this, 'config-changed', {config: this.config});
     }
 
     initFormulaEditor() {
@@ -722,11 +735,11 @@ export class HaVpdChartEditor extends HTMLElement {
         container.style.display = 'grid';
 
         const textarea = container.querySelector('textarea');
-        textarea.value = this._config.calculateVPD || this.extractFunctionBody(this.calculateVPD);
+        textarea.value = this.config.calculateVPD || this.extractFunctionBody(this.calculateVPD);
 
         textarea.addEventListener('input', (ev) => {
-            this._config.calculateVPD = ev.target.value;
-            fireEvent(this, 'config-changed', {config: this._config});
+            this.config.calculateVPD = ev.target.value;
+            fireEvent(this, 'config-changed', {config: this.config});
         });
     }
 

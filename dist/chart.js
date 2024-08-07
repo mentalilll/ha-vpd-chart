@@ -400,6 +400,7 @@ export const chart = {
         }
 
         let tooltip = null;
+
         if (this.enable_tooltip) {
             tooltip = this.querySelector(`.custom-tooltip[data-index="${index}"]`) || document.createElement('div');
             tooltip.style.bottom = `${100 - percentageTemperature}%`;
@@ -408,6 +409,9 @@ export const chart = {
 
             tooltip.setAttribute('data-index', index.toString());
 
+            if (this.enable_show_always_informations) {
+                tooltip.querySelector('.tooltipAdditionalInformations').style.display = 'inline';
+            }
             let kpaText = tooltip.querySelector('.kpaText_' + index);
             let rhText = tooltip.querySelector('.sensorHumidity_' + index);
             let temperatureText = tooltip.querySelector('.sensorAir_' + index);
@@ -502,7 +506,12 @@ export const chart = {
             this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
                 tooltip.style.opacity = '1';
                 tooltip.className = tooltip.className.split(' ').filter(c => c !== 'active').join(' ');
-                this.querySelectorAll('.tooltipAdditionalInformations').forEach(tooltip => tooltip.style.display = 'none');
+                if (this.enable_show_always_informations) {
+                    this.querySelectorAll('.tooltipAdditionalInformations').forEach(tooltip => tooltip.style.display = 'inline');
+                } else {
+                    this.querySelectorAll('.tooltipAdditionalInformations').forEach(tooltip => tooltip.style.display = 'none');
+                }
+
                 this.positionTooltip(tooltip, parseFloat(tooltip.style.left));
             });
             this.querySelectorAll(`.history-circle-${index}`).forEach(circle => circle.style.display = 'none');

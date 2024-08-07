@@ -32,7 +32,6 @@ export const methods = {
         }
         return '';
     },
-
     shouldUpdate() {
         for (let key in this.config) {
             if (this.config[key] !== this.configMemory[key]) {
@@ -77,21 +76,18 @@ export const methods = {
         return vpdMatrix;
     },
     stringToColor(str) {
-        // Erweiterte Hash-Funktion zur Erhöhung der Zufälligkeit
         let hash = 0;
+        let color = '#';
+
         for (let i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
         }
 
-        // Zufallsmodifikation basierend auf der Länge und einem Pseudozufallswert
         let randomFactor = Math.sin(hash) * 10000;
         randomFactor = randomFactor - Math.floor(randomFactor);
 
-        // Kombiniere Hash und Zufallsfaktor
         hash = (hash + Math.floor(randomFactor * 0xFFFFFF)) & 0xFFFFFF;
 
-        // Konvertiere den numerischen Hash-Wert in einen Hex-Farbcode
-        let color = '#';
         for (let i = 0; i < 3; i++) {
             const value = (hash >> (i * 8)) & 0xFF;
             color += ('00' + value.toString(16)).slice(-2);

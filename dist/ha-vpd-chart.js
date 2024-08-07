@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.4.2";
+window.vpdChartVersion = "1.4.3";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -14,7 +14,7 @@ const CONFIG_KEYS = [
     'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
     'is_bar_view', 'enable_axes', 'enable_ghostclick', 'enable_ghostmap', 'enable_triangle',
     'enable_tooltip', 'enable_crosshair', 'enable_fahrenheit', 'ghostmap_hours',
-    'unit_temperature', 'enable_zoom', 'enable_legend'
+    'unit_temperature', 'enable_zoom', 'enable_legend', 'enable_show_always_informations'
 ];
 
 class HaVpdChart extends HTMLElement {
@@ -53,6 +53,7 @@ class HaVpdChart extends HTMLElement {
         this.enable_crosshair = true;
         this.enable_fahrenheit = false;
         this.enable_zoom = true;
+        this.enable_show_always_informations = true;
         this.enable_legend = true;
         this.updateRunning = false;
         this.configMemory = {};
@@ -84,6 +85,7 @@ class HaVpdChart extends HTMLElement {
             enable_fahrenheit: {type: Boolean},
             enable_zoom: {type: Boolean},
             enable_legend: {type: Boolean},
+            enable_show_always_informations: {type: Boolean},
             configMemory: {type: Object},
             calculateVPD: {type: Function},
             ghostmap_hours: {type: Number},
