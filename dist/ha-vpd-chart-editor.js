@@ -53,7 +53,6 @@ export class HaVpdChartEditor extends HTMLElement {
         if (config.sensors.length === 0) {
             config.sensors = [{
                 temperature: '',
-                leaf_temperature: null,
                 humidity: '',
                 name: ''
             }];

@@ -307,7 +307,7 @@ export const chart = {
                 const temperature = parseFloat(this._hass.states[sensor.temperature].state);
                 let leafTemperature = temperature - this.getLeafTemperatureOffset();
                 if (sensor.leaf_temperature !== undefined) {
-                    if (this._hass.states[sensor.leaf_temperature].state !== undefined) {
+                    if (this._hass.states[sensor.leaf_temperature] !== undefined) {
                         leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
                     }
                 }
