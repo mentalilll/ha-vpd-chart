@@ -56,11 +56,11 @@ wget -O - https://get.hacs.xyz | bash -
 3. **Add the resource in Home Assistant**
 
    Add the resource through the Home Assistant UI under `Configuration` -> `Lovelace Dashboards` -> `Resource`\
-   \
+
    If you don't have the menu than go to `http://<your_homeassistant_instance:8123>/config/lovelace/resources`\
    and add the following:\
    \
-   url: `/local//community/ha-vpd-chart/ha-vpd-chart.js\`\
+   url: `/local/community/ha-vpd-chart/ha-vpd-chart.js\`\
    type: `module`
 
 **Note:** After adding the resource, you may need to restart Home Assistant.
