@@ -117,10 +117,7 @@ export const methods = {
         }
         return offset;
     },
-    checkIfFileExists(url) {
-        let http = new XMLHttpRequest();
-        http.open('HEAD', url, false);
-        http.send();
-        return http.status != 404;
-    },
+    copyConfig() {
+        return JSON.parse(JSON.stringify(this.config));
+    }
 }
