@@ -23,6 +23,14 @@
 
 ### HACS Installation
 
+If you have [HACS](https://hacs.xyz) installed, you can add this repository to HACS as a custom repository.
+Otherwise you can easily install it
+
+```bash
+sudo docker exec -it [dockername] bash
+wget -O - https://get.hacs.xyz | bash -
+```
+
 1. **Add Repository**
 
    Click `HACS` -> `Three Dot Menu upper right` -> `Custom Repository`
@@ -34,26 +42,28 @@
 
 ### From GitHub
 
-1. **Clone the repository or download the JS file**
+1. **Clone the repository**
 
-   First, you need to download the JavaScript file `ha-vpd-chart.js` from GitHub or clone the entire repository.
+   Clone the repository to your local machine
 
-2. **Incorporate the file into Home Assistant**
 
-   Copy `ha-vpd-chart.js` into your `www` directory of Home Assistant, typically located at `<config>/www/`.
+2. **Incorporate the file into Home Assistant Docker**
+    1. Navigate to the directory that is mapped to `/config` in your Docker setup.
+    2. Create 2 new directory's named `www/ha-vpd-chart/` within `/config` folder.
+    3. Copy the contents of the `dist` directory from the repository into the `<config>/www/ha-vpd-chart/` directory.
+
 
 3. **Add the resource in Home Assistant**
 
-   Add the resource to your `configuration.yaml` or through the Home Assistant UI under `Configuration` -> `Lovelace Dashboards` -> `Resources`:
+   Add the resource through the Home Assistant UI under `Configuration` -> `Lovelace Dashboards` -> `Resource`\
+   \
+   If you don't have the menu than go to `http://<your_homeassistant_instance:8123>/config/lovelace/resources`\
+   and add the following:\
+   \
+   url: `/local/ha-vpd-chart/ha-vpd-chart.js\`\
+   type: `module`
 
-    ```yaml
-    lovelace:
-      resources:
-        - url: /local/ha-vpd-chart.js
-          type: module
-    ```
-
-   **Note:** After adding the resource, you may need to restart Home Assistant.
+**Note:** After adding the resource, you may need to restart Home Assistant.
 
 Follow the steps above to store the file locally and include it as a resource.
 

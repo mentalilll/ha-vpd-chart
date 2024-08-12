@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.4.3";
+window.vpdChartVersion = "1.4.5";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -20,8 +20,9 @@ const CONFIG_KEYS = [
 class HaVpdChart extends HTMLElement {
     constructor() {
         super();
-        this.initializeDefaults();
+        this.initializeDefaults(this);
     }
+
 
     initializeDefaults() {
         this.vpd_phases = [

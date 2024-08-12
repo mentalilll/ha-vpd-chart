@@ -20,18 +20,113 @@ import {methods} from './methods.js';
 import {MultiRange} from './ha-vpd-chart-editor-multiRange.js';
 
 export class HaVpdChartEditor extends HTMLElement {
+    config = {
+        type: 'custom:ha-vpd-chart',
+        sensors: [],
+        vpd_phases: []
+    };
+
     constructor() {
         super();
+        this.config = this.initializeDefaults(this.config);
+
         this.attachShadow({mode: 'open'});
-        this.config = {};
-        this.vpd_phases = {};
     }
 
-    static get properties() {
-        return {
-            hass: {},
-            config: {},
-        };
+    initializeDefaults(config) {
+        if (config.vpd_phases === undefined) {
+            config.vpd_phases = [];
+        }
+        if (config.vpd_phases.length === 0) {
+            config.vpd_phases = [
+                {upper: 0, className: 'gray-danger-zone', color: '#999999'},
+                {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
+                {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'},
+                {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'},
+                {lower: 1.2, upper: 1.6, className: 'mid-late-flower', color: '#e7c12b'},
+                {lower: 1.6, className: 'danger-zone', color: '#ce4234'},
+            ];
+        }
+        if (config.sensors === undefined) {
+            config.sensors = [];
+        }
+        if (config.sensors.length === 0) {
+            config.sensors = [{
+                temperature: '',
+                leaf_temperature: null,
+                humidity: '',
+                name: ''
+            }];
+        }
+        if (config.is_bar_view === undefined) {
+            config.is_bar_view = false;
+        }
+        if (config.min_temperature === undefined) {
+            config.min_temperature = 5;
+        }
+        if (config.max_temperature === undefined) {
+            config.max_temperature = 35;
+        }
+        if (config.min_humidity === undefined) {
+            config.min_humidity = 10;
+        }
+        if (config.max_humidity === undefined) {
+            config.max_humidity = 90;
+        }
+        if (config.min_height === undefined) {
+            config.min_height = 200;
+        }
+        if (config.leaf_temperature_offset === undefined) {
+            config.leaf_temperature_offset = 2;
+        }
+        if (config.enable_tooltip === undefined) {
+            config.enable_tooltip = true;
+        }
+        if (config.air_text === undefined) {
+            config.air_text = "Air";
+        }
+        if (config.rh_text === undefined) {
+            config.rh_text = "RH";
+        }
+        if (config.kpa_text === undefined) {
+            config.kpa_text = "kPa";
+        }
+        if (config.enable_axes === undefined) {
+            config.enable_axes = true;
+        }
+        if (config.enable_ghostclick === undefined) {
+            config.enable_ghostclick = true;
+        }
+        if (config.enable_ghostmap === undefined) {
+            config.enable_ghostmap = true;
+        }
+        if (config.enable_triangle === undefined) {
+            config.enable_triangle = true;
+        }
+        if (config.enable_crosshair === undefined) {
+            config.enable_crosshair = true;
+        }
+        if (config.enable_fahrenheit === undefined) {
+            config.enable_fahrenheit = false;
+        }
+        if (config.enable_zoom === undefined) {
+            config.enable_zoom = true;
+        }
+        if (config.enable_show_always_informations === undefined) {
+            config.enable_show_always_informations = true;
+        }
+        if (config.enable_legend === undefined) {
+            config.enable_legend = true;
+        }
+        if (config.ghostmap_hours === undefined) {
+            config.ghostmap_hours = 24;
+        }
+        if (config.unit_temperature === undefined) {
+            config.unit_temperature = '°C';
+        }
+
+        return config;
+
     }
 
     set hass(hass) {
@@ -39,7 +134,7 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     get _sensors() {
-        return this.config.sensors || '';
+        return this.config.sensors || [];
     }
 
     get _air_text() {
@@ -142,7 +237,22 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     setConfig(config) {
-        this.config = config;
+        let loadedConfig = {...config};
+        this.config = this.initializeDefaults(loadedConfig);
+        //this.initializeDefaults();
+
+        /*        this.config = config;
+
+                CONFIG_KEYS.forEach(key => {
+                    if (key in config) {
+                        this[key] = config[key];
+                    }
+                });
+
+
+                if (this.config.calculateVPD) {
+                    this.calculateVPD = new Function('Tleaf', 'Tair', 'RH', this.config.calculateVPD);
+                }*/
     }
 
     handleValueChange = (ev) => {
@@ -205,7 +315,7 @@ export class HaVpdChartEditor extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `<style>
-    @import '/hacsfiles/ha-vpd-chart/ha-vpd-chart-editor.css?v=${window.vpdChartVersion}'
+    @import '/local/ha-vpd-chart/ha-vpd-chart-editor.css?v=${window.vpdChartVersion}'
 </style>
 <div class="vpd-chart-config">
     <button type="button" class="collapsible ">Sensors</button>
@@ -456,9 +566,7 @@ export class HaVpdChartEditor extends HTMLElement {
                     upper: this.toFixedNumber(value),
                 };
             }
-
-            this.vpd_phases = newVpdPhases;
-            this.config.vpd_phases = this.vpd_phases;
+            this.config.vpd_phases = newVpdPhases;
             fireEvent(this, 'config-changed', {config: this.config});
         });
 
@@ -524,47 +632,50 @@ export class HaVpdChartEditor extends HTMLElement {
             this.config.sensors = newSensors;
             fireEvent(this, 'config-changed', {config: this.config});
         };
-        if (this._sensors.length === 0) {
-            this.config.sensors = [{temperature: '', humidity: '', name: ''}];
+        if (this._sensors.length !== 0) {
+            this._sensors.forEach((sensor, index) => {
+                const container = document.createElement('div');
+                container.style = "border: 1px solid rgba(127,127,127,0.3); padding: 5px; border-radius: 15px;";
+
+                const fields = ['Name', 'Temperature Sensor*', 'Leaf Temperature Sensor', 'Humidity Sensor*', 'VPD Helper', 'Calculated RH?'];
+                const properties = ['name', 'temperature', 'leaf_temperature', 'humidity', 'vpd_helper', 'show_calculated_rh'];
+
+                fields.forEach((field, i) => {
+                    let element;
+                    if (properties[i] === 'show_calculated_rh') {
+                        element = createCheckbox(field, index, sensor[properties[i]], properties[i]);
+                    } else {
+                        element = createTextField(field, index, sensor[properties[i]]);
+                    }
+
+                    element.addEventListener('input', (ev) => updateSensors(index, properties[i], ev.target));
+                    container.appendChild(element);
+                });
+                const removeButton = document.createElement('button');
+                removeButton.innerHTML = 'X';
+                removeButton.className = "removeButton";
+                removeButton.addEventListener('click', () => {
+                    if (this._sensors.length === 1) return;
+                    let newSensors = [...this._sensors];
+                    newSensors.splice(index, 1);
+                    this.config.sensors = newSensors;
+                    fireEvent(this, 'config-changed', {config: this.config});
+                    this.initSensors();
+                });
+                container.appendChild(removeButton);
+                sensorEditor.appendChild(container);
+            });
         }
-        this._sensors.forEach((sensor, index) => {
-            const container = document.createElement('div');
-            container.style = "border: 1px solid rgba(127,127,127,0.3); padding: 5px; border-radius: 15px;";
-
-            const fields = ['Name', 'Temperature Sensor*', 'Leaf Temperature Sensor', 'Humidity Sensor*', 'Calculated RH?'];
-            const properties = ['name', 'temperature', 'leaf_temperature', 'humidity', 'show_calculated_rh'];
-
-            fields.forEach((field, i) => {
-                let element;
-                if (properties[i] === 'show_calculated_rh') {
-                    element = createCheckbox(field, index, sensor[properties[i]], properties[i]);
-                } else {
-                    element = createTextField(field, index, sensor[properties[i]]);
-                }
-
-                element.addEventListener('input', (ev) => updateSensors(index, properties[i], ev.target));
-                container.appendChild(element);
-            });
-            const removeButton = document.createElement('button');
-            removeButton.innerHTML = 'X';
-            removeButton.className = "removeButton";
-            removeButton.addEventListener('click', () => {
-                if (this._sensors.length === 1) return;
-                this.config.sensors.splice(index, 1);
-                fireEvent(this, 'config-changed', {config: this.config});
-                this.initSensors();
-            });
-            container.appendChild(removeButton);
-
-
-            sensorEditor.appendChild(container);
-        });
-
         const addButton = document.createElement('button');
         addButton.innerHTML = 'Add Sensor';
         addButton.className = 'addButton';
         addButton.addEventListener('click', () => {
-            this.config.sensors.push({temperature: '', leaf_temperature: null, humidity: '', name: ''});
+            let newSensors = [...this._sensors];
+            newSensors[newSensors.length] = [
+                {name: '', temperature: '', humidity: '', leaf_temperature: null, vpd_helper: false, show_calculated_rh: false}
+            ];
+
+            this.config.sensors = newSensors;
             fireEvent(this, 'config-changed', {config: this.config});
             this.initSensors();
             sensorEditor.parentElement.parentElement.style.maxHeight = `fit-content`;
@@ -601,8 +712,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 }
                 let newVpdPhases = [...this._vpd_phases];
                 newVpdPhases.splice(index, 1);
-                this.vpd_phases = newVpdPhases;
-                this.config.vpd_phases = this.vpd_phases;
+                this.config.vpd_phases = newVpdPhases;
                 fireEvent(this, 'config-changed', {config: this.config});
 
                 let rangesArray = this.generateRangesArray(newVpdPhases);
@@ -611,8 +721,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 if (index === this._vpd_phases.length) {
                     let newVpdPhases = [...this._vpd_phases];
                     delete newVpdPhases[index - 1].upper;
-                    this.vpd_phases = newVpdPhases;
-                    this.config.vpd_phases = this.vpd_phases;
+                    this.config.vpd_phases = newVpdPhases;
                     fireEvent(this, 'config-changed', {config: this.config});
                 }
                 this.initColorEditor();
@@ -633,10 +742,9 @@ export class HaVpdChartEditor extends HTMLElement {
                     color: ev.target.value
                 };
 
-                this.vpd_phases = newVpdPhases;
+                this.config.vpd_phases = newVpdPhases;
                 let vpdPhases = [...newVpdPhases];
                 let rangesArray = this.generateRangesArray(vpdPhases);
-                this.config.vpd_phases = this.vpd_phases;
                 this.multiRange.update(rangesArray);
                 fireEvent(this, 'config-changed', {config: this.config});
             });
@@ -682,10 +790,8 @@ export class HaVpdChartEditor extends HTMLElement {
 
             let rangesArray = this.generateRangesArray(newVpdPhases);
 
-            this.config.vpd_phases = newVpdPhases;
             this.multiRange.update(rangesArray);
-            this.vpd_phases = newVpdPhases;
-            this.config.vpd_phases = this.vpd_phases;
+            this.config.vpd_phases = newVpdPhases;
             fireEvent(this, 'config-changed', {
                 config: this.config
             });
@@ -719,8 +825,7 @@ export class HaVpdChartEditor extends HTMLElement {
             }
         });
 
-        this.vpd_phases = newVpdPhases;
-        this.config.vpd_phases = this.vpd_phases;
+        this.config.vpd_phases = newVpdPhases;
         fireEvent(this, 'config-changed', {config: this.config});
     }
 

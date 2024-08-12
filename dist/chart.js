@@ -7,7 +7,7 @@ export const chart = {
         <ha-card>
             <div class="vpd-chart-view">
                 <style>
-                    @import '/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}'
+                    @import '/local/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}'
                 </style>
                 <div id="vpd-card-container" class="vpd-card-container"></div>
                 <div id="ghostmap"></div>
@@ -123,13 +123,21 @@ export const chart = {
 
         this.buildMouseTooltip(event, humidity, temperature, vpd);
         if (!this.isPanning) return;
+        // pan the chart with mouse drag
+        this.content.style.cursor = 'grabbing';
+        let offsetX = event.movementX / this.zoomLevel;
+        let offsetY = event.movementY / this.zoomLevel;
+        this.content.scrollLeft -= offsetX;
+        this.content.scrollTop -= offsetY;
 
+
+        /*
         const offsetX = (event.clientX - rect.left) / this.zoomLevel;
         const offsetY = (event.clientY - rect.top) / this.zoomLevel;
         this.content.style.transformOrigin = `${offsetX}px ${offsetY}px`;
         this.sensordom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
         this.ghostmapDom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-        this.mouseTooltip.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+        this.mouseTooltip.style.transformOrigin = `${offsetX}px ${offsetY}px`;*/
     },
     positionTooltip(tooltip, percentageHumidity) {
         const containerWidth = this.content.offsetWidth;
