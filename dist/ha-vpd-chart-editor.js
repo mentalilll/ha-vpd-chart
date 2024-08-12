@@ -315,7 +315,7 @@ export class HaVpdChartEditor extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `<style>
-    @import '/local/ha-vpd-chart/ha-vpd-chart-editor.css?v=${window.vpdChartVersion}'
+    @import '/local/community/ha-vpd-chart/ha-vpd-chart-editor.css?v=${window.vpdChartVersion}'
 </style>
 <div class="vpd-chart-config">
     <button type="button" class="collapsible ">Sensors</button>

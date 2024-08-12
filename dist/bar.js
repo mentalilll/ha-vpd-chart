@@ -4,7 +4,7 @@ export const bar = {
             this.innerHTML = `
                 <ha-card class="vpd-bar-view">
                     <style>
-                         @import '/local/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}'
+                         @import '/local/community/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}'
                     </style>
                     <div class="card-content"></div>
                     <div class="highlight mousePointer" style="opacity:0">

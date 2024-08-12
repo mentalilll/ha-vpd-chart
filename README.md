@@ -49,8 +49,8 @@ wget -O - https://get.hacs.xyz | bash -
 
 2. **Incorporate the file into Home Assistant Docker**
     1. Navigate to the directory that is mapped to `/config` in your Docker setup.
-    2. Create 2 new directory's named `www/ha-vpd-chart/` within `/config` folder.
-    3. Copy the contents of the `dist` directory from the repository into the `<config>/www/ha-vpd-chart/` directory.
+    2. Create 2 new directory's named `www/community/ha-vpd-chart/` within `/config` folder.
+    3. Copy the contents of the `dist` directory from the repository into the `<config>/www/community/ha-vpd-chart/` directory.
 
 
 3. **Add the resource in Home Assistant**
@@ -60,7 +60,7 @@ wget -O - https://get.hacs.xyz | bash -
    If you don't have the menu than go to `http://<your_homeassistant_instance:8123>/config/lovelace/resources`\
    and add the following:\
    \
-   url: `/local/ha-vpd-chart/ha-vpd-chart.js\`\
+   url: `/local//community/ha-vpd-chart/ha-vpd-chart.js\`\
    type: `module`
 
 **Note:** After adding the resource, you may need to restart Home Assistant.

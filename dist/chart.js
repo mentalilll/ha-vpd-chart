@@ -7,7 +7,7 @@ export const chart = {
         <ha-card>
             <div class="vpd-chart-view">
                 <style>
-                    @import '/local/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}'
+                    @import '/local/community/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}'
                 </style>
                 <div id="vpd-card-container" class="vpd-card-container"></div>
                 <div id="ghostmap"></div>
