@@ -60,12 +60,10 @@ wget -O - https://get.hacs.xyz | bash -
    If you don't have the menu than go to `http://<your_homeassistant_instance:8123>/config/lovelace/resources`\
    and add the following:\
    \
-   url: `/local/community/ha-vpd-chart/ha-vpd-chart.js\`\
+   url: `/local/community/ha-vpd-chart/ha-vpd-chart.js`\
    type: `module`
 
 **Note:** After adding the resource, you may need to restart Home Assistant.
-
-Follow the steps above to store the file locally and include it as a resource.
 
 ## Usage
 
@@ -115,6 +113,7 @@ enable_triangle: true #optional
 enable_crosshair: true #optional
 enable_fahrenheit: false #optional
 enable_zoom: true #optional
+enable_show_always_informations: true #optional
 enable_legend: true #optional
 leaf_temperature_offset: 2 || input_number.leaf_offset_example #optional
 sensors:

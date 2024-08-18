@@ -132,10 +132,6 @@ export class HaVpdChartEditor extends HTMLElement {
         this._hass = hass;
     }
 
-    get _sensors() {
-        return this.config.sensors || [];
-    }
-
     get _air_text() {
         return this.config.air_text || '';
     }
@@ -519,7 +515,7 @@ export class HaVpdChartEditor extends HTMLElement {
             }
         });
 
-        let vpdPhases = this._vpd_phases;
+        let vpdPhases = this.config.vpd_phases;
         const sliderContainer = this.shadowRoot.querySelector('#slider-container');
 
         let rangesArray = this.generateRangesArray(vpdPhases);

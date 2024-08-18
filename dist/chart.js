@@ -63,21 +63,25 @@ export const chart = {
         newZoomLevel = Math.round(newZoomLevel * 100) / 100;  // Rundung auf 2 Dezimalstellen
         if (newZoomLevel !== this.zoomLevel) {
             this.zoomLevel = newZoomLevel;
-            if (zoomDirection > 0) {
-                this.content.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-                this.sensordom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-                this.ghostmapDom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-                this.mouseTooltip.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-            }
+
+            this.content.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+            this.sensordom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+            this.ghostmapDom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+            this.mouseTooltip.style.transformOrigin = `${offsetX}px ${offsetY}px`;
+
 
             this.content.style.transform = `scale(${this.zoomLevel})`;
             this.sensordom.style.transform = `scale(${this.zoomLevel})`;
             this.ghostmapDom.style.transform = `scale(${this.zoomLevel})`;
             this.mouseTooltip.style.transform = `scale(${this.zoomLevel})`;
-            // custom-tooltip fontsize
+
             this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
                 tooltip.style.fontSize = `${12 / this.zoomLevel}px`;
                 tooltip.style.padding = `${7 / this.zoomLevel}px`;
+                if (tooltip.querySelector('.cf-icon-svg')) {
+                    tooltip.querySelector('.cf-icon-svg').style.width = `${13 / this.zoomLevel}px`;
+                    tooltip.querySelector('.cf-icon-svg').style.height = `${13 / this.zoomLevel}px`;
+                }
             });
         }
     },
@@ -89,6 +93,23 @@ export const chart = {
             this.addEventListener('wheel', this.handleZoom.bind(this));
             this.addEventListener('mousedown', this.handleMouseDown.bind(this));
             this.addEventListener('mouseup', this.handleMouseUp.bind(this));
+            this.addEventListener('auxclick', (event) => {
+                if (event.button === 1) {
+                    this.zoomLevel = 1;
+                    this.content.style.transform = `scale(${this.zoomLevel})`;
+                    this.sensordom.style.transform = `scale(${this.zoomLevel})`;
+                    this.ghostmapDom.style.transform = `scale(${this.zoomLevel})`;
+                    this.mouseTooltip.style.transform = `scale(${this.zoomLevel})`;
+                    this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
+                        tooltip.style.fontSize = `${12 / this.zoomLevel}px`;
+                        tooltip.style.padding = `${7 / this.zoomLevel}px`;
+                        if (tooltip.querySelector('.cf-icon-svg')) {
+                            tooltip.querySelector('.cf-icon-svg').style.width = `${13 / this.zoomLevel}px`;
+                            tooltip.querySelector('.cf-icon-svg').style.height = `${13 / this.zoomLevel}px`;
+                        }
+                    });
+                }
+            });
         }
     },
     updateGhostMapPeriodically() {
@@ -98,8 +119,19 @@ export const chart = {
         }
     },
 
-    handleMouseDown() {
+    handleMouseDown(event) {
         this.isPanning = true;
+
+        this.startX = event.clientX;
+        this.startY = event.clientY;
+
+        const computedStyle = window.getComputedStyle(this.content);
+        const matrix = new WebKitCSSMatrix(computedStyle.transform);
+
+        this.startLeft = matrix.m41;
+        this.startTop = matrix.m42;
+
+        event.preventDefault();
     },
     handleMouseUp() {
         this.isPanning = false;
@@ -122,22 +154,31 @@ export const chart = {
         const vpd = this.calculateVPD(leafTemperature, temperature, humidity);
 
         this.buildMouseTooltip(event, humidity, temperature, vpd);
+
+        if (this.enable_crosshair) {
+            const mouseHorizontalLine = this.querySelector(`.mouse-horizontal-line`);
+            const mouseVerticalLine = this.querySelector(`.mouse-vertical-line`);
+
+            mouseHorizontalLine.style.top = `${y / this.zoomLevel}px`;
+            mouseVerticalLine.style.left = `${x / this.zoomLevel}px`;
+            mouseHorizontalLine.style.opacity = '1';
+            mouseVerticalLine.style.opacity = '1';
+        }
+
+
         if (!this.isPanning) return;
-        // pan the chart with mouse drag
-        this.content.style.cursor = 'grabbing';
-        let offsetX = event.movementX / this.zoomLevel;
-        let offsetY = event.movementY / this.zoomLevel;
-        this.content.scrollLeft -= offsetX;
-        this.content.scrollTop -= offsetY;
+        if (this.zoomLevel === 1) return;
+        const deltaX = event.clientX - this.startX;
+        const deltaY = event.clientY - this.startY;
 
+        let newLeft = this.startLeft + deltaX;
+        let newTop = this.startTop + deltaY;
 
-        /*
-        const offsetX = (event.clientX - rect.left) / this.zoomLevel;
-        const offsetY = (event.clientY - rect.top) / this.zoomLevel;
-        this.content.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-        this.sensordom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-        this.ghostmapDom.style.transformOrigin = `${offsetX}px ${offsetY}px`;
-        this.mouseTooltip.style.transformOrigin = `${offsetX}px ${offsetY}px`;*/
+        this.content.style.transform = `translate(${newLeft}px, ${newTop}px) scale(${this.zoomLevel})`;
+        this.sensordom.style.transform = `translate(${newLeft}px, ${newTop}px) scale(${this.zoomLevel})`;
+        this.ghostmapDom.style.transform = `translate(${newLeft}px, ${newTop}px) scale(${this.zoomLevel})`;
+        this.mouseTooltip.style.transform = `translate(${newLeft}px, ${newTop}px) scale(${this.zoomLevel})`;
+
     },
     positionTooltip(tooltip, percentageHumidity) {
         const containerWidth = this.content.offsetWidth;
@@ -203,6 +244,7 @@ export const chart = {
                 const div = document.createElement('div');
                 div.className = `cell ${segment.className}`;
                 div.style.backgroundColor = segment.color;
+                div.style.boxShadow = `0 0 0 1px ${segment.color}`;
                 div.style.width = `${adjustedWidth}%`;
 
                 rowElement.appendChild(div);
@@ -360,6 +402,7 @@ export const chart = {
                     </div>
                 `;
                     sensors.innerHTML += htmlTemplate;
+                    this.updatePointer(index, percentageHumidity, percentageTemperature, sensor.name, vpd, showHumidity, temperature);
                 } else {
                     this.updatePointer(index, percentageHumidity, percentageTemperature, sensor.name, vpd, showHumidity, temperature);
                 }

@@ -40,7 +40,7 @@ export const ghostmap = {
         temperatures.forEach((temperature, tempIndex) => {
             if (humidities[tempIndex]) {
                 opacityFade -= fadeStep;
-                let humidity = (humidities[tempIndex].state - this.getLeafTemperatureOffset());
+                let humidity = (humidities[tempIndex].state);
                 const circle = this.createCircle(index, tempIndex, temperature, humidity, opacityFade);
                 fragment.appendChild(circle);
             }
@@ -61,7 +61,9 @@ export const ghostmap = {
         circle.style.left = `${percentageHumidity}%`;
         circle.style.bottom = `${100 - percentageTemperature}%`;
         circle.style.opacity = opacityFade;
-        //  circle.style.boxShadow = `0 0 25px 5px rgba(255, 255, 255, ${opacityFade})`;
+
+        circle.dataset.humidity = humidity;
+        circle.dataset.temperature = temperature.state;
 
         return circle;
     }
