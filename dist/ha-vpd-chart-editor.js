@@ -1,21 +1,3 @@
-export const fireEvent = (node, type, detail = {}, options = {}) => {
-    const event = new Event(type, {
-        bubbles: options.bubbles === undefined ? true : options.bubbles,
-        cancelable: Boolean(options.cancelable),
-        composed: options.composed === undefined ? true : options.composed,
-    });
-    if (detail.config.vpd_phases !== undefined) {
-        if (detail.config.vpd_phases[0] !== undefined) {
-            detail.config.vpd_phases[0].lower = undefined;
-        }
-        if (detail.config.vpd_phases[detail.config.vpd_phases.length - 1] !== undefined) {
-            detail.config.vpd_phases[detail.config.vpd_phases.length - 1].upper = undefined;
-        }
-    }
-    event.detail = detail;
-    node.dispatchEvent(event);
-    return event;
-};
 import {methods} from './methods.js';
 import {MultiRange} from './ha-vpd-chart-editor-multiRange.js';
 
@@ -240,11 +222,9 @@ export class HaVpdChartEditor extends HTMLElement {
         }
     }
 
-    handleValueChange = (ev) => {
-        const target = ev.target;
-        const configValue = target.getAttribute('data-configvalue');
+    checkValue(target) {
         let value = target.type === 'checkbox' ? target.checked : target.value;
-        let configCopy = this.copyConfig();
+
         if (typeof value === 'string' && !isNaN(value)) {
             value = this.toFixedNumber(value);
         }
@@ -260,14 +240,33 @@ export class HaVpdChartEditor extends HTMLElement {
         if (value === "off") {
             value = false;
         }
-        // if empty value
         if (value === "") {
             value = undefined;
         }
 
+        if (target.detail !== undefined && target.detail.value !== undefined) {
+            value = target.detail.value;
+        }
+        if (target.detail !== undefined && target.detail.value === undefined) {
+            value = undefined;
+            if (target.currentTarget.renderOptions.host.renderRoot.activeElement !== null) {
+                target.currentTarget.renderOptions.host.renderRoot.activeElement.__value = "";
+            }
+            target.currentTarget.renderOptions.host.__value = "";
+        }
+        return value;
+    }
+
+    handleValueChange = (ev) => {
+        const target = ev.target;
+        const configValue = target.getAttribute('data-configvalue');
+        let value = this.checkValue(target);
+        let configCopy = this.copyConfig();
+
+
         if (configCopy[configValue] !== value) {
             configCopy[configValue] = value;
-            fireEvent(this, 'config-changed', {config: configCopy});
+            this.fireEvent(this, 'config-changed', {config: configCopy});
         }
         this.config = configCopy;
 
@@ -283,7 +282,7 @@ export class HaVpdChartEditor extends HTMLElement {
             } else {
                 console.warn('Cannot define property on a non-extensible object');
             }
-            fireEvent(this, 'config-changed', {config: this.config});
+            this.fireEvent(this, 'config-changed', {config: this.config});
         }
     }
 
@@ -550,7 +549,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 };
             }
             this.config = configCopy;
-            fireEvent(this, 'config-changed', {config: this.config});
+            this.fireEvent(this, 'config-changed', {config: this.config});
         });
 
     }
@@ -562,61 +561,14 @@ export class HaVpdChartEditor extends HTMLElement {
         sensorEditor.style.gridTemplateColumns = 'repeat(2, 1fr)';
         sensorEditor.style.gap = '10px';
 
-        const createTextField = (label, index, value) => {
-            const textField = document.createElement('ha-textfield');
-            textField.style = 'width:100%';
-            textField.label = label;
-            textField.setAttribute('data-index', index);
-            textField.value = value || '';
-            return textField;
-        };
-
-        const createCheckbox = (label, index, value, property) => {
-            const divElement = document.createElement('div');
-            divElement.style = 'display: flex; align-items: center; padding:13px;';
-            const labelElement = document.createElement('label');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = property;
-            if (value) {
-                checkbox.setAttribute('checked', 'checked');
-            }
-            checkbox.setAttribute('data-configvalue', property);
-            labelElement.appendChild(checkbox);
-            labelElement.innerHTML += label;
-            divElement.appendChild(labelElement);
-            return divElement;
-        }
 
         const updateSensors = (index, property, target) => {
             let configCopy = this.copyConfig();
-            let value = target.type === 'checkbox' ? target.checked : target.value;
-
-            if (typeof value === 'string' && !isNaN(value)) {
-                value = this.toFixedNumber(value);
-            }
-
-            if (isNaN(value)) {
-                value = target.value;
-            }
-
-            if (value === "on") {
-                value = true;
-            }
-
-            if (value === "off") {
-                value = false;
-            }
-            // if empty value
-            if (value === "") {
-                value = undefined;
-            }
-
-
-            configCopy.sensors[index][property] = value;
+            configCopy.sensors[index][property] = this.checkValue(target);
             this.config = configCopy;
-            fireEvent(this, 'config-changed', {config: this.config});
+            this.fireEvent(this, 'config-changed', {config: this.config});
         };
+
         if (this.config.sensors.length !== 0) {
             this.config.sensors.forEach((sensor, index) => {
                 const container = document.createElement('div');
@@ -627,12 +579,22 @@ export class HaVpdChartEditor extends HTMLElement {
 
                 fields.forEach((field, i) => {
                     let element;
-                    if (properties[i] === 'show_calculated_rh') {
-                        element = createCheckbox(field, index, sensor[properties[i]], properties[i]);
-                    } else {
-                        element = createTextField(field, index, sensor[properties[i]]);
+                    switch (properties[i]) {
+                        case 'temperature':
+                        case 'leaf_temperature':
+                            element = this.createComboBox(field, index, sensor[properties[i]], properties[i], 'temperature');
+                            break;
+                        case 'humidity':
+                            element = this.createComboBox(field, index, sensor[properties[i]], properties[i], 'humidity');
+                            break;
+                        case 'show_calculated_rh':
+                            element = this.createCheckbox(field, index, sensor[properties[i]], properties[i]);
+                            break;
+                        default:
+                            element = this.createTextField(field, index, sensor[properties[i]]);
+                            break;
                     }
-
+                    element.addEventListener('value-changed', (ev) => updateSensors(index, properties[i], ev));
                     element.addEventListener('input', (ev) => updateSensors(index, properties[i], ev.target));
                     container.appendChild(element);
                 });
@@ -644,7 +606,7 @@ export class HaVpdChartEditor extends HTMLElement {
                     let copyConfig = this.copyConfig();
                     copyConfig.sensors.splice(index, 1);
                     this.config = copyConfig;
-                    fireEvent(this, 'config-changed', {config: this.config});
+                    this.fireEvent(this, 'config-changed', {config: this.config});
                     this.initSensors();
                 });
                 container.appendChild(removeButton);
@@ -661,7 +623,7 @@ export class HaVpdChartEditor extends HTMLElement {
             ];
 
             this.config = configCopy;
-            fireEvent(this, 'config-changed', {config: this.config});
+            this.fireEvent(this, 'config-changed', {config: this.config});
             this.initSensors();
             sensorEditor.parentElement.parentElement.style.maxHeight = `fit-content`;
         });
@@ -698,7 +660,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 let copyConfig = this.copyConfig();
                 copyConfig.vpd_phases.splice(index, 1);
                 this.config = copyConfig;
-                fireEvent(this, 'config-changed', {config: this.config});
+                this.fireEvent(this, 'config-changed', {config: this.config});
 
                 let rangesArray = this.generateRangesArray(copyConfig.vpd_phases);
                 this.multiRange.update(rangesArray);
@@ -706,7 +668,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 if (index === this._vpd_phases.length) {
                     delete copyConfig.vpd_phases[index - 1].upper;
                     this.config = copyConfig;
-                    fireEvent(this, 'config-changed', {config: this.config});
+                    this.fireEvent(this, 'config-changed', {config: this.config});
                 }
                 this.initColorEditor();
                 this.resortPhases();
@@ -730,7 +692,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 let rangesArray = this.generateRangesArray(vpdPhases);
                 this.multiRange.update(rangesArray);
                 this.config = copyConfig;
-                fireEvent(this, 'config-changed', {config: this.config});
+                this.fireEvent(this, 'config-changed', {config: this.config});
             });
             input.addEventListener('input', this.handleVPDPhaseChange);
 
@@ -778,7 +740,7 @@ export class HaVpdChartEditor extends HTMLElement {
             this.multiRange.update(rangesArray);
             copyConfig.vpd_phases = newVpdPhases;
             this.config = copyConfig;
-            fireEvent(this, 'config-changed', {
+            this.fireEvent(this, 'config-changed', {
                 config: this.config
             });
 
@@ -814,7 +776,7 @@ export class HaVpdChartEditor extends HTMLElement {
 
         copyConfig.vpd_phases = newVpdPhases;
         this.config = copyConfig;
-        fireEvent(this, 'config-changed', {config: this.config});
+        this.fireEvent(this, 'config-changed', {config: this.config});
     }
 
     initFormulaEditor() {
@@ -832,7 +794,7 @@ export class HaVpdChartEditor extends HTMLElement {
 
         textarea.addEventListener('input', (ev) => {
             this.config.calculateVPD = ev.target.value;
-            fireEvent(this, 'config-changed', {config: this.config});
+            this.fireEvent(this, 'config-changed', {config: this.config});
         });
     }
 
