@@ -1,34 +1,52 @@
 export const chart = {
-    initializeChart() {
+    async initializeChart() {
         this.zoomLevel = 1;
         this.minZoom = 1;
         this.maxZoom = 3;
-        this.innerHTML = `
-        <ha-card>
-            <div class="vpd-chart-view">
-                <style>
-                    @import '/local/community/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}'
-                </style>
-                <div id="vpd-card-container" class="vpd-card-container"></div>
-                <div id="ghostmap"></div>
-                <div id="sensors"></div>
-                <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
-                <div id="mouse-tooltip">
-                    <div class="horizontal-line mouse-horizontal-line" style="opacity: 0;"></div>
-                    <div class="vertical-line mouse-vertical-line" style="opacity: 0;"></div>
+        this.htmlTemplate = `
+            <ha-card>
+                <div class="vpd-chart-view"  style="display:none;">
+                    <style>
+                        @import '##url##?v=${window.vpdChartVersion}'
+                    </style>
+                    <div id="vpd-card-container" class="vpd-card-container"></div>
+                    <div id="ghostmap"></div>
+                    <div id="sensors"></div>
+                    <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
+                    <div id="mouse-tooltip">
+                        <div class="horizontal-line mouse-horizontal-line" style="opacity: 0;"></div>
+                        <div class="vertical-line mouse-vertical-line" style="opacity: 0;"></div>
+                    </div>
+                    <div class="vpd-legend"></div>
                 </div>
-                <div class="vpd-legend"></div>
-            </div>
-        </ha-card>
-    `;
-        this.content = this.querySelector("div.vpd-card-container");
-        this.sensordom = this.querySelector("div#sensors");
-        this.ghostmapDom = this.querySelector("div#ghostmap");
-        this.mouseTooltip = this.querySelector("div#mouse-tooltip");
+            </ha-card>
+        `;
+        await fetch(`/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`)
+            .then(response => {
+                if (response.ok) {
+                    this.innerHTML = this.htmlTemplate.replace('##url##', `/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
+                    this.content = this.querySelector("div.vpd-card-container");
+                    this.sensordom = this.querySelector("div#sensors");
+                    this.ghostmapDom = this.querySelector("div#ghostmap");
+                    this.mouseTooltip = this.querySelector("div#mouse-tooltip");
+                    return;
+                }
+                throw new Error('fallback to local/community');
+            })
+            .catch(error => {
+                this.innerHTML = this.htmlTemplate.replace('##url##', `/local/community/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
+                this.content = this.querySelector("div.vpd-card-container");
+                this.sensordom = this.querySelector("div#sensors");
+                this.ghostmapDom = this.querySelector("div#ghostmap");
+                this.mouseTooltip = this.querySelector("div#mouse-tooltip");
+            });
+
     },
-    buildChart() {
+    async buildChart() {
         if (!this.content) {
-            this.initializeChart.call(this);
+
+            await this.initializeChart.call(this);
+
             const table = this.buildTable();
             if (!table.isConnected) {
                 this.content.appendChild(table);

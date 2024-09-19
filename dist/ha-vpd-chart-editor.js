@@ -1,11 +1,10 @@
 import {methods} from './methods.js';
+
 import {MultiRange} from './ha-vpd-chart-editor-multiRange.js';
 
 export class HaVpdChartEditor extends HTMLElement {
     config = {
-        type: 'custom:ha-vpd-chart',
-        sensors: [],
-        vpd_phases: []
+        type: 'custom:ha-vpd-chart', sensors: [], vpd_phases: []
     };
 
     constructor() {
@@ -20,23 +19,14 @@ export class HaVpdChartEditor extends HTMLElement {
             config.vpd_phases = [];
         }
         if (config.vpd_phases.length === 0) {
-            config.vpd_phases = [
-                {upper: 0, className: 'gray-danger-zone', color: '#999999'},
-                {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
-                {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'},
-                {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'},
-                {lower: 1.2, upper: 1.6, className: 'mid-late-flower', color: '#e7c12b'},
-                {lower: 1.6, className: 'danger-zone', color: '#ce4234'},
-            ];
+            config.vpd_phases = [{upper: 0, className: 'gray-danger-zone', color: '#999999'}, {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'}, {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'}, {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'}, {lower: 1.2, upper: 1.6, className: 'mid-late-flower', color: '#e7c12b'}, {lower: 1.6, className: 'danger-zone', color: '#ce4234'},];
         }
         if (config.sensors === undefined) {
             config.sensors = [];
         }
         if (config.sensors.length === 0) {
             config.sensors = [{
-                temperature: '',
-                humidity: '',
-                name: ''
+                temperature: '', humidity: '', name: ''
             }];
         }
         if (config.is_bar_view === undefined) {
@@ -127,14 +117,7 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     get _vpd_phases() {
-        return this.config.vpd_phases !== undefined ? this.config.vpd_phases : [
-            {upper: 0, className: 'gray-danger-zone', color: '#999999'},
-            {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'},
-            {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'},
-            {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'},
-            {lower: 1.2, upper: 1.6, className: 'mid-late-flower', color: '#e7c12b'},
-            {lower: 1.6, className: 'danger-zone', color: '#ce4234'},
-        ];
+        return this.config.vpd_phases !== undefined ? this.config.vpd_phases : [{upper: 0, className: 'gray-danger-zone', color: '#999999'}, {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'}, {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'}, {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'}, {lower: 1.2, upper: 1.6, className: 'mid-late-flower', color: '#e7c12b'}, {lower: 1.6, className: 'danger-zone', color: '#ce4234'},];
     }
 
     get _min_temperature() {
@@ -223,8 +206,13 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     checkValue(target) {
-        let value = target.type === 'checkbox' ? target.checked : target.value;
-
+        let value = target.value;
+        if (target.tagName === "HA-CHECKBOX") {
+            if (target.checked === "checked") {
+                target.checked = true;
+            }
+            value = target.checked;
+        }
         if (typeof value === 'string' && !isNaN(value)) {
             value = this.toFixedNumber(value);
         }
@@ -258,12 +246,13 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     handleValueChange = (ev) => {
-        const target = ev.target;
-        const configValue = target.getAttribute('data-configvalue');
+        let target = ev.target;
+        if (ev.target === undefined) {
+            target = ev;
+        }
+        const configValue = target.getAttribute('id');
         let value = this.checkValue(target);
         let configCopy = this.copyConfig();
-
-
         if (configCopy[configValue] !== value) {
             configCopy[configValue] = value;
             this.fireEvent(this, 'config-changed', {config: configCopy});
@@ -287,12 +276,25 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     connectedCallback() {
-        this.render();
-        this.initValues();
-        this.initSensors();
-        this.initColorEditor();
-        this.initAddButton();
-        this.initFormulaEditor();
+        import('./lang/' + this._hass.language + '.js').then((module) => {
+            this.language = module.language;
+            this.render();
+            this.initValues();
+            this.initSensors();
+            this.initColorEditor();
+            this.initAddButton();
+            this.initFormulaEditor();
+        }).catch((error) => {
+            import('./lang/en.js').then((module) => {
+                this.language = module.language;
+                this.render();
+                this.initValues();
+                this.initSensors();
+                this.initColorEditor();
+                this.initAddButton();
+                this.initFormulaEditor();
+            });
+        });
     }
 
     render() {
@@ -300,139 +302,138 @@ export class HaVpdChartEditor extends HTMLElement {
     @import '/local/community/ha-vpd-chart/ha-vpd-chart-editor.css?v=${window.vpdChartVersion}'
 </style>
 <div class="vpd-chart-config">
-    <button type="button" class="collapsible ">Sensors</button>
+    <button type="button" class="collapsible ">${this.language.buttons.sensors}</button>
     <div class="content">
         <div>
             <div class="sensorEditor"></div>
         </div>
-        </div>
-    <button type="button" class="collapsible active">Main Settings</button>
+    </div>
+    <button type="button" class="collapsible active">${this.language.buttons.main_settings}</button>
     <div class="content" style="max-height:fit-content;">
         <div>
             <table>
                 <tr>
                     <td>
-                        <ha-textfield style="width:100%;" label="Air Text" id="air_text" data-configvalue="air_text"></ha-textfield>
+                        <ha-textfield label="${this.language.air_text}" id="air_text"></ha-textfield>
                     </td>
                     <td>
-                        <ha-textfield style="width:100%;" label="RH Text" id="rh_text" data-configvalue="rh_text"></ha-textfield>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <ha-textfield style="width:100%;" label="kPa Text" id="kpa_text" data-configvalue="kpa_text"></ha-textfield>
-                    </td>
-                    <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Height of Table" id="min_height" data-configvalue="min_height"></ha-textfield>
+                        <ha-textfield label="${this.language.rh_text}" id="rh_text"></ha-textfield>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Temperature" id="min_temperature" data-configvalue="min_temperature"></ha-textfield>
+                        <ha-textfield label="${this.language.kpa_text}" id="kpa_text"></ha-textfield>
                     </td>
                     <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Max Temperature" id="max_temperature" data-configvalue="max_temperature"></ha-textfield>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Min Humidity" id="min_humidity" data-configvalue="min_humidity"></ha-textfield>
-                    </td>
-                    <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Max Humidity" id="max_humidity" data-configvalue="max_humidity"></ha-textfield>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.min_height}" id="min_height"></ha-textfield>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <ha-textfield style="width:100%;" type="text" label="Leaf Temperature offset" id="leaf_temperature_offset" data-configvalue="leaf_temperature_offset"></ha-textfield>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.min_temperature}" id="min_temperature"></ha-textfield>
                     </td>
                     <td>
-                        <ha-textfield style="width:100%;" pattern="[0-9]+([.][0-9]+)?" type="number" label="Ghostmap Hours" id="ghostmap_hours" data-configvalue="ghostmap_hours"></ha-textfield>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.max_temperature}" id="max_temperature"></ha-textfield>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.min_humidity}" id="min_humidity"></ha-textfield>
+                    </td>
+                    <td>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.max_humidity}" id="max_humidity"></ha-textfield>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <ha-textfield type="text" label="${this.language.leaf_temperature_offset}" id="leaf_temperature_offset"></ha-textfield>
+                    </td>
+                    <td>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.ghostmap_hours}" id="ghostmap_hours"></ha-textfield>
                     </td>
                 </tr>
             </table>
         </div>
     </div>
-    <button type="button" class="collapsible">Features</button>
+    <button type="button" class="collapsible">${this.language.buttons.features}</button>
     <div class="content">
         <div>
             <table>
                 <tr>
                     <td>
-                        <label>
-                            <input type="checkbox" id="is_bar_view" data-configvalue="is_bar_view">
-                            Bar View
-                        </label>
+                        <ha-formfield data-title="${this.language.description.is_bar_view}" label="${this.language.titles.is_bar_view}">
+                            <ha-checkbox id="is_bar_view"></ha-checkbox>
+                        </ha-formfield>
                     </td>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_axes" data-configvalue="enable_axes">
-                            Enable Axes
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_axes}" label="${this.language.titles.enable_axes}">
+                            <ha-checkbox id="enable_axes"></ha-checkbox>
+                        </ha-formfield>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_ghostmap" data-configvalue="enable_ghostmap">
-                            Enable Ghostmap
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_ghostmap}" label="${this.language.titles.enable_ghostmap}">
+                            <ha-checkbox id="enable_ghostmap"></ha-checkbox>
+                        </ha-formfield>
                     </td>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_ghostclick" data-configvalue="enable_ghostclick">
-                            Enable Ghostclick
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_ghostclick}" label="${this.language.titles.enable_ghostclick}">
+                            <ha-checkbox id="enable_ghostclick"></ha-checkbox>
+                        </ha-formfield>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_triangle" data-configvalue="enable_triangle">
-                            Enable Triangle
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_triangle}" label="${this.language.titles.enable_triangle}">
+                            <ha-checkbox id="enable_triangle"></ha-checkbox>
+                        </ha-formfield>
                     </td>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_tooltip" data-configvalue="enable_tooltip">
-                            Enable Tooltip
-                        </label>
-                    </td>
-                </tr>
-                <tr>         
-                    <td>
-                        <label>
-                            <input type="checkbox" id="enable_crosshair" data-configvalue="enable_crosshair">
-                            Enable Mousehover Crosshair
-                        </label>
-                    </td>
-                    <td>
-                        <label>
-                            <input type="checkbox" id="enable_fahrenheit" data-configvalue="enable_fahrenheit">
-                            Enable Fahrenheit
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_tooltip}" label="${this.language.titles.enable_tooltip}">
+                            <ha-checkbox id="enable_tooltip"></ha-checkbox>
+                        </ha-formfield>
+
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_zoom" data-configvalue="enable_zoom">
-                            Enable Zoom
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_crosshair}" label="${this.language.titles.enable_crosshair}">
+                            <ha-checkbox id="enable_crosshair"></ha-checkbox>
+                        </ha-formfield>
+
                     </td>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_legend" data-configvalue="enable_legend">
-                            Enable Legend
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_fahrenheit}" label="${this.language.titles.enable_fahrenheit}">
+                            <ha-checkbox id="enable_fahrenheit"></ha-checkbox>
+                        </ha-formfield>
+
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <label>
-                            <input type="checkbox" id="enable_show_always_informations" data-configvalue="enable_show_always_informations">
-                            Always Show Info 
-                        </label>
+                        <ha-formfield title="${this.language.description.enable_zoom}" label="${this.language.titles.enable_zoom}">
+                            <ha-checkbox id="enable_zoom"></ha-checkbox>
+                        </ha-formfield>
+
+                    </td>
+                    <td>
+                        <ha-formfield title="${this.language.description.enable_legend}" label="${this.language.titles.enable_legend}">
+                            <ha-checkbox id="enable_legend"></ha-checkbox>
+                        </ha-formfield>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <ha-formfield title="${this.language.description.enable_show_always_informations}">
+                            
+                                <ha-checkbox id="enable_show_always_informations"></ha-checkbox>
+                                <label>
+                                ${this.language.titles.enable_show_always_informations}
+                            </label>
+                        </ha-formfield>
+
                     </td>
                     <td>
                     </td>
@@ -440,7 +441,7 @@ export class HaVpdChartEditor extends HTMLElement {
             </table>
         </div>
     </div>
-    <button type="button" class="collapsible">Configure Phases</button>
+    <button type="button" class="collapsible">${this.language.buttons.phases}</button>
     <div class="content">
         <div>
             <div id="slider-container" class="slider-container">
@@ -449,14 +450,24 @@ export class HaVpdChartEditor extends HTMLElement {
             <div class="colorEditor"></div>
         </div>
     </div>
-    <button type="button" class="collapsible">VPD Calibration Formula</button>
+    <button type="button" class="collapsible">${this.language.buttons.vpd_calibration}</button>
     <div class="content">
-            <div class="formulaEditor"></div>
+        <div class="formulaEditor"></div>
     </div>
 </div>`;
-        this.shadowRoot.querySelectorAll('ha-switch, ha-textfield, ha-checkbox, label, input').forEach(input => {
-            input.addEventListener('input', this.handleValueChange);
+        const debouncedHandleInputChange = this.debounce(this.handleValueChange, 500);
+
+        this.shadowRoot.querySelectorAll('ha-switch, ha-textfield, input').forEach(input => {
+            let target = input;
+
+            input.addEventListener('input', event => {
+                debouncedHandleInputChange(target);
+            });
         });
+        this.shadowRoot.querySelectorAll('ha-checkbox').forEach(input => {
+
+            input.addEventListener('change', this.handleValueChange);
+        })
         this.shadowRoot.querySelectorAll('.collapsible').forEach(collapsible => {
             collapsible.onclick = () => {
                 collapsible.classList.toggle("active");
@@ -470,41 +481,18 @@ export class HaVpdChartEditor extends HTMLElement {
 
     initValues() {
 
-        const configValues = [
-            {id: 'air_text', prop: '_air_text', type: 'value'},
-            {id: 'rh_text', prop: '_rh_text', type: 'value'},
-            {id: 'kpa_text', prop: '_kpa_text', type: 'value'},
-            {id: 'min_temperature', prop: '_min_temperature', type: 'value'},
-            {id: 'max_temperature', prop: '_max_temperature', type: 'value'},
-            {id: 'min_humidity', prop: '_min_humidity', type: 'value'},
-            {id: 'max_humidity', prop: '_max_humidity', type: 'value'},
-            {id: 'leaf_temperature_offset', prop: '_leaf_temperature_offset', type: 'value'},
-            {id: 'min_height', prop: '_min_height', type: 'value'},
-            {id: 'is_bar_view', prop: '_is_bar_view', type: 'checked'},
-            {id: 'enable_axes', prop: '_enable_axes', type: 'checked'},
-            {id: 'enable_ghostclick', prop: '_enable_ghostclick', type: 'checked'},
-            {id: 'enable_ghostmap', prop: '_enable_ghostmap', type: 'checked'},
-            {id: 'enable_triangle', prop: '_enable_triangle', type: 'checked'},
-            {id: 'enable_crosshair', prop: '_enable_crosshair', type: 'checked'},
-            {id: 'enable_tooltip', prop: '_enable_tooltip', type: 'checked'},
-            {id: 'enable_fahrenheit', prop: '_enable_fahrenheit', type: 'checked'},
-            {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'},
-            {id: 'enable_legend', prop: '_enable_legend', type: 'checked'},
-            {id: 'enable_show_always_informations', prop: '_enable_show_always_informations', type: 'checked'},
-            {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'},
-            {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}
-        ];
+        const configValues = [{id: 'air_text', prop: '_air_text', type: 'value'}, {id: 'rh_text', prop: '_rh_text', type: 'value'}, {id: 'kpa_text', prop: '_kpa_text', type: 'value'}, {id: 'min_temperature', prop: '_min_temperature', type: 'value'}, {id: 'max_temperature', prop: '_max_temperature', type: 'value'}, {id: 'min_humidity', prop: '_min_humidity', type: 'value'}, {id: 'max_humidity', prop: '_max_humidity', type: 'value'}, {id: 'leaf_temperature_offset', prop: '_leaf_temperature_offset', type: 'value'}, {id: 'min_height', prop: '_min_height', type: 'value'}, {id: 'is_bar_view', prop: '_is_bar_view', type: 'checked'}, {id: 'enable_axes', prop: '_enable_axes', type: 'checked'}, {id: 'enable_ghostclick', prop: '_enable_ghostclick', type: 'checked'}, {id: 'enable_ghostmap', prop: '_enable_ghostmap', type: 'checked'}, {id: 'enable_triangle', prop: '_enable_triangle', type: 'checked'}, {id: 'enable_crosshair', prop: '_enable_crosshair', type: 'checked'}, {
+            id: 'enable_tooltip',
+            prop: '_enable_tooltip',
+            type: 'checked'
+        }, {id: 'enable_fahrenheit', prop: '_enable_fahrenheit', type: 'checked'}, {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'}, {id: 'enable_legend', prop: '_enable_legend', type: 'checked'}, {id: 'enable_show_always_informations', prop: '_enable_show_always_informations', type: 'checked'}, {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'}, {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}];
 
         configValues.forEach(({id, prop, type}) => {
             const element = this.shadowRoot.querySelector(`#${id}`);
             if (element) {
                 if (Object.isExtensible(element)) {
                     if (type === "checked") {
-                        if (this[prop]) {
-                            element[type] = 'checked';
-                        } else {
-                            element[type] = '';
-                        }
+                        element[type] = this[prop] ? 'checked' : '';
                     } else {
                         element[type] = this[prop];
                     }
@@ -514,7 +502,15 @@ export class HaVpdChartEditor extends HTMLElement {
             }
         });
 
-        let vpdPhases = this.config.vpd_phases;
+        // Use requestAnimationFrame to update the multiRange
+        requestAnimationFrame(() => {
+            this.updateMultiRange();
+        });
+
+    }
+
+    updateMultiRange() {
+        const vpdPhases = this.config.vpd_phases;
         const sliderContainer = this.shadowRoot.querySelector('#slider-container');
 
         let rangesArray = this.generateRangesArray(vpdPhases);
@@ -529,7 +525,6 @@ export class HaVpdChartEditor extends HTMLElement {
         this.multiRange = new MultiRange(sliderContainer, settings);
 
         this.multiRange.on("changed", (event) => {
-
             if (event.detail.idx === undefined || event.detail.value === undefined) return;
             let configCopy = this.copyConfig();
             const idx = event.detail.idx;
@@ -550,8 +545,8 @@ export class HaVpdChartEditor extends HTMLElement {
             }
             this.config = configCopy;
             this.fireEvent(this, 'config-changed', {config: this.config});
-        });
 
+        });
     }
 
     initSensors() {
@@ -574,7 +569,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 const container = document.createElement('div');
                 container.style = "border: 1px solid rgba(127,127,127,0.3); padding: 5px; border-radius: 15px;";
 
-                const fields = ['Name', 'Temperature Sensor*', 'Leaf Temperature Sensor', 'Humidity Sensor*', /*'VPD Helper',*/ 'Calculated RH?'];
+                const fields = [this.language.name, this.language.temperature_sensor + '*', this.language.leaf_temperature_sensor, this.language.humidity_sensor + '*', /*'VPD Helper',*/ this.language.use_leaf_position];
                 const properties = ['name', 'temperature', 'leaf_temperature', 'humidity', /*'vpd_helper',*/ 'show_calculated_rh'];
 
                 fields.forEach((field, i) => {
@@ -588,14 +583,17 @@ export class HaVpdChartEditor extends HTMLElement {
                             element = this.createComboBox(field, index, sensor[properties[i]], properties[i], 'humidity');
                             break;
                         case 'show_calculated_rh':
-                            element = this.createCheckbox(field, index, sensor[properties[i]], properties[i]);
+                            element = this.createCheckbox(field, index, sensor[properties[i]], properties[i], this.language.description.use_leaf_position);
                             break;
                         default:
                             element = this.createTextField(field, index, sensor[properties[i]]);
                             break;
                     }
                     element.addEventListener('value-changed', (ev) => updateSensors(index, properties[i], ev));
-                    element.addEventListener('input', (ev) => updateSensors(index, properties[i], ev.target));
+                    const debouncedHandleInputChange = this.debounce(updateSensors, 500);
+                    element.addEventListener('input', function (event) {
+                        debouncedHandleInputChange(index, properties[i], event.target);
+                    });
                     container.appendChild(element);
                 });
                 const removeButton = document.createElement('button');
@@ -614,14 +612,11 @@ export class HaVpdChartEditor extends HTMLElement {
             });
         }
         const addButton = document.createElement('button');
-        addButton.innerHTML = 'Add Sensor';
+        addButton.innerHTML = this.language.buttons.addSensor;
         addButton.className = 'addButton';
         addButton.addEventListener('click', () => {
             let configCopy = this.copyConfig();
-            configCopy.sensors[configCopy.sensors.length] = [
-                {name: '', temperature: '', humidity: '', leaf_temperature: null, vpd_helper: false, show_calculated_rh: false}
-            ];
-
+            configCopy.sensors[configCopy.sensors.length] = [{name: '', temperature: '', humidity: '', leaf_temperature: null, vpd_helper: false, show_calculated_rh: false}];
             this.config = configCopy;
             this.fireEvent(this, 'config-changed', {config: this.config});
             this.initSensors();
@@ -636,7 +631,6 @@ export class HaVpdChartEditor extends HTMLElement {
         colorEditor.style.display = 'grid';
         colorEditor.style.gridTemplateColumns = 'repeat(2, 1fr)';
         colorEditor.style.gap = '10px';
-
         this._vpd_phases.forEach((phase, index) => {
             const container = document.createElement('div');
             const input = document.createElement('ha-textfield');
@@ -684,8 +678,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 let idx = index;
                 let copyConfig = this.copyConfig();
                 copyConfig.vpd_phases[idx] = {
-                    ...this.copyConfig().vpd_phases[idx],
-                    color: ev.target.value
+                    ...this.copyConfig().vpd_phases[idx], color: ev.target.value
                 };
 
                 let vpdPhases = [...copyConfig.vpd_phases];
@@ -709,7 +702,7 @@ export class HaVpdChartEditor extends HTMLElement {
         }
 
         const addButton = document.createElement('button');
-        addButton.innerHTML = 'Add Phase';
+        addButton.innerHTML = this.language.buttons.addPhase;
         addButton.className = 'addButton';
         addButton.addEventListener('click', () => {
             let copyConfig = this.copyConfig();
@@ -729,10 +722,7 @@ export class HaVpdChartEditor extends HTMLElement {
             let newLowerValue = this.toFixedNumber(lowerValue + ((this.toFixedNumber(this.multiRange.settings.max) - lowerValue) / 2))
             newVpdPhases[newVpdPhases.length - 1].upper = newLowerValue;
             newVpdPhases.push({
-                lower: newLowerValue,
-                upper: maxVPD,
-                className: randomPhaseName,
-                color: randomColor
+                lower: newLowerValue, upper: maxVPD, className: randomPhaseName, color: randomColor
             });
 
             let rangesArray = this.generateRangesArray(newVpdPhases);
@@ -758,8 +748,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 color = newVpdPhases[i + 1].color;
             }
             rangesArray.push({
-                value: newVpdPhases[i].upper,
-                color: color
+                value: newVpdPhases[i].upper, color: color
             });
         }
         return rangesArray;

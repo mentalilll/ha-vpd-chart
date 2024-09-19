@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "1.5.0";
+window.vpdChartVersion = "1.6.0";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';

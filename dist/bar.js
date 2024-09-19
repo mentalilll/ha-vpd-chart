@@ -1,10 +1,9 @@
 export const bar = {
-    buildBarChart() {
-        if (!this.content) {
-            this.innerHTML = `
-                <ha-card class="vpd-bar-view">
+    async initializeBar() {
+        this.htmlTemplate = `
+            <ha-card class="vpd-bar-view" style="display:none;">
                     <style>
-                         @import '/local/community/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}'
+                        @import '##url##?v=${window.vpdChartVersion}'                    
                     </style>
                     <div class="card-content"></div>
                     <div class="highlight mousePointer" style="opacity:0">
@@ -15,8 +14,25 @@ export const bar = {
                         <div class="clearfix"></div>
                     </div>
                 </ha-card>
-            `;
-            this.content = this.querySelector("div.card-content");
+        `;
+        await fetch(`/hacsfiles/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}`)
+            .then(response => {
+                if (response.ok) {
+                    this.innerHTML = this.htmlTemplate.replace('##url##', `/hacsfiles/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}`);
+                    this.content = this.querySelector("div.card-content");
+                    return;
+                }
+                throw new Error('fallback to local/community');
+            })
+            .catch(error => {
+                this.innerHTML = this.htmlTemplate.replace('##url##', `/local/community/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}`);
+                this.content = this.querySelector("div.card-content");
+            });
+
+    },
+    async buildBarChart() {
+        if (!this.content) {
+            await this.initializeBar();
             if (this._hass) {
                 let vpd = 0;
 
@@ -115,7 +131,7 @@ export const bar = {
 
             let showHumidity = humidity;
             if (sensor.show_calculated_rh === true) {
-                showHumidity = this.calculateRH(temperature - 2, temperature, vpd).toFixed(1);
+                showHumidity = this.calculateRH(leafTemperature, temperature, vpd).toFixed(1);
             }
             let sensorName = sensor.name;
             if (sensorName === undefined) {

@@ -1,3 +1,7 @@
+.vpd-bar-view {
+    display: block !important;
+}
+
 .vpd-bar-view .type-custom-ha-vpd-chart {
     margin-bottom: 5px;
 }

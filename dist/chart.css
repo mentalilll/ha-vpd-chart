@@ -11,7 +11,7 @@ div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
 }
 
 .vpd-chart-view {
-    display: grid;
+    display: grid !important;
 }
 
 .vpd-chart-view .gray-danger-zone {

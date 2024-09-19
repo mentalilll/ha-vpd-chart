@@ -21,12 +21,14 @@ export const ghostmap = {
         const ghostmap = this.querySelector('#ghostmap');
 
         const sensorPromises = this.config.sensors.map(async (sensor, index) => {
-            const [temperatures, humidities] = await Promise.all([
-                this.getEntityHistory(sensor.temperature, this.config.ghostmap_hours),
-                this.getEntityHistory(sensor.humidity, this.config.ghostmap_hours)
-            ]);
+            if (this._hass.states[sensor.humidity] && this._hass.states[sensor.temperature]) {
+                const [temperatures, humidities] = await Promise.all([
+                    this.getEntityHistory(sensor.temperature, this.config.ghostmap_hours),
+                    this.getEntityHistory(sensor.humidity, this.config.ghostmap_hours)
+                ]);
 
-            this.processSensorData(fragment, temperatures, humidities, index);
+                this.processSensorData(fragment, temperatures, humidities, index);
+            }
         });
 
         await Promise.all(sensorPromises);

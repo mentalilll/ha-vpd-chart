@@ -299,3 +299,53 @@ input[type="color"]::-webkit-color-swatch {
     border: none;
     border-radius: 4px;
 }
+
+[data-title] {
+    position: relative;
+}
+
+[data-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+    position: absolute;
+}
+
+[data-title]:after {
+    content: attr(data-title);
+    width: auto;
+    position: absolute;
+    bottom: -1.6em;
+    left: 100%;
+    padding: 4px 4px 4px 8px;
+    white-space: nowrap;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: hsla(0, 0%, 20%, 0.9);
+    color: #ffffff;
+    text-align: center;
+    font-style: normal;
+    font-size: 12px;
+    opacity: 0;
+    z-index: 99999;
+    visibility: hidden;
+}
+
+.vpd-chart-config ha-textfield {
+    width: 100%;
+}
+
+.vpd-chart-config .infoIcon {
+    position: relative;
+}
+
+.vpd-chart-config .infoIcon:hover {
+    position: absolute;
+    cursor: pointer;
+}
+
+.vpd-chart-config .infoIcon i {
+    line-height: 25px;
+    margin-left: 5px;
+}

@@ -42,6 +42,15 @@ export const methods = {
 
         return false;
     },
+    debounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, timeout);
+        };
+    },
     async getEntityHistory(entityId, hours = 24) {
         const endTime = new Date();
         const startTime = new Date(endTime.getTime() - hours * 60 * 60 * 1000);
@@ -98,22 +107,14 @@ export const methods = {
     getLeafTemperatureOffset() {
         let offset = 2;
         if (typeof this.config.leaf_temperature_offset === 'number') {
-            if (this.config.leaf_temperature_offset < 2) {
-                return 2;
-            }
+
             return this.config.leaf_temperature_offset;
         }
         if (typeof this.config.leaf_temperature_offset === 'string') {
             offset = this._hass.states[this.config.leaf_temperature_offset].state;
             if (!isNaN(offset)) {
-                if (offset < 2) {
-                    return 2;
-                }
                 return offset;
             }
-        }
-        if (offset < 2) {
-            offset = 2;
         }
         return offset;
     },
@@ -178,21 +179,17 @@ export const methods = {
 
         return haComboBox;
     },
-    createCheckbox(label, index, value, property) {
-        const divElement = document.createElement('div');
-        divElement.style = 'display: flex; align-items: center; padding:13px;';
-        const labelElement = document.createElement('label');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
+    createCheckbox(label, index, value, property, title = '') {
+        const haFormfield = document.createElement('ha-formfield');
+        haFormfield.label = label;
+        if (title !== '') haFormfield.title = title;
+        haFormfield.setAttribute('data-index', index);
+        const checkbox = document.createElement('ha-checkbox');
         checkbox.id = property;
-        if (value) {
-            checkbox.setAttribute('checked', 'checked');
-        }
+        checkbox.checked = value;
         checkbox.setAttribute('data-configvalue', property);
-        labelElement.appendChild(checkbox);
-        labelElement.innerHTML += label;
-        divElement.appendChild(labelElement);
-        return divElement;
+        haFormfield.appendChild(checkbox);
+        return haFormfield;
     },
     fireEvent(node, type, detail = {}, options = {}) {
         const event = new Event(type, {

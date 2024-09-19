@@ -120,6 +120,7 @@ sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
     leaf_temperature: sensor.infrared_sensor #optional
+    show_calculated_rh: true # optional 
     name: Tent 1
   - temperature: sensor.temperature_tent_2
     humidity: sensor.humidity_tent_2
@@ -169,6 +170,7 @@ calculateVPD: |2-
 | is_bar_view                     | boolean        | optional     | `true`                                  | Enable Bar view of this chart for fast information of sensors                                       |
 | enable_axes                     | boolean        | optional     | `true`                                  | Enable Axes on the Chart                                                                            |
 | enable_ghostmap                 | boolean        | optional     | `true`                                  | Enable Ghostmap on the Chart                                                                        |
+| enable_ghostclick               | boolean        | optional     | `true`                                  | Enable Ghostclick instead of Hover                                                                  |
 | enable_triangle                 | boolean        | optional     | `true`                                  | Enable Triangle instead of Circle for tooltip marker                                                |
 | enable_crosshair                | boolean        | optional     | `true`                                  | Enable MouseHover Crosshair                                                                         |
 | enable_fahrenheit               | boolean        | optional     | `false`                                 | Enable Fahrenheit instead of Celsius                                                                |
