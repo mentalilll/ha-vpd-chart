@@ -4,13 +4,12 @@ import {MultiRange} from './ha-vpd-chart-editor-multiRange.js';
 
 export class HaVpdChartEditor extends HTMLElement {
     config = {
-        type: 'custom:ha-vpd-chart', sensors: [], vpd_phases: []
+        type: 'custom:ha-vpd-chart', rooms: [], vpd_phases: []
     };
 
     constructor() {
         super();
         this.config = this.initializeDefaults(this.config);
-
         this.attachShadow({mode: 'open'});
     }
 
@@ -21,11 +20,14 @@ export class HaVpdChartEditor extends HTMLElement {
         if (config.vpd_phases.length === 0) {
             config.vpd_phases = [{upper: 0, className: 'gray-danger-zone', color: '#999999'}, {lower: 0, upper: 0.4, className: 'under-transpiration', color: '#1a6c9c'}, {lower: 0.4, upper: 0.8, className: 'early-veg', color: '#22ab9c'}, {lower: 0.8, upper: 1.2, className: 'late-veg', color: '#9cc55b'}, {lower: 1.2, upper: 1.6, className: 'mid-late-flower', color: '#e7c12b'}, {lower: 1.6, className: 'danger-zone', color: '#ce4234'},];
         }
-        if (config.sensors === undefined) {
-            config.sensors = [];
+        if (config.rooms === undefined) {
+            config.rooms = [];
         }
-        if (config.sensors.length === 0) {
-            config.sensors = [{
+        if (config.sensors !== undefined) {
+            config.rooms = config.sensors;
+        }
+        if (config.rooms.length === 0) {
+            config.rooms = [{
                 temperature: '', humidity: '', name: ''
             }];
         }
@@ -280,7 +282,7 @@ export class HaVpdChartEditor extends HTMLElement {
             this.language = module.language;
             this.render();
             this.initValues();
-            this.initSensors();
+            this.initRooms();
             this.initColorEditor();
             this.initAddButton();
             this.initFormulaEditor();
@@ -289,7 +291,7 @@ export class HaVpdChartEditor extends HTMLElement {
                 this.language = module.language;
                 this.render();
                 this.initValues();
-                this.initSensors();
+                this.initRooms();
                 this.initColorEditor();
                 this.initAddButton();
                 this.initFormulaEditor();
@@ -302,7 +304,7 @@ export class HaVpdChartEditor extends HTMLElement {
     @import '/local/community/ha-vpd-chart/ha-vpd-chart-editor.css?v=${window.vpdChartVersion}'
 </style>
 <div class="vpd-chart-config">
-    <button type="button" class="collapsible ">${this.language.buttons.sensors}</button>
+    <button type="button" class="collapsible ">${this.language.buttons.rooms}</button>
     <div class="content">
         <div>
             <div class="sensorEditor"></div>
@@ -549,7 +551,7 @@ export class HaVpdChartEditor extends HTMLElement {
         });
     }
 
-    initSensors() {
+    initRooms() {
         const sensorEditor = this.shadowRoot.querySelector('.sensorEditor');
         sensorEditor.innerHTML = '';
         sensorEditor.style.display = 'grid';
@@ -559,13 +561,13 @@ export class HaVpdChartEditor extends HTMLElement {
 
         const updateSensors = (index, property, target) => {
             let configCopy = this.copyConfig();
-            configCopy.sensors[index][property] = this.checkValue(target);
+            configCopy.rooms[index][property] = this.checkValue(target);
             this.config = configCopy;
             this.fireEvent(this, 'config-changed', {config: this.config});
         };
 
-        if (this.config.sensors.length !== 0) {
-            this.config.sensors.forEach((sensor, index) => {
+        if (this.config.rooms.length !== 0) {
+            this.config.rooms.forEach((sensor, index) => {
                 const container = document.createElement('div');
                 container.style = "border: 1px solid rgba(127,127,127,0.3); padding: 5px; border-radius: 15px;";
 
@@ -597,26 +599,26 @@ export class HaVpdChartEditor extends HTMLElement {
                 removeButton.innerHTML = 'X';
                 removeButton.className = "removeButton";
                 removeButton.addEventListener('click', () => {
-                    if (this.config.sensors.length === 1) return;
+                    if (this.config.rooms.length === 1) return;
                     let copyConfig = this.copyConfig();
-                    copyConfig.sensors.splice(index, 1);
+                    copyConfig.rooms.splice(index, 1);
                     this.config = copyConfig;
                     this.fireEvent(this, 'config-changed', {config: this.config});
-                    this.initSensors();
+                    this.initRooms();
                 });
                 container.appendChild(removeButton);
                 sensorEditor.appendChild(container);
             });
         }
         const addButton = document.createElement('button');
-        addButton.innerHTML = this.language.buttons.addSensor;
+        addButton.innerHTML = this.language.buttons.addRoom;
         addButton.className = 'addButton';
         addButton.addEventListener('click', () => {
             let configCopy = this.copyConfig();
-            configCopy.sensors[configCopy.sensors.length] = [{name: '', temperature: '', humidity: '', leaf_temperature: null}];
+            configCopy.rooms[configCopy.rooms.length] = [{name: '', temperature: '', humidity: '', leaf_temperature: null}];
             this.config = configCopy;
             this.fireEvent(this, 'config-changed', {config: this.config});
-            this.initSensors();
+            this.initRooms();
             sensorEditor.parentElement.parentElement.style.maxHeight = `fit-content`;
         });
         sensorEditor.appendChild(addButton);

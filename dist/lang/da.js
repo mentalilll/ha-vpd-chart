@@ -40,8 +40,8 @@ export const language = {
         enable_show_always_informations: "Vis altid info"
     },
     buttons: {
-        sensors: "Sensorer",
-        addSensor: "Tilføj sensor",
+        rooms: "Værelser",
+        addRoom: "Tilføj værelse",
         addPhase: "Tilføj fase",
         main_settings: "Hovedindstillinger",
         features: "Funktioner",

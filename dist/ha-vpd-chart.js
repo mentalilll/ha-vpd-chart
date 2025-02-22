@@ -34,6 +34,7 @@ class HaVpdChart extends HTMLElement {
             {lower: 1.6, className: 'danger-zone', color: '#ce4234'},
         ];
         this.sensors = [];
+        this.rooms = [];
         this.is_bar_view = false;
         this.min_temperature = 5;
         this.max_temperature = 35;
@@ -65,7 +66,7 @@ class HaVpdChart extends HTMLElement {
 
     static get properties() {
         return {
-            sensors: {type: Array},
+            rooms: {type: Array},
             min_temperature: {type: Number},
             max_temperature: {type: Number},
             min_humidity: {type: Number},
@@ -117,8 +118,14 @@ class HaVpdChart extends HTMLElement {
     setConfig(config) {
         this.config = config;
 
-        if (!config.sensors) {
-            throw new Error('You need to define sensors');
+        if (!config.rooms) {
+            if (config.sensors) {
+                const newConfig = {...config};
+                newConfig.rooms = newConfig.sensors;
+                this.config = newConfig;
+            } else {
+                throw new Error('You need to define rooms');
+            }
         }
 
         CONFIG_KEYS.forEach(key => {

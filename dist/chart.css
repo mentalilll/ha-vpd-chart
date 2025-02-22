@@ -266,7 +266,7 @@ div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
     top: 20px; /* Adjust to position outside the chart */
 }
 
-.vpd-chart-view #sensors, .vpd-chart-view #ghostmap, .vpd-chart-view #mouse-tooltip {
+.vpd-chart-view #rooms, .vpd-chart-view #ghostmap, .vpd-chart-view #mouse-tooltip {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -275,16 +275,24 @@ div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
     pointer-events: none;
 }
 
-.vpd-chart-view #sensors {
+.vpd-chart-view #rooms {
     pointer-events: all;
 }
 
-.vpd-chart-view #sensors .custom-tooltip {
+.vpd-chart-view #rooms .custom-tooltip {
     margin-bottom: 9px;
     cursor: pointer;
 }
 
-.vpd-chart-view #sensors .sensor-triangle {
+.vpd-chart-view #rooms .room {
+    display: none;
+}
+
+.vpd-chart-view #rooms .room:first-child {
+    display: block;
+}
+
+.vpd-chart-view #rooms .room-triangle {
     width: 16px !important;
     height: 16px !important;
     padding: 0 !important;
@@ -295,11 +303,11 @@ div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
     z-index: 3;
 }
 
-.vpd-chart-view #sensors .sensor-pointer {
+.vpd-chart-view #rooms .room-pointer {
     z-index: 3;
 }
 
-.vpd-chart-view #sensors .sensor-triangle:after {
+.vpd-chart-view #rooms .room-triangle:after {
     position: absolute;
     bottom: 4px;
     left: 49%;
@@ -341,7 +349,7 @@ div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
     z-index: 3;
 }
 
-.vpd-chart-view .vpd-legend .sensor-legend {
+.vpd-chart-view .vpd-legend .room-legend {
     justify-content: center;
     align-items: center;
     padding: 5px;

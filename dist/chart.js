@@ -11,7 +11,7 @@ export const chart = {
                     </style>
                     <div id="vpd-card-container" class="vpd-card-container"></div>
                     <div id="ghostmap"></div>
-                    <div id="sensors"></div>
+                    <div id="rooms"></div>
                     <div class="mouse-custom-tooltip" style="opacity: 0;"></div>
                     <div id="mouse-tooltip">
                         <div class="horizontal-line mouse-horizontal-line" style="opacity: 0;"></div>
@@ -26,7 +26,7 @@ export const chart = {
                 if (response.ok) {
                     this.innerHTML = this.htmlTemplate.replace('##url##', `/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
                     this.content = this.querySelector("div.vpd-card-container");
-                    this.sensordom = this.querySelector("div#sensors");
+                    this.sensordom = this.querySelector("div#rooms");
                     this.ghostmapDom = this.querySelector("div#ghostmap");
                     this.mouseTooltip = this.querySelector("div#mouse-tooltip");
                     return;
@@ -36,7 +36,7 @@ export const chart = {
             .catch(() => {
                 this.innerHTML = this.htmlTemplate.replace('##url##', `/local/community/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
                 this.content = this.querySelector("div.vpd-card-container");
-                this.sensordom = this.querySelector("div#sensors");
+                this.sensordom = this.querySelector("div#rooms");
                 this.ghostmapDom = this.querySelector("div#ghostmap");
                 this.mouseTooltip = this.querySelector("div#mouse-tooltip");
             });
@@ -172,8 +172,8 @@ export const chart = {
         const humidity = this.max_humidity - (humidityRange * xPercent / 100);
         let leafTemperature = temperature - this.getLeafTemperatureOffset();
 
-        if (this.config.sensors.length > 0) {
-            this.config.sensors.forEach((sensor) => {
+        if (this.config.rooms.length > 0) {
+            this.config.rooms.forEach((sensor) => {
                 if (sensor.leaf_temperature !== undefined) {
                     if (this._hass.states[sensor.leaf_temperature] !== undefined) {
                         leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
@@ -227,79 +227,97 @@ export const chart = {
         tooltip.style.visibility = 'visible';
     },
     buildTable() {
-        const container = document.createElement('div');
+        // check performance
+        const container = this.querySelector('.vpd-container') || document.createElement('div');
         container.className = 'vpd-container';
         const maxHumidity = this.max_humidity;
         const stepsHumidity = this.steps_humidity;
-        this.config.sensors.forEach((sensor, index) => {
-            const tableContainer = document.createElement('div');
-            tableContainer.className = `sensor-${index}-table-container table-container`;
-            const temperature = parseFloat(this._hass.states[sensor.temperature].state);
-            const leafTemperature = sensor.leaf_temperature ? parseFloat(this._hass.states[sensor.leaf_temperature].state) : undefined;
+        console.time('createRoomContainers');
+
+        this.config.rooms.forEach((room, index) => {
+            let tableContainer = container.querySelector(`.room-${index}-table-container`) || document.createElement('div');
+            tableContainer.className = `room-${index}-table-container table-container`;
+            const temperature = parseFloat(this._hass.states[room.temperature].state);
+            const leafTemperature = room.leaf_temperature ? parseFloat(this._hass.states[room.leaf_temperature].state) : undefined;
             let leafTemperatureOffset = (this.getLeafTemperatureOffset());
             if (leafTemperature !== undefined) {
                 leafTemperatureOffset = temperature - leafTemperature;
             }
-
             let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity, leafTemperatureOffset);
-            const fragment = document.createDocumentFragment();
-
-            vpdMatrix.forEach(row => {
+            const createRow = (row, stepsHumidity, maxHumidity) => {
                 const rowElement = document.createElement('div');
                 rowElement.className = 'vpd-row';
-
                 let segments = [];
                 let currentClass = null;
                 let startIndex = 0;
-                row.forEach((cell, index) => {
+                const rowLength = row.length;
+
+                for (let index = 0; index < rowLength; index++) {
+                    const cell = row[index];
                     if (currentClass === null) {
                         currentClass = cell.className;
                         startIndex = index;
                     } else if (cell.className !== currentClass) {
-                        const segmentWidth = (index - startIndex) * stepsHumidity * 100 / maxHumidity;
-                        let customColor = this.getColorByClassName(currentClass);
-                        segments.push({className: currentClass, width: segmentWidth, color: customColor});
-
+                        segments.push({
+                            className: currentClass,
+                            width: (index - startIndex) * stepsHumidity * 100 / maxHumidity,
+                            color: this.getColorByClassName(currentClass)
+                        });
                         currentClass = cell.className;
                         startIndex = index;
                     }
-                });
-                if (startIndex < row.length) {
-                    const segmentWidth = (row.length - startIndex) * stepsHumidity * 100 / maxHumidity;
-                    let customColor = this.getColorByClassName(currentClass);
-                    segments.push({className: currentClass, width: segmentWidth, color: customColor});
+                }
+
+                if (startIndex < rowLength) {
+                    segments.push({
+                        className: currentClass,
+                        width: (rowLength - startIndex) * stepsHumidity * 100 / maxHumidity,
+                        color: this.getColorByClassName(currentClass)
+                    });
                 }
 
                 const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
                 const widthAdjustmentFactor = 100 / totalWidth;
 
                 let accumulatedWidth = 0;
-                segments.forEach((segment, index) => {
+                const segmentsLength = segments.length;
+                for (let i = 0; i < segmentsLength; i++) {
+                    const segment = segments[i];
                     let adjustedWidth;
-                    if (index === segments.length - 1) {
-                        adjustedWidth = (100 - accumulatedWidth).toFixed(2); // Ensure the last segment fills the remaining width
+                    if (i === segmentsLength - 1) {
+                        adjustedWidth = (100 - accumulatedWidth).toFixed(2);
                     } else {
                         adjustedWidth = (segment.width * widthAdjustmentFactor).toFixed(2);
                         accumulatedWidth += parseFloat(adjustedWidth);
                     }
+
                     const div = document.createElement('div');
                     div.className = `cell ${segment.className}`;
-                    div.style.backgroundColor = segment.color;
-                    div.style.boxShadow = `0 0 0 1px ${segment.color}`;
-                    div.style.width = `${adjustedWidth}%`;
-
+                    div.style.cssText = `background-color: ${segment.color}; box-shadow: 0 0 0 1px ${segment.color}; width: ${adjustedWidth}%;`;
                     rowElement.appendChild(div);
-                });
+                }
 
-                fragment.appendChild(rowElement);
-            });
-            tableContainer.appendChild(fragment);
-            container.appendChild(tableContainer);
+                return rowElement;
+            };
+
+            const fragment = document.createDocumentFragment();
+            const vpdMatrixLength = vpdMatrix.length;
+            for (let i = 0; i < vpdMatrixLength; i++) {
+                fragment.appendChild(createRow(vpdMatrix[i], stepsHumidity, maxHumidity));
+            }
+            if (!tableContainer.isConnected) {
+                tableContainer.appendChild(fragment);
+            } else {
+                tableContainer.innerHTML = '';
+                tableContainer.appendChild(fragment);
+            }
+            if (!container.querySelector(`.room-${index}-table-container`)) {
+                container.appendChild(tableContainer);
+            }
         });
         return container;
     }, refreshTable() {
-        const table = this.buildTable();
-        this.content.replaceChildren(table);
+        this.buildTable();
     }, addGridLines() {
         const grid = this.querySelector('.vpd-grid') || document.createElement('div');
         grid.className = 'vpd-grid';
@@ -380,9 +398,9 @@ export const chart = {
     },
 
     buildTooltip() {
-        let sensors = this.querySelector('#sensors');
+        let rooms = this.querySelector('#rooms');
         let vpd = 0;
-        this.config.sensors.forEach((sensor, index) => {
+        this.config.rooms.forEach((sensor, index) => {
             if (this._hass.states[sensor.humidity] && this._hass.states[sensor.temperature]) {
                 const humidity = parseFloat(this._hass.states[sensor.humidity].state);
                 const temperature = parseFloat(this._hass.states[sensor.temperature].state);
@@ -407,18 +425,18 @@ export const chart = {
                 let showHumidity = humidity;
 
 
-                if (sensors.querySelector(`.sensor_${index}`) === null) {
+                if (rooms.querySelector(`.room_${index}`) === null) {
                     let name = sensor.name;
                     if (name === undefined) {
                         name = `<svg fill="#ffffff" width="13" height="13" viewBox="-1.7 0 20.4 20.4" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.32639999999999997"></g><g id="SVGRepo_iconCarrier"><path d="M16.476 10.283A7.917 7.917 0 1 1 8.56 2.366a7.916 7.916 0 0 1 7.916 7.917zm-5.034-2.687a2.845 2.845 0 0 0-.223-1.13A2.877 2.877 0 0 0 9.692 4.92a2.747 2.747 0 0 0-1.116-.227 2.79 2.79 0 0 0-1.129.227 2.903 2.903 0 0 0-1.543 1.546 2.803 2.803 0 0 0-.227 1.128v.02a.792.792 0 0 0 1.583 0v-.02a1.23 1.23 0 0 1 .099-.503 1.32 1.32 0 0 1 .715-.717 1.223 1.223 0 0 1 .502-.098 1.18 1.18 0 0 1 .485.096 1.294 1.294 0 0 1 .418.283 1.307 1.307 0 0 1 .281.427 1.273 1.273 0 0 1 .099.513 1.706 1.706 0 0 1-.05.45 1.546 1.546 0 0 1-.132.335 2.11 2.11 0 0 1-.219.318c-.126.15-.25.293-.365.424-.135.142-.26.28-.374.412a4.113 4.113 0 0 0-.451.639 3.525 3.525 0 0 0-.342.842 3.904 3.904 0 0 0-.12.995v.035a.792.792 0 0 0 1.583 0v-.035a2.324 2.324 0 0 1 .068-.59 1.944 1.944 0 0 1 .187-.463 2.49 2.49 0 0 1 .276-.39c.098-.115.209-.237.329-.363l.018-.02c.129-.144.264-.301.403-.466a3.712 3.712 0 0 0 .384-.556 3.083 3.083 0 0 0 .28-.692 3.275 3.275 0 0 0 .108-.875zM9.58 14.895a.982.982 0 0 0-.294-.707 1.059 1.059 0 0 0-.32-.212l-.004-.001a.968.968 0 0 0-.382-.079 1.017 1.017 0 0 0-.397.08 1.053 1.053 0 0 0-.326.212 1.002 1.002 0 0 0-.215 1.098 1.028 1.028 0 0 0 .216.32 1.027 1.027 0 0 0 .722.295.968.968 0 0 0 .382-.078l.005-.002a1.01 1.01 0 0 0 .534-.534.98.98 0 0 0 .08-.392z"></path></g></svg>`;
                     }
                     let htmlTemplate = `
-                    <div class="sensor_${index}">
-                        <div class="sensor-pointer-${index} sensor-pointer sensor-circle" data-index="${index}"></div>
+                    <div class="room room_${index}">
+                        <div class="room-pointer-${index} room-pointer room-circle" data-index="${index}"></div>
                         <div class="horizontal-line horizontal-line-${index}" data-index="${index}"></div>
                         <div class="vertical-line vertical-line-${index}" data-index="${index}"></div>
                         <div class="custom-tooltip custom-tooltip-${index}" data-index="${index}">
-                            <span class="sensor-name">${name}</span>
+                            <span class="room-name">${name}</span>
                             <div class="tooltipAdditionalInformations">
                                 <span class="kpaText_${index}" class="kpaText_${index}">${this.kpa_text ? this.kpa_text + ': ' : ''}${vpd}</span>
                                 <span class="sensorHumidity_${index}" class="sensorHumidity_${index}">${this.rh_text ? this.rh_text + ': ' : ''}${showHumidity}</span>
@@ -428,7 +446,7 @@ export const chart = {
                         </div>
                     </div>
                 `;
-                    sensors.innerHTML += htmlTemplate;
+                    rooms.innerHTML += htmlTemplate;
                     this.updatePointer(index, percentageHumidity, percentageTemperature, sensor.name, vpd, showHumidity, temperature);
                 } else {
                     this.updatePointer(index, percentageHumidity, percentageTemperature, sensor.name, vpd, showHumidity, temperature);
@@ -437,12 +455,12 @@ export const chart = {
         });
     },
     updatePointer(index, percentageHumidity, percentageTemperature, sensorName = "", vpd, humidity, temperature) {
-        const pointer = this.querySelector(`.sensor-pointer[data-index="${index}"]`) || document.createElement('div');
+        const pointer = this.querySelector(`.room-pointer[data-index="${index}"]`) || document.createElement('div');
         pointer.setAttribute('data-index', index.toString());
         pointer.style.left = `${percentageHumidity}%`;
         pointer.style.bottom = `${100 - percentageTemperature}%`;
-        pointer.className = this.enable_triangle ? 'highlight sensor-pointer sensor-triangle' : 'highlight sensor-pointer sensor-circle';
-        pointer.classList.add(`sensor-pointer-${index}`);
+        pointer.className = this.enable_triangle ? 'highlight room-pointer room-triangle' : 'highlight room-pointer room-circle';
+        pointer.classList.add(`room-pointer-${index}`);
 
         const horizontalLine = this.querySelector(`.horizontal-line[data-index="${index}"]`) || document.createElement('div');
         horizontalLine.className = `horizontal-line horizontal-line-${index}`;
@@ -459,8 +477,8 @@ export const chart = {
             if (!legend) {
                 return;
             }
-            let legendElement = legend.querySelector(`.sensor-legend-${index}`) || document.createElement('div');
-            legendElement.className = `sensor-legend sensor-legend-${index}`;
+            let legendElement = legend.querySelector(`.room-legend-${index}`) || document.createElement('div');
+            legendElement.className = `room-legend room-legend-${index}`;
             legendElement.innerHTML = sensorName || `Sensor ${index + 1}`;
             if (!legendElement.isConnected) {
                 legendElement.addEventListener('mouseover', (event) => {
@@ -548,7 +566,11 @@ export const chart = {
         }
     },
     showSensorDetails(index) {
+        this.querySelectorAll('.room, .table-container, .custom-tooltip').forEach(el => el.style.display = 'none');
         this.querySelectorAll(`.history-circle-${index}`).forEach(circle => circle.style.display = 'block');
+        this.querySelectorAll(`.room_${index}`).forEach(el => el.style.display = 'block');
+        this.querySelectorAll(`.room-${index}-table-container`).forEach(el => el.style.display = 'flex');
+
         this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
             tooltip.style.display = tooltip.classList.contains(`custom-tooltip-${index}`) ? 'block' : 'none';
             if (tooltip.classList.contains(`custom-tooltip-${index}`)) {
@@ -561,8 +583,8 @@ export const chart = {
                 tooltip.querySelector('.tooltipAdditionalInformations').style.display = 'inline';
 
                 if (this.enable_legend) {
-                    let legend = this.querySelector(`.sensor-legend-${index}`);
-                    classes = `sensor-legend sensor-legend-${index}`;
+                    let legend = this.querySelector(`.room-legend-${index}`);
+                    classes = `room-legend room-legend-${index}`;
                     if (this.clickedTooltip) {
                         classes += ' active';
                     }
@@ -573,8 +595,8 @@ export const chart = {
             this.positionTooltip(tooltip, parseFloat(tooltip.style.left));
         });
 
-        this.querySelectorAll('.horizontal-line, .vertical-line, .sensor-pointer').forEach(el => {
-            if (!el.classList.contains(`horizontal-line-${index}`) && !el.classList.contains(`vertical-line-${index}`) && !el.classList.contains(`sensor-pointer-${index}`)) {
+        this.querySelectorAll('.horizontal-line, .vertical-line, .room-pointer').forEach(el => {
+            if (!el.classList.contains(`horizontal-line-${index}`) && !el.classList.contains(`vertical-line-${index}`) && !el.classList.contains(`room-pointer-${index}`)) {
                 el.style.display = 'none';
             } else {
                 el.style.display = 'block';
@@ -595,7 +617,7 @@ export const chart = {
                 this.positionTooltip(tooltip, parseFloat(tooltip.style.left));
             });
             this.querySelectorAll(`.history-circle-${index}`).forEach(circle => circle.style.display = 'none');
-            this.querySelectorAll('.custom-tooltip, .horizontal-line, .vertical-line, .sensor-pointer').forEach(el => el.style.display = 'block');
+            this.querySelectorAll('.custom-tooltip, .horizontal-line, .vertical-line, .room-pointer').forEach(el => el.style.display = 'block');
         }
     },
     buildMouseTooltip(target, targetHumidity = null, targetTemperature = null, targetVpd = null) {

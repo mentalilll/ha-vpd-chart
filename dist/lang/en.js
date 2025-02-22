@@ -14,7 +14,7 @@ export const language = {
     humidity_sensor: "Humidity Sensor",
     leaf_temperature_sensor: "Leaf Temperature Sensor",
     description: {
-        is_bar_view: "Enable Bar view of this chart for fast information of sensors",
+        is_bar_view: "Enable Bar view of this chart for fast information of rooms",
         enable_axes: "Enable Axes on the Chart",
         enable_ghostmap: "Enable Ghostmap on the Chart to get history of Sensor",
         enable_ghostclick: "Enable Ghostclick instead of Hover",
@@ -40,8 +40,8 @@ export const language = {
         enable_show_always_informations: "Always Show Info"
     },
     buttons: {
-        sensors: "Sensors",
-        addSensor: "Add Sensor",
+        rooms: "Rooms",
+        addRoom: "Add Room",
         addPhase: "Add Phase",
         main_settings: "Main Settings",
         features: "Features",

@@ -4,7 +4,6 @@ export const methods = {
         const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000 * RH / 100;
         return Number(VPleaf - VPair).toFixed(2);
     },
-
     calculateDP(relativeHumidity, airTemperature) {
         const MIN_RELATIVE_HUMIDITY = 0.0000001; // Minimal relative humidity to avoid log(0)
         if (relativeHumidity === 0) relativeHumidity = MIN_RELATIVE_HUMIDITY;
@@ -68,21 +67,40 @@ export const methods = {
         }
     },
     createVPDMatrix(minTemperature, maxTemperature, stepsTemperature, maxHumidity, minHumidity, stepsHumidity, leafTemperatureOffset) {
-        const vpdMatrix = [];
+        const temperatureSteps = Math.ceil((maxTemperature - minTemperature) / stepsTemperature) + 1;
+        const humiditySteps = Math.ceil((maxHumidity - minHumidity) / stepsHumidity) + 1;
+        const vpdMatrix = new Array(temperatureSteps);
 
-        for (let Tair = minTemperature; Tair <= maxTemperature; Tair += stepsTemperature) {
-            const row = [];
+        // Vorberechen der Klassen und Farben für VPD-Werte
+        const vpdClassCache = new Map();
+        const vpdColorCache = new Map();
+
+        for (let i = 0; i < temperatureSteps; i++) {
+            const Tair = minTemperature + i * stepsTemperature;
             const Tleaf = Tair - leafTemperatureOffset;
+            const row = new Array(humiditySteps);
 
-            for (let RH = minHumidity; RH <= maxHumidity; RH += stepsHumidity) {
+            for (let j = 0; j < humiditySteps; j++) {
+                const RH = maxHumidity - j * stepsHumidity;
                 const vpd = this.calculateVPD(Tleaf, Tair, RH);
-                const className = this.getPhaseClass(vpd);
-                row.push({vpd: this.toFixedNumber(vpd), className: className, color: this.getColorForVpd(vpd)});
-            }
-            // mirror row array
-            const mirroredRow = row.slice().reverse();
+                const fixedVpd = this.toFixedNumber(vpd);
 
-            vpdMatrix.push(mirroredRow);
+                let className = vpdClassCache.get(fixedVpd);
+                if (className === undefined) {
+                    className = this.getPhaseClass(vpd);
+                    vpdClassCache.set(fixedVpd, className);
+                }
+
+                let color = vpdColorCache.get(fixedVpd);
+                if (color === undefined) {
+                    color = this.getColorForVpd(vpd);
+                    vpdColorCache.set(fixedVpd, color);
+                }
+
+                row[j] = {vpd: fixedVpd, className, color};
+            }
+
+            vpdMatrix[i] = row;
         }
 
         return vpdMatrix;

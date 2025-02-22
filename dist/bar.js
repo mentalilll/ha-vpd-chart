@@ -36,7 +36,7 @@ export const bar = {
             if (this._hass) {
                 let vpd = 0;
 
-                this.config.sensors.forEach((sensor) => {
+                this.config.rooms.forEach((sensor) => {
                     const humidity = parseFloat(this._hass.states[sensor.humidity].state);
                     const temperature = parseFloat(this._hass.states[sensor.temperature].state);
                     let leafTemperature = temperature - this.getLeafTemperatureOffset();
@@ -101,7 +101,7 @@ export const bar = {
     },
     updateBars() {
         let vpd = 0;
-        this.config.sensors.forEach((sensor, index) => {
+        this.config.rooms.forEach((sensor, index) => {
             const humidity = this.toFixedNumber(this._hass.states[sensor.humidity].state, 1);
             const temperature = this.toFixedNumber(this._hass.states[sensor.temperature].state, 1);
             let leafTemperature = this.toFixedNumber(temperature - this.getLeafTemperatureOffset());
@@ -198,7 +198,7 @@ export const bar = {
     async renderMiniHistory() {
 
         const data = [];
-        for (const [index, sensor] of this.config.sensors.entries()) {
+        for (const [index, sensor] of this.config.rooms.entries()) {
             data['sensor-' + index] = [];
             const temperaturesPromise = this.getEntityHistory(sensor.temperature);
             const humiditiesPromise = this.getEntityHistory(sensor.humidity);

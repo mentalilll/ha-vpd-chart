@@ -40,8 +40,8 @@ export const language = {
         enable_show_always_informations: "Mostra sempre le info"
     },
     buttons: {
-        sensors: "Sensori",
-        addSensor: "Aggiungi sensore",
+        rooms: "Le camere",
+        addRoom: "Aggiungi camera",
         addPhase: "Aggiungi fase",
         main_settings: "Impostazioni principali",
         features: "Funzionalità",

@@ -40,8 +40,8 @@ export const language = {
         enable_show_always_informations: "Всегда показывать информацию"
     },
     buttons: {
-        sensors: "Датчики",
-        addSensor: "Добавить датчик",
+        rooms: "Номера",
+        addRoom: "Добавить комнату",
         addPhase: "Добавить фазу",
         main_settings: "Основные настройки",
         features: "Функции",
