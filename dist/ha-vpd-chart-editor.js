@@ -307,7 +307,7 @@ export class HaVpdChartEditor extends HTMLElement {
     <button type="button" class="collapsible ">${this.language.buttons.rooms}</button>
     <div class="content">
         <div>
-            <div class="sensorEditor"></div>
+            <div class="roomEditor"></div>
         </div>
     </div>
     <button type="button" class="collapsible active">${this.language.buttons.main_settings}</button>
@@ -552,11 +552,11 @@ export class HaVpdChartEditor extends HTMLElement {
     }
 
     initRooms() {
-        const sensorEditor = this.shadowRoot.querySelector('.sensorEditor');
-        sensorEditor.innerHTML = '';
-        sensorEditor.style.display = 'grid';
-        sensorEditor.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        sensorEditor.style.gap = '10px';
+        const roomEditor = this.shadowRoot.querySelector('.roomEditor');
+        roomEditor.innerHTML = '';
+        roomEditor.style.display = 'grid';
+        roomEditor.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        roomEditor.style.gap = '10px';
 
 
         const updateSensors = (index, property, target) => {
@@ -567,7 +567,7 @@ export class HaVpdChartEditor extends HTMLElement {
         };
 
         if (this.config.rooms.length !== 0) {
-            this.config.rooms.forEach((sensor, index) => {
+            this.config.rooms.forEach((room, index) => {
                 const container = document.createElement('div');
                 container.style = "border: 1px solid rgba(127,127,127,0.3); padding: 5px; border-radius: 15px;";
 
@@ -579,13 +579,13 @@ export class HaVpdChartEditor extends HTMLElement {
                     switch (properties[i]) {
                         case 'temperature':
                         case 'leaf_temperature':
-                            element = this.createComboBox(field, index, sensor[properties[i]], properties[i], 'temperature');
+                            element = this.createComboBox(field, index, room[properties[i]], properties[i], 'temperature');
                             break;
                         case 'humidity':
-                            element = this.createComboBox(field, index, sensor[properties[i]], properties[i], 'humidity');
+                            element = this.createComboBox(field, index, room[properties[i]], properties[i], 'humidity');
                             break;
                         default:
-                            element = this.createTextField(field, index, sensor[properties[i]]);
+                            element = this.createTextField(field, index, room[properties[i]]);
                             break;
                     }
                     element.addEventListener('value-changed', (ev) => updateSensors(index, properties[i], ev));
@@ -607,7 +607,7 @@ export class HaVpdChartEditor extends HTMLElement {
                     this.initRooms();
                 });
                 container.appendChild(removeButton);
-                sensorEditor.appendChild(container);
+                roomEditor.appendChild(container);
             });
         }
         const addButton = document.createElement('button');
@@ -619,9 +619,9 @@ export class HaVpdChartEditor extends HTMLElement {
             this.config = configCopy;
             this.fireEvent(this, 'config-changed', {config: this.config});
             this.initRooms();
-            sensorEditor.parentElement.parentElement.style.maxHeight = `fit-content`;
+            roomEditor.parentElement.parentElement.style.maxHeight = `fit-content`;
         });
-        sensorEditor.appendChild(addButton);
+        roomEditor.appendChild(addButton);
     }
 
     initColorEditor() {

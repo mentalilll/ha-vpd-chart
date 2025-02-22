@@ -16,15 +16,15 @@ export const ghostmap = {
         return filteredEntries;
     },
 
-    async fetchDataForSensors() {
+    async fetchDataForRooms() {
         const fragment = document.createDocumentFragment();
         const ghostmap = this.querySelector('#ghostmap');
 
-        const sensorPromises = this.config.rooms.map(async (sensor, index) => {
-            if (this._hass.states[sensor.humidity] && this._hass.states[sensor.temperature]) {
+        const sensorPromises = this.config.rooms.map(async (room, index) => {
+            if (this._hass.states[room.humidity] && this._hass.states[room.temperature]) {
                 const [temperatures, humidities] = await Promise.all([
-                    this.getEntityHistory(sensor.temperature, this.config.ghostmap_hours),
-                    this.getEntityHistory(sensor.humidity, this.config.ghostmap_hours)
+                    this.getEntityHistory(room.temperature, this.config.ghostmap_hours),
+                    this.getEntityHistory(room.humidity, this.config.ghostmap_hours)
                 ]);
 
                 this.processSensorData(fragment, temperatures, humidities, index);
