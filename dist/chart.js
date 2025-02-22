@@ -227,92 +227,85 @@ export const chart = {
         tooltip.style.visibility = 'visible';
     },
     buildTable() {
-        // check performance
         const container = this.querySelector('.vpd-container') || document.createElement('div');
         container.className = 'vpd-container';
         const maxHumidity = this.max_humidity;
         const stepsHumidity = this.steps_humidity;
-        console.time('createRoomContainers');
+        const vpdMatrixLength = Math.ceil((this.max_temperature - this.min_temperature) / this.steps_temperature) + 1;
+
+        const createRow = (row, stepsHumidity, maxHumidity) => {
+            const rowElement = document.createElement('div');
+            rowElement.className = 'vpd-row';
+            let segments = [];
+            let currentClass = null;
+            let startIndex = 0;
+            const rowLength = row.length;
+
+            for (let index = 0; index < rowLength; index++) {
+                const cell = row[index];
+                if (currentClass === null || cell.className !== currentClass) {
+                    if (currentClass !== null) {
+                        segments.push({
+                            className: currentClass,
+                            width: (index - startIndex) * stepsHumidity * 100 / maxHumidity,
+                            color: this.getColorByClassName(currentClass)
+                        });
+                    }
+                    currentClass = cell.className;
+                    startIndex = index;
+                }
+            }
+
+            segments.push({
+                className: currentClass,
+                width: (rowLength - startIndex) * stepsHumidity * 100 / maxHumidity,
+                color: this.getColorByClassName(currentClass)
+            });
+
+            const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
+            const widthAdjustmentFactor = 100 / totalWidth;
+
+            let accumulatedWidth = 0;
+            const segmentsLength = segments.length;
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < segmentsLength; i++) {
+                const segment = segments[i];
+                let adjustedWidth;
+                if (i === segmentsLength - 1) {
+                    adjustedWidth = (100 - accumulatedWidth).toFixed(2);
+                } else {
+                    adjustedWidth = (segment.width * widthAdjustmentFactor).toFixed(2);
+                    accumulatedWidth += parseFloat(adjustedWidth);
+                }
+
+                const div = document.createElement('div');
+                div.className = `cell ${segment.className}`;
+                div.style.cssText = `background-color: ${segment.color}; box-shadow: 0 0 0 1px ${segment.color}; width: ${adjustedWidth}%;`;
+                fragment.appendChild(div);
+            }
+            rowElement.appendChild(fragment);
+            return rowElement;
+        };
 
         this.config.rooms.forEach((room, index) => {
             let tableContainer = container.querySelector(`.room-${index}-table-container`) || document.createElement('div');
             tableContainer.className = `room-${index}-table-container table-container`;
             const temperature = parseFloat(this._hass.states[room.temperature].state);
             const leafTemperature = room.leaf_temperature ? parseFloat(this._hass.states[room.leaf_temperature].state) : undefined;
-            let leafTemperatureOffset = (this.getLeafTemperatureOffset());
-            if (leafTemperature !== undefined) {
-                leafTemperatureOffset = temperature - leafTemperature;
-            }
+            let leafTemperatureOffset = leafTemperature !== undefined ? temperature - leafTemperature : this.getLeafTemperatureOffset();
+
             let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity, leafTemperatureOffset);
-            const createRow = (row, stepsHumidity, maxHumidity) => {
-                const rowElement = document.createElement('div');
-                rowElement.className = 'vpd-row';
-                let segments = [];
-                let currentClass = null;
-                let startIndex = 0;
-                const rowLength = row.length;
-
-                for (let index = 0; index < rowLength; index++) {
-                    const cell = row[index];
-                    if (currentClass === null) {
-                        currentClass = cell.className;
-                        startIndex = index;
-                    } else if (cell.className !== currentClass) {
-                        segments.push({
-                            className: currentClass,
-                            width: (index - startIndex) * stepsHumidity * 100 / maxHumidity,
-                            color: this.getColorByClassName(currentClass)
-                        });
-                        currentClass = cell.className;
-                        startIndex = index;
-                    }
-                }
-
-                if (startIndex < rowLength) {
-                    segments.push({
-                        className: currentClass,
-                        width: (rowLength - startIndex) * stepsHumidity * 100 / maxHumidity,
-                        color: this.getColorByClassName(currentClass)
-                    });
-                }
-
-                const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
-                const widthAdjustmentFactor = 100 / totalWidth;
-
-                let accumulatedWidth = 0;
-                const segmentsLength = segments.length;
-                for (let i = 0; i < segmentsLength; i++) {
-                    const segment = segments[i];
-                    let adjustedWidth;
-                    if (i === segmentsLength - 1) {
-                        adjustedWidth = (100 - accumulatedWidth).toFixed(2);
-                    } else {
-                        adjustedWidth = (segment.width * widthAdjustmentFactor).toFixed(2);
-                        accumulatedWidth += parseFloat(adjustedWidth);
-                    }
-
-                    const div = document.createElement('div');
-                    div.className = `cell ${segment.className}`;
-                    div.style.cssText = `background-color: ${segment.color}; box-shadow: 0 0 0 1px ${segment.color}; width: ${adjustedWidth}%;`;
-                    rowElement.appendChild(div);
-                }
-
-                return rowElement;
-            };
 
             const fragment = document.createDocumentFragment();
-            const vpdMatrixLength = vpdMatrix.length;
             for (let i = 0; i < vpdMatrixLength; i++) {
                 fragment.appendChild(createRow(vpdMatrix[i], stepsHumidity, maxHumidity));
             }
+
             if (!tableContainer.isConnected) {
                 tableContainer.appendChild(fragment);
-            } else {
-                tableContainer.innerHTML = '';
-                tableContainer.appendChild(fragment);
-            }
-            if (!container.querySelector(`.room-${index}-table-container`)) {
                 container.appendChild(tableContainer);
+            } else {
+                tableContainer.replaceChildren(fragment);
             }
         });
         return container;
