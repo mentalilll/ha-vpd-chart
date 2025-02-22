@@ -13,9 +13,7 @@ export const language = {
     temperature_sensor: "Temperatursensor",
     humidity_sensor: "Feuchtigkeitssensor",
     leaf_temperature_sensor: "Blatttemperatursensor",
-    use_leaf_position: "Blattposition verwenden?",
     description: {
-        use_leaf_position: "Blatttemperatur als Position für die VPD-Tooltip-Anzeige verwenden (berechnet RH neu)",
         is_bar_view: "Balkenansicht dieses Diagramms für schnelle Sensorinformationen aktivieren",
         enable_axes: "Achsen im Diagramm aktivieren",
         enable_ghostmap: "Ghostmap im Diagramm aktivieren, um die Sensorhistorie anzuzeigen",

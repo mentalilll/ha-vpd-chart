@@ -2,12 +2,15 @@ export const methods = {
     calculateVPD(Tleaf, Tair, RH) {
         const VPleaf = 610.7 * Math.exp(17.27 * Tleaf / (Tleaf + 237.3)) / 1000;
         const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000 * RH / 100;
-        return VPleaf - VPair;
+        return Number(VPleaf - VPair).toFixed(2);
     },
-    calculateRH(Tleaf, Tair, VPD) {
-        const VPleaf = 610.7 * Math.exp(17.27 * Tleaf / (Tleaf + 237.3)) / 1000;
-        const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000;
-        return ((VPleaf - VPD) / VPair) * 100;
+
+    calculateDP(relativeHumidity, airTemperature) {
+        const MIN_RELATIVE_HUMIDITY = 0.0000001; // Minimal relative humidity to avoid log(0)
+        if (relativeHumidity === 0) relativeHumidity = MIN_RELATIVE_HUMIDITY;
+        const MAGNUS_CONSTANT = 243.12;
+        const logarithm = Math.log(relativeHumidity / 100) + 17.62 * airTemperature / (MAGNUS_CONSTANT + airTemperature);
+        return MAGNUS_CONSTANT * logarithm / (17.62 - logarithm);
     },
     getPhaseClass(vpd) {
         for (const phase of this.vpd_phases) {
@@ -64,15 +67,15 @@ export const methods = {
             return [];
         }
     },
-    createVPDMatrix(minTemperature, maxTemperature, stepsTemperature, maxHumidity, minHumidity, stepsHumidity) {
+    createVPDMatrix(minTemperature, maxTemperature, stepsTemperature, maxHumidity, minHumidity, stepsHumidity, leafTemperatureOffset) {
         const vpdMatrix = [];
 
         for (let Tair = minTemperature; Tair <= maxTemperature; Tair += stepsTemperature) {
             const row = [];
-            const Tleaf = Tair - 2;
+            const Tleaf = Tair - leafTemperatureOffset;
 
             for (let RH = minHumidity; RH <= maxHumidity; RH += stepsHumidity) {
-                const vpd = this.calculateVPD(Tleaf, Tair, RH).toFixed(2);
+                const vpd = this.calculateVPD(Tleaf, Tair, RH);
                 const className = this.getPhaseClass(vpd);
                 row.push({vpd: this.toFixedNumber(vpd), className: className, color: this.getColorForVpd(vpd)});
             }
@@ -167,7 +170,7 @@ export const methods = {
         haComboBox.placeholder = 'Select Sensor';
         haComboBox.disabled = false;
         haComboBox.helper = '';
-        haComboBox.renderer = (root, obj, index) => {
+        haComboBox.renderer = (root, obj) => {
             return this.createHaListItem(obj.item, this._hass);
         }
         haComboBox.items = temperatureSensors;

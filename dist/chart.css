@@ -10,6 +10,17 @@ div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
     overflow: hidden;
 }
 
+.table-container:first-child {
+    display: flex;
+}
+
+.table-container {
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+}
+
 .vpd-chart-view {
     display: grid !important;
 }

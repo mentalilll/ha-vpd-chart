@@ -13,9 +13,7 @@ export const language = {
     temperature_sensor: "Sensor de temperatura",
     humidity_sensor: "Sensor de humedad",
     leaf_temperature_sensor: "Sensor de temperatura de la hoja",
-    use_leaf_position: "¿Usar posición de la hoja?",
     description: {
-        use_leaf_position: "Usar la temperatura de la hoja como posición para la visualización de VPD (recalcula RH)",
         is_bar_view: "Habilitar vista de barras de este gráfico para información rápida de los sensores",
         enable_axes: "Habilitar ejes en el gráfico",
         enable_ghostmap: "Habilitar Ghostmap en el gráfico para obtener el historial del sensor",

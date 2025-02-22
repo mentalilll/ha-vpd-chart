@@ -13,9 +13,7 @@ export const language = {
     temperature_sensor: "Czujnik temperatury",
     humidity_sensor: "Czujnik wilgotności",
     leaf_temperature_sensor: "Czujnik temperatury liścia",
-    use_leaf_position: "Użyj pozycji liścia?",
     description: {
-        use_leaf_position: "Użyj temperatury liścia jako pozycji do renderowania VPD Tooltip (ponownie oblicza RH)",
         is_bar_view: "Włącz widok słupkowy tego wykresu dla szybkiej informacji o czujnikach",
         enable_axes: "Włącz osie na wykresie",
         enable_ghostmap: "Włącz Ghostmap na wykresie, aby uzyskać historię czujnika",

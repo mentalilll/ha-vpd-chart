@@ -33,7 +33,7 @@ export const chart = {
                 }
                 throw new Error('fallback to local/community');
             })
-            .catch(error => {
+            .catch(() => {
                 this.innerHTML = this.htmlTemplate.replace('##url##', `/local/community/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
                 this.content = this.querySelector("div.vpd-card-container");
                 this.sensordom = this.querySelector("div#sensors");
@@ -54,7 +54,10 @@ export const chart = {
             }
             this.updateGhostMapPeriodically.call(this);
         } else {
-            this.refreshTable.call(this);
+            if (this.shouldUpdate() || (this.lastUpdate === undefined || Date.now() - this.lastUpdate > 1000)) {
+                this.refreshTable.call(this);
+                this.lastUpdate = Date.now();
+            }
         }
 
         if (this.enable_axes) {
@@ -167,7 +170,17 @@ export const chart = {
 
         const temperature = this.min_temperature + (temperatureRange * yPercent / 100);
         const humidity = this.max_humidity - (humidityRange * xPercent / 100);
-        const leafTemperature = temperature - this.getLeafTemperatureOffset();
+        let leafTemperature = temperature - this.getLeafTemperatureOffset();
+
+        if (this.config.sensors.length > 0) {
+            this.config.sensors.forEach((sensor) => {
+                if (sensor.leaf_temperature !== undefined) {
+                    if (this._hass.states[sensor.leaf_temperature] !== undefined) {
+                        leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
+                    }
+                }
+            });
+        }
 
         const vpd = this.calculateVPD(leafTemperature, temperature, humidity);
 
@@ -216,69 +229,77 @@ export const chart = {
     buildTable() {
         const container = document.createElement('div');
         container.className = 'vpd-container';
-        let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity);
         const maxHumidity = this.max_humidity;
         const stepsHumidity = this.steps_humidity;
-
-        const fragment = document.createDocumentFragment();
-        vpdMatrix.forEach(row => {
-            const rowElement = document.createElement('div');
-            rowElement.className = 'vpd-row';
-
-            let segments = [];
-            let currentClass = null;
-            let startIndex = 0;
-            row.forEach((cell, index) => {
-                if (currentClass === null) {
-                    currentClass = cell.className;
-                    startIndex = index;
-                } else if (cell.className !== currentClass) {
-                    const segmentWidth = (index - startIndex) * stepsHumidity * 100 / maxHumidity;
-                    let customColor = this.getColorByClassName(currentClass);
-                    segments.push({className: currentClass, width: segmentWidth, color: customColor});
-
-                    currentClass = cell.className;
-                    startIndex = index;
-                }
-            });
-            if (startIndex < row.length) {
-                const segmentWidth = (row.length - startIndex) * stepsHumidity * 100 / maxHumidity;
-                let customColor = this.getColorByClassName(currentClass);
-                segments.push({className: currentClass, width: segmentWidth, color: customColor});
+        this.config.sensors.forEach((sensor, index) => {
+            const tableContainer = document.createElement('div');
+            tableContainer.className = `sensor-${index}-table-container table-container`;
+            const temperature = parseFloat(this._hass.states[sensor.temperature].state);
+            const leafTemperature = sensor.leaf_temperature ? parseFloat(this._hass.states[sensor.leaf_temperature].state) : undefined;
+            let leafTemperatureOffset = (this.getLeafTemperatureOffset());
+            if (leafTemperature !== undefined) {
+                leafTemperatureOffset = temperature - leafTemperature;
             }
 
-            const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
-            const widthAdjustmentFactor = 100 / totalWidth;
+            let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity, leafTemperatureOffset);
+            const fragment = document.createDocumentFragment();
 
-            let accumulatedWidth = 0;
-            segments.forEach((segment, index) => {
-                let adjustedWidth;
-                if (index === segments.length - 1) {
-                    adjustedWidth = (100 - accumulatedWidth).toFixed(2); // Ensure the last segment fills the remaining width
-                } else {
-                    adjustedWidth = (segment.width * widthAdjustmentFactor).toFixed(2);
-                    accumulatedWidth += parseFloat(adjustedWidth);
+            vpdMatrix.forEach(row => {
+                const rowElement = document.createElement('div');
+                rowElement.className = 'vpd-row';
+
+                let segments = [];
+                let currentClass = null;
+                let startIndex = 0;
+                row.forEach((cell, index) => {
+                    if (currentClass === null) {
+                        currentClass = cell.className;
+                        startIndex = index;
+                    } else if (cell.className !== currentClass) {
+                        const segmentWidth = (index - startIndex) * stepsHumidity * 100 / maxHumidity;
+                        let customColor = this.getColorByClassName(currentClass);
+                        segments.push({className: currentClass, width: segmentWidth, color: customColor});
+
+                        currentClass = cell.className;
+                        startIndex = index;
+                    }
+                });
+                if (startIndex < row.length) {
+                    const segmentWidth = (row.length - startIndex) * stepsHumidity * 100 / maxHumidity;
+                    let customColor = this.getColorByClassName(currentClass);
+                    segments.push({className: currentClass, width: segmentWidth, color: customColor});
                 }
-                const div = document.createElement('div');
-                div.className = `cell ${segment.className}`;
-                div.style.backgroundColor = segment.color;
-                div.style.boxShadow = `0 0 0 1px ${segment.color}`;
-                div.style.width = `${adjustedWidth}%`;
 
-                rowElement.appendChild(div);
+                const totalWidth = segments.reduce((sum, segment) => sum + segment.width, 0);
+                const widthAdjustmentFactor = 100 / totalWidth;
+
+                let accumulatedWidth = 0;
+                segments.forEach((segment, index) => {
+                    let adjustedWidth;
+                    if (index === segments.length - 1) {
+                        adjustedWidth = (100 - accumulatedWidth).toFixed(2); // Ensure the last segment fills the remaining width
+                    } else {
+                        adjustedWidth = (segment.width * widthAdjustmentFactor).toFixed(2);
+                        accumulatedWidth += parseFloat(adjustedWidth);
+                    }
+                    const div = document.createElement('div');
+                    div.className = `cell ${segment.className}`;
+                    div.style.backgroundColor = segment.color;
+                    div.style.boxShadow = `0 0 0 1px ${segment.color}`;
+                    div.style.width = `${adjustedWidth}%`;
+
+                    rowElement.appendChild(div);
+                });
+
+                fragment.appendChild(rowElement);
             });
-
-            fragment.appendChild(rowElement);
+            tableContainer.appendChild(fragment);
+            container.appendChild(tableContainer);
         });
-
-        container.appendChild(fragment);
-
         return container;
     }, refreshTable() {
-        if (this.shouldUpdate()) {
-            const table = this.buildTable();
-            this.content.replaceChildren(table);
-        }
+        const table = this.buildTable();
+        this.content.replaceChildren(table);
     }, addGridLines() {
         const grid = this.querySelector('.vpd-grid') || document.createElement('div');
         grid.className = 'vpd-grid';
@@ -374,15 +395,8 @@ export const chart = {
                 if (sensor.vpd !== undefined) {
                     vpd = parseFloat(this._hass.states[sensor.vpd].state);
                 } else {
-                    vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
+                    vpd = this.calculateVPD(leafTemperature, temperature, humidity);
                 }
-                const min_vpd = this.calculateVPD(temperature - 2, temperature, this.max_humidity);
-                const max_vpd = this.calculateVPD(temperature - 2, temperature, this.min_humidity);
-                const relativeVpd = vpd - min_vpd;
-
-                const totalVpdRange = max_vpd - min_vpd;
-                const percentageVpd = (relativeVpd / totalVpdRange) * 100;
-
                 const relativeTemperature = temperature - this.min_temperature;
                 const totalTemperatureRange = this.max_temperature - this.min_temperature;
                 const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
@@ -391,11 +405,6 @@ export const chart = {
                 let percentageHumidity = ((relativeHumidity / totalHumidityRange) * 100).toFixed(1);
 
                 let showHumidity = humidity;
-                let calculatedHumidity = (this.max_humidity - (percentageVpd * totalHumidityRange / 100)).toFixed(1);
-                if (sensor.show_calculated_rh === true) {
-                    showHumidity = calculatedHumidity;
-                    percentageHumidity = percentageVpd;
-                }
 
 
                 if (sensors.querySelector(`.sensor_${index}`) === null) {
@@ -592,7 +601,7 @@ export const chart = {
     buildMouseTooltip(target, targetHumidity = null, targetTemperature = null, targetVpd = null) {
         const humidity = targetHumidity?.toFixed(1) || parseFloat(target.getAttribute('data-rh')).toFixed(1);
         const temperature = targetTemperature?.toFixed(1) || parseFloat(target.getAttribute('data-air')).toFixed(1);
-        const vpd = targetVpd?.toFixed(2) || parseFloat(target.getAttribute('data-vpd')).toFixed(2);
+        const vpd = targetVpd || parseFloat(target.getAttribute('data-vpd')).toFixed(2);
 
         const tooltip = this.querySelector('.mouse-custom-tooltip');
         tooltip.innerHTML = `${this.kpa_text ? this.kpa_text + ':' : ''} ${vpd} | ${this.rh_text ? this.rh_text + ':' : ''} ${humidity}% | ${this.air_text ? this.air_text + ':' : ''} ${temperature}${this.unit_temperature} | ${this.getPhaseClass(vpd)}`;

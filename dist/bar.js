@@ -24,7 +24,7 @@ export const bar = {
                 }
                 throw new Error('fallback to local/community');
             })
-            .catch(error => {
+            .catch(() => {
                 this.innerHTML = this.htmlTemplate.replace('##url##', `/local/community/ha-vpd-chart/bar.css?v=${window.vpdChartVersion}`);
                 this.content = this.querySelector("div.card-content");
             });
@@ -48,22 +48,9 @@ export const bar = {
                     if (sensor.vpd !== undefined) {
                         vpd = parseFloat(this._hass.states[sensor.vpd].state);
                     } else {
-                        vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
+                        vpd = this.calculateVPD(leafTemperature, temperature, humidity);
                     }
-                    const min_vpd = this.calculateVPD(temperature - 2, temperature, this.max_humidity);
-                    const max_vpd = this.calculateVPD(temperature - 2, temperature, this.min_humidity);
-                    const relativeVpd = vpd - min_vpd;
-
-                    const totalVpdRange = max_vpd - min_vpd;
-                    const percentageVpd = (relativeVpd / totalVpdRange) * 100;
-
-                    const totalHumidityRange = this.max_humidity - this.min_humidity;
-
                     let showHumidity = humidity;
-                    let calculatedHumidity = (this.max_humidity - (percentageVpd * totalHumidityRange / 100)).toFixed(1);
-                    if (sensor.show_calculated_rh === true) {
-                        showHumidity = calculatedHumidity;
-                    }
 
                     let card = this.content.querySelector(`ha-card[data-sensor="${sensor.name}"]`);
                     if (!card) {
@@ -126,13 +113,10 @@ export const bar = {
             if (sensor.vpd !== undefined) {
                 vpd = this.toFixedNumber(this._hass.states[sensor.vpd].state);
             } else {
-                vpd = this.calculateVPD(leafTemperature, temperature, humidity).toFixed(2);
+                vpd = this.calculateVPD(leafTemperature, temperature, humidity);
             }
 
             let showHumidity = humidity;
-            if (sensor.show_calculated_rh === true) {
-                showHumidity = this.calculateRH(leafTemperature, temperature, vpd).toFixed(1);
-            }
             let sensorName = sensor.name;
             if (sensorName === undefined) {
                 sensorName = 'Sensor ' + (index + 1);
@@ -224,7 +208,7 @@ export const bar = {
                 if (humidities[tempIndex]) {
                     data['sensor-' + index].push({
                         time: temperature.last_changed,
-                        vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - this.getLeafTemperatureOffset(), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)).toFixed(2),
+                        vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - this.getLeafTemperatureOffset(), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)),
                     });
                 }
             });

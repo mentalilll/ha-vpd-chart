@@ -15,15 +15,9 @@
 - Home Assistant installation
 - Basic knowledge of YAML and Home Assistant configuration
 
-## Installation
-
-### HACS Easy Installation
-
-1. **Currently not available - still wait for accept pull request**
-
 ### HACS Installation
 
-If you have [HACS](https://hacs.xyz) installed, you can add this repository to HACS as a custom repository.
+If you have [HACS](https://hacs.xyz) installed, easily search for this Repository ("ha-vpd-chart").
 Otherwise you can easily install it
 
 ```bash
@@ -66,6 +60,10 @@ wget -O - https://get.hacs.xyz | bash -
 **Note:** After adding the resource, you may need to restart Home Assistant.
 
 ## Usage
+
+Just use the Configuration Gui to configure the card.
+
+A YAML example is only needed if you realy want to use:
 
 Easy start as Chart View:
 
@@ -120,7 +118,6 @@ sensors:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
     leaf_temperature: sensor.infrared_sensor #optional
-    show_calculated_rh: true # optional 
     name: Tent 1
   - temperature: sensor.temperature_tent_2
     humidity: sensor.humidity_tent_2

@@ -13,9 +13,7 @@ export const language = {
     temperature_sensor: "Temperatursensor",
     humidity_sensor: "Fugtighedssensor",
     leaf_temperature_sensor: "Bladtemperatursensor",
-    use_leaf_position: "Brug bladposition?",
     description: {
-        use_leaf_position: "Brug bladtemperatur som position til VPD-værktøjstip (beregner RH igen)",
         is_bar_view: "Aktiver søjlediagram for hurtig sensorinformation",
         enable_axes: "Aktiver akser i diagrammet",
         enable_ghostmap: "Aktiver Ghostmap i diagrammet for at få historik over sensor",

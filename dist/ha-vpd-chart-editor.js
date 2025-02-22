@@ -284,7 +284,7 @@ export class HaVpdChartEditor extends HTMLElement {
             this.initColorEditor();
             this.initAddButton();
             this.initFormulaEditor();
-        }).catch((error) => {
+        }).catch(() => {
             import('./lang/en.js').then((module) => {
                 this.language = module.language;
                 this.render();
@@ -460,7 +460,7 @@ export class HaVpdChartEditor extends HTMLElement {
         this.shadowRoot.querySelectorAll('ha-switch, ha-textfield, input').forEach(input => {
             let target = input;
 
-            input.addEventListener('input', event => {
+            input.addEventListener('input', () => {
                 debouncedHandleInputChange(target);
             });
         });
@@ -569,8 +569,8 @@ export class HaVpdChartEditor extends HTMLElement {
                 const container = document.createElement('div');
                 container.style = "border: 1px solid rgba(127,127,127,0.3); padding: 5px; border-radius: 15px;";
 
-                const fields = [this.language.name, this.language.temperature_sensor + '*', this.language.leaf_temperature_sensor, this.language.humidity_sensor + '*', /*'VPD Helper',*/ this.language.use_leaf_position];
-                const properties = ['name', 'temperature', 'leaf_temperature', 'humidity', /*'vpd_helper',*/ 'show_calculated_rh'];
+                const fields = [this.language.name, this.language.temperature_sensor + '*', this.language.leaf_temperature_sensor, this.language.humidity_sensor + '*'];
+                const properties = ['name', 'temperature', 'leaf_temperature', 'humidity'];
 
                 fields.forEach((field, i) => {
                     let element;
@@ -581,9 +581,6 @@ export class HaVpdChartEditor extends HTMLElement {
                             break;
                         case 'humidity':
                             element = this.createComboBox(field, index, sensor[properties[i]], properties[i], 'humidity');
-                            break;
-                        case 'show_calculated_rh':
-                            element = this.createCheckbox(field, index, sensor[properties[i]], properties[i], this.language.description.use_leaf_position);
                             break;
                         default:
                             element = this.createTextField(field, index, sensor[properties[i]]);
@@ -616,7 +613,7 @@ export class HaVpdChartEditor extends HTMLElement {
         addButton.className = 'addButton';
         addButton.addEventListener('click', () => {
             let configCopy = this.copyConfig();
-            configCopy.sensors[configCopy.sensors.length] = [{name: '', temperature: '', humidity: '', leaf_temperature: null, vpd_helper: false, show_calculated_rh: false}];
+            configCopy.sensors[configCopy.sensors.length] = [{name: '', temperature: '', humidity: '', leaf_temperature: null}];
             this.config = configCopy;
             this.fireEvent(this, 'config-changed', {config: this.config});
             this.initSensors();
