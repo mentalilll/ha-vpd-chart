@@ -21,7 +21,6 @@ export const language = {
         enable_triangle: "Aktiver trekant i stedet for cirkel som værktøjstipmarkør",
         enable_tooltip: "Aktiver værktøjstip i diagrammet",
         enable_crosshair: "Aktiver krydshår ved MouseHover i diagrammet",
-        enable_fahrenheit: "Aktiver Fahrenheit i stedet for Celsius",
         enable_zoom: "Aktiver zoomfunktion i diagrammet (tryk på midterste museknap for at nulstille)",
         enable_legend: "Aktiver legend for faser",
         enable_show_always_informations: "Aktiver altid værktøjstipinformation i diagrammet"
@@ -34,7 +33,6 @@ export const language = {
         enable_triangle: "Aktiver trekant",
         enable_tooltip: "Aktiver værktøjstip",
         enable_crosshair: "Aktiver krydshår",
-        enable_fahrenheit: "Aktiver Fahrenheit",
         enable_zoom: "Aktiver zoom",
         enable_legend: "Aktiver legend",
         enable_show_always_informations: "Vis altid info"

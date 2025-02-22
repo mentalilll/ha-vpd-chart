@@ -21,7 +21,6 @@ export const language = {
         enable_triangle: "Enable Triangle instead of Circle for tooltip marker",
         enable_tooltip: "Enable tooltip on the Chart",
         enable_crosshair: "Enable MouseHover Crosshair on the Chart",
-        enable_fahrenheit: "Enable Fahrenheit instead of Celsius",
         enable_zoom: "Enable Zoomfunction on the Chart (MouseWheel Press to reset)",
         enable_legend: "Enable Legend for Phases",
         enable_show_always_informations: "Enable show always tooltip information for chart"
@@ -34,7 +33,6 @@ export const language = {
         enable_triangle: "Enable Triangle",
         enable_tooltip: "Enable Tooltip",
         enable_crosshair: "Enable MouseHover Crosshair",
-        enable_fahrenheit: "Enable Fahrenheit",
         enable_zoom: "Enable Zoom",
         enable_legend: "Enable Legend",
         enable_show_always_informations: "Always Show Info"

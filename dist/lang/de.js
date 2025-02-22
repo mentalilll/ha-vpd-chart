@@ -21,7 +21,6 @@ export const language = {
         enable_triangle: "Dreieck anstelle eines Kreises als Tooltip-Marker aktivieren",
         enable_tooltip: "Tooltip im Diagramm aktivieren",
         enable_crosshair: "MouseHover Fadenkreuz im Diagramm aktivieren",
-        enable_fahrenheit: "Fahrenheit anstelle von Celsius aktivieren",
         enable_zoom: "Zoomfunktion im Diagramm aktivieren (Mittlere Maustaste drücken, um zurückzusetzen)",
         enable_legend: "Legende für Phasen aktivieren",
         enable_show_always_informations: "Immer Tooltip-Informationen für das Diagramm anzeigen"
@@ -34,7 +33,6 @@ export const language = {
         enable_triangle: "Dreieck aktivieren",
         enable_tooltip: "Tooltip aktivieren",
         enable_crosshair: "Fadenkreuz aktivieren",
-        enable_fahrenheit: "Fahrenheit aktivieren",
         enable_zoom: "Zoom aktivieren",
         enable_legend: "Legende aktivieren",
         enable_show_always_informations: "Immer Info anzeigen"

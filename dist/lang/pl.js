@@ -21,7 +21,6 @@ export const language = {
         enable_triangle: "Włącz trójkąt zamiast koła dla wskaźnika narzędzi",
         enable_tooltip: "Włącz tooltip na wykresie",
         enable_crosshair: "Włącz celownik na wykresie podczas najeżdżania kursorem",
-        enable_fahrenheit: "Włącz Fahrenheita zamiast Celsjusza",
         enable_zoom: "Włącz funkcję zoomu na wykresie (naciśnij środkowy przycisk myszy, aby zresetować)",
         enable_legend: "Włącz legendę dla faz",
         enable_show_always_informations: "Zawsze wyświetlaj informacje tooltip na wykresie"
@@ -34,7 +33,6 @@ export const language = {
         enable_triangle: "Włącz trójkąt",
         enable_tooltip: "Włącz tooltip",
         enable_crosshair: "Włącz celownik",
-        enable_fahrenheit: "Włącz Fahrenheita",
         enable_zoom: "Włącz zoom",
         enable_legend: "Włącz legendę",
         enable_show_always_informations: "Zawsze pokazuj informacje"

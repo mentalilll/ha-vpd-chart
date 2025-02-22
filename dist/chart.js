@@ -326,15 +326,25 @@ export const chart = {
         }
     }, addHorizontalGridLines(grid) {
         const temperatureSteps = 7;
-        for (let i = 0; i <= temperatureSteps; i++) {
-            const line = document.createElement('div');
-            line.className = 'grid-line horizontal';
-            line.style.top = `${(i / temperatureSteps) * 100}%`;
+        if (!this.horizontalGridCache) {
+            this.horizontalGridCache = new Array(temperatureSteps + 1);
+        }
 
-            const label = document.createElement('div');
-            label.className = 'temperature-axis-label';
-            const currentValue = this.min_temperature + (i * (this.max_temperature - this.min_temperature) / temperatureSteps);
-            label.innerHTML = `${currentValue.toFixed(0)}${this.unit_temperature}`;
+        for (let i = 0; i <= temperatureSteps; i++) {
+            if (!this.horizontalGridCache[i]) {
+                const line = document.createElement('div');
+                line.className = 'grid-line horizontal';
+                line.style.top = `${(i / temperatureSteps) * 100}%`;
+
+                const label = document.createElement('div');
+                label.className = 'temperature-axis-label';
+                const currentValue = this.min_temperature + (i * (this.max_temperature - this.min_temperature) / temperatureSteps);
+
+                this.horizontalGridCache[i] = {line, label, value: currentValue};
+            }
+
+            const {line, label, value} = this.horizontalGridCache[i];
+            label.textContent = `${value.toFixed(0)}${this.unit_temperature}`;
             label.style.top = `${(i / temperatureSteps) * 100}%`;
 
             grid.appendChild(line);
@@ -344,6 +354,16 @@ export const chart = {
         }
     },
 
+    updateTemperatureUnit(newUnit) {
+        this.unit_temperature = newUnit;
+        if (this.horizontalGridCache) {
+            this.horizontalGridCache.forEach(item => {
+                if (item && item.label) {
+                    item.label.textContent = `${item.value.toFixed(0)}${this.unit_temperature}`;
+                }
+            });
+        }
+    },
     addVerticalGridLines(grid) {
         const humiditySteps = 9;
         for (let i = 0; i <= humiditySteps; i++) {
@@ -563,7 +583,7 @@ export const chart = {
         this.querySelectorAll(`.history-circle-${index}`).forEach(circle => circle.style.display = 'block');
         this.querySelectorAll(`.room_${index}`).forEach(el => el.style.display = 'block');
         this.querySelectorAll(`.room-${index}-table-container`).forEach(el => el.style.display = 'flex');
-
+        this.updateTemperatureUnit(this._hass.states[this.config.rooms[index].temperature].attributes['unit_of_measurement']);
         this.querySelectorAll('.custom-tooltip').forEach(tooltip => {
             tooltip.style.display = tooltip.classList.contains(`custom-tooltip-${index}`) ? 'block' : 'none';
             if (tooltip.classList.contains(`custom-tooltip-${index}`)) {

@@ -21,7 +21,6 @@ export const language = {
         enable_triangle: "Habilitar triángulo en lugar de círculo para el marcador de tooltip",
         enable_tooltip: "Habilitar tooltip en el gráfico",
         enable_crosshair: "Habilitar mira al pasar el ratón por el gráfico",
-        enable_fahrenheit: "Habilitar Fahrenheit en lugar de Celsius",
         enable_zoom: "Habilitar función de zoom en el gráfico (presionar rueda del ratón para restablecer)",
         enable_legend: "Habilitar leyenda para las fases",
         enable_show_always_informations: "Habilitar mostrar siempre la información del tooltip para el gráfico"
@@ -34,7 +33,6 @@ export const language = {
         enable_triangle: "Habilitar triángulo",
         enable_tooltip: "Habilitar tooltip",
         enable_crosshair: "Habilitar mira",
-        enable_fahrenheit: "Habilitar Fahrenheit",
         enable_zoom: "Habilitar zoom",
         enable_legend: "Habilitar leyenda",
         enable_show_always_informations: "Mostrar siempre info"

@@ -21,7 +21,6 @@ export const language = {
         enable_triangle: "Activer le triangle au lieu du cercle comme marqueur d'infobulle",
         enable_tooltip: "Activer l'infobulle dans le diagramme",
         enable_crosshair: "Activer le réticule au survol de la souris dans le diagramme",
-        enable_fahrenheit: "Activer Fahrenheit au lieu de Celsius",
         enable_zoom: "Activer la fonction de zoom dans le diagramme (Appuyer sur le bouton central de la souris pour réinitialiser)",
         enable_legend: "Activer la légende pour les phases",
         enable_show_always_informations: "Toujours afficher les informations de l'infobulle pour le diagramme"
@@ -34,7 +33,6 @@ export const language = {
         enable_triangle: "Activer le triangle",
         enable_tooltip: "Activer l'infobulle",
         enable_crosshair: "Activer le réticule",
-        enable_fahrenheit: "Activer Fahrenheit",
         enable_zoom: "Activer le zoom",
         enable_legend: "Activer la légende",
         enable_show_always_informations: "Toujours afficher l'info"

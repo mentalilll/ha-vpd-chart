@@ -36,36 +36,36 @@ export const bar = {
             if (this._hass) {
                 let vpd = 0;
 
-                this.config.rooms.forEach((sensor) => {
-                    const humidity = parseFloat(this._hass.states[sensor.humidity].state);
-                    const temperature = parseFloat(this._hass.states[sensor.temperature].state);
+                this.config.rooms.forEach((room) => {
+                    const humidity = parseFloat(this._hass.states[room.humidity].state);
+                    const temperature = parseFloat(this._hass.states[room.temperature].state);
                     let leafTemperature = temperature - this.getLeafTemperatureOffset();
-                    if (sensor.leaf_temperature !== undefined) {
-                        if (this._hass.states[sensor.leaf_temperature] !== undefined) {
-                            leafTemperature = parseFloat(this._hass.states[sensor.leaf_temperature].state);
+                    if (room.leaf_temperature !== undefined) {
+                        if (this._hass.states[room.leaf_temperature] !== undefined) {
+                            leafTemperature = parseFloat(this._hass.states[room.leaf_temperature].state);
                         }
                     }
-                    if (sensor.vpd !== undefined) {
-                        vpd = parseFloat(this._hass.states[sensor.vpd].state);
+                    if (room.vpd !== undefined) {
+                        vpd = parseFloat(this._hass.states[room.vpd].state);
                     } else {
                         vpd = this.calculateVPD(leafTemperature, temperature, humidity);
                     }
                     let showHumidity = humidity;
 
-                    let card = this.content.querySelector(`ha-card[data-sensor="${sensor.name}"]`);
+                    let card = this.content.querySelector(`ha-card[data-room="${room.name}"]`);
                     if (!card) {
                         card = document.createElement('ha-card');
-                        card.dataset.sensor = sensor.name;
+                        card.dataset.room = room.name;
                         card.className = 'vpd-card';
                     }
-                    // if sensor.name is not empty than show in the card
+                    // if room.name is not empty than show in the card
                     let html = `<div class="bar">`;
-                    if (sensor.name !== "") {
-                        html += `<span class="vpd-title">${sensor.name}</span>`;
+                    if (room.name !== "") {
+                        html += `<span class="vpd-title">${room.name}</span>`;
                     }
                     html += `<span class="vpd-value">${vpd} ${this.kpa_text || ''}</span>`;
                     html += `<span class="vpd-rh">${showHumidity}%</span>`;
-                    html += `<span class="vpd-temp">${temperature} ${this.unit_temperature}</span>`;
+                    html += `<span class="vpd-temp">${temperature}</span>`;
                     html += `<span style="background: ${this.getColorForVpd(vpd)}" class="vpd-state ${this.getPhaseClass(vpd)}"><span>${this.getPhaseClass(vpd)}</span></span>`;
                     html += `<span class="vpd-history" style="float:right;"><canvas></canvas></span>`;
                     html += `</div>`;
@@ -101,39 +101,39 @@ export const bar = {
     },
     updateBars() {
         let vpd = 0;
-        this.config.rooms.forEach((sensor, index) => {
-            const humidity = this.toFixedNumber(this._hass.states[sensor.humidity].state, 1);
-            const temperature = this.toFixedNumber(this._hass.states[sensor.temperature].state, 1);
+        this.config.rooms.forEach((room, index) => {
+            const humidity = this.toFixedNumber(this._hass.states[room.humidity].state, 1);
+            const temperature = this.toFixedNumber(this._hass.states[room.temperature].state, 1);
             let leafTemperature = this.toFixedNumber(temperature - this.getLeafTemperatureOffset());
-            if (sensor.leaf_temperature !== undefined) {
-                if (this._hass.states[sensor.leaf_temperature] !== undefined) {
-                    leafTemperature = this.toFixedNumber(this._hass.states[sensor.leaf_temperature].state);
+            if (room.leaf_temperature !== undefined) {
+                if (this._hass.states[room.leaf_temperature] !== undefined) {
+                    leafTemperature = this.toFixedNumber(this._hass.states[room.leaf_temperature].state);
                 }
             }
-            if (sensor.vpd !== undefined) {
-                vpd = this.toFixedNumber(this._hass.states[sensor.vpd].state);
+            if (room.vpd !== undefined) {
+                vpd = this.toFixedNumber(this._hass.states[room.vpd].state);
             } else {
                 vpd = this.calculateVPD(leafTemperature, temperature, humidity);
             }
 
             let showHumidity = humidity;
-            let sensorName = sensor.name;
-            if (sensorName === undefined) {
-                sensorName = 'Sensor ' + (index + 1);
+            let roomName = room.name;
+            if (roomName === undefined) {
+                roomName = 'Room ' + (index + 1);
             }
-            let card = this.content.querySelector(`ha-card[data-sensor="${sensor.name}"]`);
+            let card = this.content.querySelector(`ha-card[data-room="${room.name}"]`);
             // get the bar from card
             let bar = card.querySelector('.bar');
-            bar.querySelector('.vpd-title').innerText = sensorName;
+            bar.querySelector('.vpd-title').innerText = roomName;
             bar.querySelector('.vpd-value').innerText = `${vpd} ${this.kpa_text}`;
             bar.querySelector('.vpd-rh').innerText = `${showHumidity}%`;
-            bar.querySelector('.vpd-temp').innerText = `${temperature}${this.unit_temperature}`;
+            bar.querySelector('.vpd-temp').innerText = `${temperature} ${this._hass.states[room.leaf_temperature].attributes['unit_of_measurement']}`;
             bar.querySelector('.vpd-state span').innerText = this.getPhaseClass(vpd);
             bar.querySelector('.vpd-state').style.background = this.getColorForVpd(vpd);
             if (this.enable_ghostmap) {
                 if (!this.updateRunning) {
 
-                    this.renderMiniHistory(sensor).then((data) => {
+                    this.renderMiniHistory(room).then((data) => {
                         this.updateRunning = true;
                         const canvas = bar.querySelector('canvas');
                         const ctx = canvas.getContext('2d');
@@ -145,16 +145,16 @@ export const bar = {
                         const pointRadius = 1;
                         const width = canvas.width - 2 * padding;
                         const height = canvas.height - 2 * padding;
-                        const sensorData = data['sensor-' + index];
-                        const maxY = Math.max(...sensorData.map(data => this.toFixedNumber(data.vpd)));
-                        const minY = Math.min(...sensorData.map(data => this.toFixedNumber(data.vpd)));
-                        const scaleX = width / (sensorData.length - 1);
+                        const roomData = data['room-' + index];
+                        const maxY = Math.max(...roomData.map(data => this.toFixedNumber(data.vpd)));
+                        const minY = Math.min(...roomData.map(data => this.toFixedNumber(data.vpd)));
+                        const scaleX = width / (roomData.length - 1);
                         const scaleY = height / (maxY - minY);
 
                         let previousX;
                         let previousY;
 
-                        sensorData.forEach((data, index) => {
+                        roomData.forEach((data, index) => {
                             const x = index * scaleX + padding;
                             const y = padding + height - (this.toFixedNumber(data.vpd) - minY) * scaleY;
                             const color = this.getColorForVpd(this.toFixedNumber(data.vpd));
@@ -198,15 +198,15 @@ export const bar = {
     async renderMiniHistory() {
 
         const data = [];
-        for (const [index, sensor] of this.config.rooms.entries()) {
-            data['sensor-' + index] = [];
-            const temperaturesPromise = this.getEntityHistory(sensor.temperature);
-            const humiditiesPromise = this.getEntityHistory(sensor.humidity);
+        for (const [index, room] of this.config.rooms.entries()) {
+            data['room-' + index] = [];
+            const temperaturesPromise = this.getEntityHistory(room.temperature);
+            const humiditiesPromise = this.getEntityHistory(room.humidity);
 
             const [temperatures, humidities] = await Promise.all([temperaturesPromise, humiditiesPromise]);
             temperatures.forEach((temperature, tempIndex) => {
                 if (humidities[tempIndex]) {
-                    data['sensor-' + index].push({
+                    data['room-' + index].push({
                         time: temperature.last_changed,
                         vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - this.getLeafTemperatureOffset(), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)),
                     });

@@ -20,7 +20,7 @@ export const ghostmap = {
         const fragment = document.createDocumentFragment();
         const ghostmap = this.querySelector('#ghostmap');
 
-        const sensorPromises = this.config.rooms.map(async (room, index) => {
+        const roomPromises = this.config.rooms.map(async (room, index) => {
             if (this._hass.states[room.humidity] && this._hass.states[room.temperature]) {
                 const [temperatures, humidities] = await Promise.all([
                     this.getEntityHistory(room.temperature, this.config.ghostmap_hours),
@@ -31,7 +31,7 @@ export const ghostmap = {
             }
         });
 
-        await Promise.all(sensorPromises);
+        await Promise.all(roomPromises);
 
         ghostmap.replaceChildren(fragment);
     },

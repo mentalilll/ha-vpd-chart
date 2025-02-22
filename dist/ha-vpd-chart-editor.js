@@ -79,9 +79,6 @@ export class HaVpdChartEditor extends HTMLElement {
         if (config.enable_crosshair === undefined) {
             config.enable_crosshair = true;
         }
-        if (config.enable_fahrenheit === undefined) {
-            config.enable_fahrenheit = false;
-        }
         if (config.enable_zoom === undefined) {
             config.enable_zoom = true;
         }
@@ -176,10 +173,6 @@ export class HaVpdChartEditor extends HTMLElement {
 
     get _ghostmap_hours() {
         return this.config.ghostmap_hours !== undefined ? this.config.ghostmap_hours : 24;
-    }
-
-    get _enable_fahrenheit() {
-        return this.config.enable_fahrenheit !== undefined ? this.config.enable_fahrenheit : false;
     }
 
     get _unit_temperature() {
@@ -403,31 +396,19 @@ export class HaVpdChartEditor extends HTMLElement {
                         <ha-formfield title="${this.language.description.enable_crosshair}" label="${this.language.titles.enable_crosshair}">
                             <ha-checkbox id="enable_crosshair"></ha-checkbox>
                         </ha-formfield>
-
                     </td>
-                    <td>
-                        <ha-formfield title="${this.language.description.enable_fahrenheit}" label="${this.language.titles.enable_fahrenheit}">
-                            <ha-checkbox id="enable_fahrenheit"></ha-checkbox>
-                        </ha-formfield>
-
-                    </td>
-                </tr>
-                <tr>
                     <td>
                         <ha-formfield title="${this.language.description.enable_zoom}" label="${this.language.titles.enable_zoom}">
                             <ha-checkbox id="enable_zoom"></ha-checkbox>
                         </ha-formfield>
-
                     </td>
+                </tr>
+                <tr>
+
                     <td>
                         <ha-formfield title="${this.language.description.enable_legend}" label="${this.language.titles.enable_legend}">
                             <ha-checkbox id="enable_legend"></ha-checkbox>
                         </ha-formfield>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td>
                         <ha-formfield title="${this.language.description.enable_show_always_informations}">
                             
                                 <ha-checkbox id="enable_show_always_informations"></ha-checkbox>
@@ -487,7 +468,7 @@ export class HaVpdChartEditor extends HTMLElement {
             id: 'enable_tooltip',
             prop: '_enable_tooltip',
             type: 'checked'
-        }, {id: 'enable_fahrenheit', prop: '_enable_fahrenheit', type: 'checked'}, {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'}, {id: 'enable_legend', prop: '_enable_legend', type: 'checked'}, {id: 'enable_show_always_informations', prop: '_enable_show_always_informations', type: 'checked'}, {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'}, {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}];
+        }, {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'}, {id: 'enable_legend', prop: '_enable_legend', type: 'checked'}, {id: 'enable_show_always_informations', prop: '_enable_show_always_informations', type: 'checked'}, {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'}, {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}];
 
         configValues.forEach(({id, prop, type}) => {
             const element = this.shadowRoot.querySelector(`#${id}`);

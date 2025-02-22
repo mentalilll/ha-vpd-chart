@@ -21,7 +21,6 @@ export const language = {
         enable_triangle: "Включить треугольник вместо круга для маркера подсказки",
         enable_tooltip: "Включить подсказку на графике",
         enable_crosshair: "Включить прицел при наведении курсора на график",
-        enable_fahrenheit: "Включить Фаренгейт вместо Цельсия",
         enable_zoom: "Включить функцию увеличения на графике (нажмите среднюю кнопку мыши для сброса)",
         enable_legend: "Включить легенду для фаз",
         enable_show_always_informations: "Всегда показывать информацию подсказки для графика"
@@ -34,7 +33,6 @@ export const language = {
         enable_triangle: "Включить треугольник",
         enable_tooltip: "Включить подсказку",
         enable_crosshair: "Включить прицел",
-        enable_fahrenheit: "Включить Фаренгейт",
         enable_zoom: "Включить увеличение",
         enable_legend: "Включить легенду",
         enable_show_always_informations: "Всегда показывать информацию"

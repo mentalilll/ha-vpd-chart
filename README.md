@@ -69,7 +69,7 @@ Easy start as Chart View:
 
 ```yaml
 type: custom:ha-vpd-chart
-sensors:
+rooms:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
     name: Tent 1
@@ -83,7 +83,7 @@ Easy start as Bar View:
 ```yaml
 type: custom:ha-vpd-chart
 is_bar_view: true
-sensors:
+rooms:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
     name: Tent 1
@@ -92,7 +92,7 @@ sensors:
     name: Tent 2
 ```
 
-To use the `HaVpdChart` in your Lovelace dashboard, add the following configuration to your dashboard. Adjust the sensors and other options according to your setup:
+To use the `HaVpdChart` in your Lovelace dashboard, add the following configuration to your dashboard. Adjust the rooms and other options according to your setup:
 
 ```yaml
 type: custom:ha-vpd-chart
@@ -109,12 +109,11 @@ enable_axes: true #optional
 enable_ghostmap: true #optional
 enable_triangle: true #optional
 enable_crosshair: true #optional
-enable_fahrenheit: false #optional
 enable_zoom: true #optional
 enable_show_always_informations: true #optional
 enable_legend: true #optional
 leaf_temperature_offset: 2 || input_number.leaf_offset_example #optional
-sensors:
+rooms:
   - temperature: sensor.temperature_2
     humidity: sensor.humidity_2
     leaf_temperature: sensor.infrared_sensor #optional
@@ -149,32 +148,31 @@ calculateVPD: |2-
 
 ## Configuration Parameters
 
-| Name                            | Type           | Required     | Default                                 | Description                                                                                         |
-|---------------------------------|----------------|--------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------|
-| type                            | string         | **required** |                                         | Must be `custom:ha-vpd-chart`.                                                                      |
-| air_text                        | string         | optional     | `Air`                                   | The text used for temperature readings. Default is "Air".                                           |
-| rh_text                         | string         | optional     | `RH`                                    | The text used for humidity readings. Default is "RH".                                               |
-| kpa_text                        | string         | optional     | `kPa`                                   | The text used for kPa readings. Default is "kPa".                                                   |
-| min_temperature                 | number         | optional     | `5`                                     | Minimum temperature in the chart. Default is 5.                                                     |
-| min_humidity                    | number         | optional     | `10`                                    | Minimum humidity in the chart. Default is 10.                                                       |
-| max_temperature                 | number         | optional     | `35`                                    | Maximum temperature in the chart. Default is 35.                                                    |
-| max_humidity                    | number         | optional     | `90`                                    | Maximum humidity in the chart. Default is 90.                                                       |
-| min_height                      | number         | optional     | `200`                                   | Minimum height of the chart as px. Default is 200.                                                  |
-| leaf_temperature_offset         | number\|string | optional     | `2`\|`input_number.leaf_offset_example` | Sets the Temperature Offset of the Leaf                                                             |                                                                                                     |
-| sensors                         | list           | **required** |                                         | A list of sensors with their temperature and humidity entity IDs, and an optional name for display. |
-| vpd_phases                      | list           | optional     | See description                         | A list of VPD phases and their classes for visual representation. See below for defaults.           |
-| enable_tooltip                  | boolean        | optional     | `true`                                  | Tooltip enabled by default.                                                                         |
-| is_bar_view                     | boolean        | optional     | `true`                                  | Enable Bar view of this chart for fast information of sensors                                       |
-| enable_axes                     | boolean        | optional     | `true`                                  | Enable Axes on the Chart                                                                            |
-| enable_ghostmap                 | boolean        | optional     | `true`                                  | Enable Ghostmap on the Chart                                                                        |
-| enable_ghostclick               | boolean        | optional     | `true`                                  | Enable Ghostclick instead of Hover                                                                  |
-| enable_triangle                 | boolean        | optional     | `true`                                  | Enable Triangle instead of Circle for tooltip marker                                                |
-| enable_crosshair                | boolean        | optional     | `true`                                  | Enable MouseHover Crosshair                                                                         |
-| enable_fahrenheit               | boolean        | optional     | `false`                                 | Enable Fahrenheit instead of Celsius                                                                |
-| enable_zoom                     | boolean        | optional     | `true`                                  | Enable zoom function for chart                                                                      |
-| enable_show_always_informations | boolean        | optional     | `true`                                  | Enable show always tooltip informations for chart                                                   |
-| enable_legend                   | boolean        | optional     | `true`                                  | Enable Legend function for chart                                                                    |
-| calculateVPD                    | string         | optional     | See description                         | Custom function to calculate VPD.                                                                   |
+| Name                            | Type           | Required     | Default                                 | Description                                                                                       |
+|---------------------------------|----------------|--------------|-----------------------------------------|---------------------------------------------------------------------------------------------------|
+| type                            | string         | **required** |                                         | Must be `custom:ha-vpd-chart`.                                                                    |
+| air_text                        | string         | optional     | `Air`                                   | The text used for temperature readings. Default is "Air".                                         |
+| rh_text                         | string         | optional     | `RH`                                    | The text used for humidity readings. Default is "RH".                                             |
+| kpa_text                        | string         | optional     | `kPa`                                   | The text used for kPa readings. Default is "kPa".                                                 |
+| min_temperature                 | number         | optional     | `5`                                     | Minimum temperature in the chart. Default is 5.                                                   |
+| min_humidity                    | number         | optional     | `10`                                    | Minimum humidity in the chart. Default is 10.                                                     |
+| max_temperature                 | number         | optional     | `35`                                    | Maximum temperature in the chart. Default is 35.                                                  |
+| max_humidity                    | number         | optional     | `90`                                    | Maximum humidity in the chart. Default is 90.                                                     |
+| min_height                      | number         | optional     | `200`                                   | Minimum height of the chart as px. Default is 200.                                                |
+| leaf_temperature_offset         | number\|string | optional     | `2`\|`input_number.leaf_offset_example` | Sets the Temperature Offset of the Leaf                                                           |                                                                                                     |
+| rooms                           | list           | **required** |                                         | A list of rooms with their temperature and humidity entity IDs, and an optional name for display. |
+| vpd_phases                      | list           | optional     | See description                         | A list of VPD phases and their classes for visual representation. See below for defaults.         |
+| enable_tooltip                  | boolean        | optional     | `true`                                  | Tooltip enabled by default.                                                                       |
+| is_bar_view                     | boolean        | optional     | `true`                                  | Enable Bar view of this chart for fast information of sensors                                     |
+| enable_axes                     | boolean        | optional     | `true`                                  | Enable Axes on the Chart                                                                          |
+| enable_ghostmap                 | boolean        | optional     | `true`                                  | Enable Ghostmap on the Chart                                                                      |
+| enable_ghostclick               | boolean        | optional     | `true`                                  | Enable Ghostclick instead of Hover                                                                |
+| enable_triangle                 | boolean        | optional     | `true`                                  | Enable Triangle instead of Circle for tooltip marker                                              |
+| enable_crosshair                | boolean        | optional     | `true`                                  | Enable MouseHover Crosshair                                                                       |
+| enable_zoom                     | boolean        | optional     | `true`                                  | Enable zoom function for chart                                                                    |
+| enable_show_always_informations | boolean        | optional     | `true`                                  | Enable show always tooltip informations for chart                                                 |
+| enable_legend                   | boolean        | optional     | `true`                                  | Enable Legend function for chart                                                                  |
+| calculateVPD                    | string         | optional     | See description                         | Custom function to calculate VPD.                                                                 |
 
 **Default `vpd_phases` Configuration:**
 

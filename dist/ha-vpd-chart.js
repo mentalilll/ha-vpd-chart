@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "2.0.0-dev2";
+window.vpdChartVersion = "2.0.0-dev3";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -7,13 +7,11 @@ import {bar} from './bar.js';
 import {ghostmap} from './ghostmap.js';
 import {HaVpdChartEditor} from './ha-vpd-chart-editor.js';
 
-const DEFAULT_UNIT_TEMPERATURE = '°C';
-const FAHRENHEIT_UNIT_TEMPERATURE = '°F';
 const CONFIG_KEYS = [
     'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
     'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
     'is_bar_view', 'enable_axes', 'enable_ghostclick', 'enable_ghostmap', 'enable_triangle',
-    'enable_tooltip', 'enable_crosshair', 'enable_fahrenheit', 'ghostmap_hours',
+    'enable_tooltip', 'enable_crosshair', 'ghostmap_hours',
     'unit_temperature', 'enable_zoom', 'enable_legend', 'enable_show_always_informations'
 ];
 
@@ -53,14 +51,12 @@ class HaVpdChart extends HTMLElement {
         this.enable_ghostmap = true;
         this.enable_triangle = true;
         this.enable_crosshair = true;
-        this.enable_fahrenheit = false;
         this.enable_zoom = true;
         this.enable_show_always_informations = true;
         this.enable_legend = true;
         this.updateRunning = false;
         this.configMemory = {};
         this.ghostmap_hours = 24;
-        this.unit_temperature = DEFAULT_UNIT_TEMPERATURE;
         this.clickedTooltip = false;
     }
 
@@ -84,7 +80,6 @@ class HaVpdChart extends HTMLElement {
             enable_ghostmap: {type: Boolean},
             enable_triangle: {type: Boolean},
             enable_crosshair: {type: Boolean},
-            enable_fahrenheit: {type: Boolean},
             enable_zoom: {type: Boolean},
             enable_legend: {type: Boolean},
             enable_show_always_informations: {type: Boolean},
@@ -100,15 +95,10 @@ class HaVpdChart extends HTMLElement {
     set hass(hass) {
         this._hass = hass;
         this.updateChartView();
-        this.updateTemperatureUnit();
     }
 
     updateChartView() {
         this.is_bar_view ? this.buildBarChart() : this.buildChart();
-    }
-
-    updateTemperatureUnit() {
-        this.unit_temperature = this.config.enable_fahrenheit ? FAHRENHEIT_UNIT_TEMPERATURE : DEFAULT_UNIT_TEMPERATURE;
     }
 
     static getConfigElement() {
