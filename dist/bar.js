@@ -127,7 +127,7 @@ export const bar = {
             bar.querySelector('.vpd-title').innerText = roomName;
             bar.querySelector('.vpd-value').innerText = `${vpd} ${this.kpa_text}`;
             bar.querySelector('.vpd-rh').innerText = `${showHumidity}%`;
-            bar.querySelector('.vpd-temp').innerText = `${temperature} ${this._hass.states[room.leaf_temperature].attributes['unit_of_measurement']}`;
+            bar.querySelector('.vpd-temp').innerText = `${temperature} ${this._hass.states[room.temperature].attributes['unit_of_measurement']}`;
             bar.querySelector('.vpd-state span').innerText = this.getPhaseClass(vpd);
             bar.querySelector('.vpd-state').style.background = this.getColorForVpd(vpd);
             if (this.enable_ghostmap) {
