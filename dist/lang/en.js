@@ -13,6 +13,7 @@ export const language = {
     temperature_sensor: "Temperature Sensor",
     humidity_sensor: "Humidity Sensor",
     leaf_temperature_sensor: "Leaf Temperature Sensor",
+    antialiasing: "Antialiasing (Higher is better, but slower)",
     description: {
         is_bar_view: "Enable Bar view of this chart for fast information of rooms",
         enable_axes: "Enable Axes on the Chart",

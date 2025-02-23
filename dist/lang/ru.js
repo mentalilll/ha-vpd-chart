@@ -13,6 +13,7 @@ export const language = {
     temperature_sensor: "Датчик температуры",
     humidity_sensor: "Датчик влажности",
     leaf_temperature_sensor: "Датчик температуры листа",
+    antialiasing: "Антиалиасинг (Чем выше, тем лучше, но медленнее)",
     description: {
         is_bar_view: "Включить отображение графика в виде столбцов для быстрой информации о датчиках",
         enable_axes: "Включить оси на графике",

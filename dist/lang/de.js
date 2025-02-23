@@ -3,7 +3,7 @@ export const language = {
     air_text: "Luft Text",
     rh_text: "RH Text",
     kpa_text: "kPa Text",
-    min_height: "Minimale Höhe des Tisches",
+    min_height: "Minimale Chart Höhe",
     min_temperature: "Minimale Temperatur",
     max_temperature: "Maximale Temperatur",
     min_humidity: "Minimale Luftfeuchtigkeit",
@@ -13,6 +13,7 @@ export const language = {
     temperature_sensor: "Temperatursensor",
     humidity_sensor: "Feuchtigkeitssensor",
     leaf_temperature_sensor: "Blatttemperatursensor",
+    antialiasing: "Antialiasing (Höher ist besser, aber langsamer)",
     description: {
         is_bar_view: "Balkenansicht dieses Diagramms für schnelle Sensorinformationen aktivieren",
         enable_axes: "Achsen im Diagramm aktivieren",

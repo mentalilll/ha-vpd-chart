@@ -13,6 +13,7 @@ export const language = {
     temperature_sensor: "Czujnik temperatury",
     humidity_sensor: "Czujnik wilgotności",
     leaf_temperature_sensor: "Czujnik temperatury liścia",
+    antialiasing: "Antialiasing (Czynsz jest lepszy, ale szybszy)",
     description: {
         is_bar_view: "Włącz widok słupkowy tego wykresu dla szybkiej informacji o czujnikach",
         enable_axes: "Włącz osie na wykresie",

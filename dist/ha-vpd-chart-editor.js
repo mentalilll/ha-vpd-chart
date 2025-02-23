@@ -91,6 +91,9 @@ export class HaVpdChartEditor extends HTMLElement {
         if (config.ghostmap_hours === undefined) {
             config.ghostmap_hours = 24;
         }
+        if (config.antialiasing === undefined) {
+            config.antialiasing = 5;
+        }
         if (config.unit_temperature === undefined) {
             config.unit_temperature = '°C';
         }
@@ -173,6 +176,10 @@ export class HaVpdChartEditor extends HTMLElement {
 
     get _ghostmap_hours() {
         return this.config.ghostmap_hours !== undefined ? this.config.ghostmap_hours : 24;
+    }
+
+    get _antialiasing() {
+        return this.config.antialiasing !== undefined ? this.config.antialiasing : 5;
     }
 
     get _unit_temperature() {
@@ -347,6 +354,11 @@ export class HaVpdChartEditor extends HTMLElement {
                         <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.ghostmap_hours}" id="ghostmap_hours"></ha-textfield>
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="2">
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" min="1" max="10" type="number" label="${this.language.antialiasing}" id="antialiasing"></ha-textfield>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
@@ -409,16 +421,14 @@ export class HaVpdChartEditor extends HTMLElement {
                         <ha-formfield title="${this.language.description.enable_legend}" label="${this.language.titles.enable_legend}">
                             <ha-checkbox id="enable_legend"></ha-checkbox>
                         </ha-formfield>
-                        <ha-formfield title="${this.language.description.enable_show_always_informations}">
-                            
-                                <ha-checkbox id="enable_show_always_informations"></ha-checkbox>
-                                <label>
+                    </td>
+                    <td>
+                        <ha-formfield title="${this.language.description.enable_show_always_informations}">                       
+                            <ha-checkbox id="enable_show_always_informations"></ha-checkbox>
+                            <label>
                                 ${this.language.titles.enable_show_always_informations}
                             </label>
                         </ha-formfield>
-
-                    </td>
-                    <td>
                     </td>
                 </tr>
             </table>
@@ -464,11 +474,30 @@ export class HaVpdChartEditor extends HTMLElement {
 
     initValues() {
 
-        const configValues = [{id: 'air_text', prop: '_air_text', type: 'value'}, {id: 'rh_text', prop: '_rh_text', type: 'value'}, {id: 'kpa_text', prop: '_kpa_text', type: 'value'}, {id: 'min_temperature', prop: '_min_temperature', type: 'value'}, {id: 'max_temperature', prop: '_max_temperature', type: 'value'}, {id: 'min_humidity', prop: '_min_humidity', type: 'value'}, {id: 'max_humidity', prop: '_max_humidity', type: 'value'}, {id: 'leaf_temperature_offset', prop: '_leaf_temperature_offset', type: 'value'}, {id: 'min_height', prop: '_min_height', type: 'value'}, {id: 'is_bar_view', prop: '_is_bar_view', type: 'checked'}, {id: 'enable_axes', prop: '_enable_axes', type: 'checked'}, {id: 'enable_ghostclick', prop: '_enable_ghostclick', type: 'checked'}, {id: 'enable_ghostmap', prop: '_enable_ghostmap', type: 'checked'}, {id: 'enable_triangle', prop: '_enable_triangle', type: 'checked'}, {id: 'enable_crosshair', prop: '_enable_crosshair', type: 'checked'}, {
-            id: 'enable_tooltip',
-            prop: '_enable_tooltip',
-            type: 'checked'
-        }, {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'}, {id: 'enable_legend', prop: '_enable_legend', type: 'checked'}, {id: 'enable_show_always_informations', prop: '_enable_show_always_informations', type: 'checked'}, {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'}, {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}];
+        const configValues = [
+            {id: 'air_text', prop: '_air_text', type: 'value'},
+            {id: 'rh_text', prop: '_rh_text', type: 'value'},
+            {id: 'kpa_text', prop: '_kpa_text', type: 'value'},
+            {id: 'min_temperature', prop: '_min_temperature', type: 'value'},
+            {id: 'max_temperature', prop: '_max_temperature', type: 'value'},
+            {id: 'min_humidity', prop: '_min_humidity', type: 'value'},
+            {id: 'max_humidity', prop: '_max_humidity', type: 'value'},
+            {id: 'leaf_temperature_offset', prop: '_leaf_temperature_offset', type: 'value'},
+            {id: 'min_height', prop: '_min_height', type: 'value'},
+            {id: 'is_bar_view', prop: '_is_bar_view', type: 'checked'},
+            {id: 'enable_axes', prop: '_enable_axes', type: 'checked'},
+            {id: 'enable_ghostclick', prop: '_enable_ghostclick', type: 'checked'},
+            {id: 'enable_ghostmap', prop: '_enable_ghostmap', type: 'checked'},
+            {id: 'enable_triangle', prop: '_enable_triangle', type: 'checked'},
+            {id: 'enable_crosshair', prop: '_enable_crosshair', type: 'checked'},
+            {id: 'enable_tooltip', prop: '_enable_tooltip', type: 'checked'},
+            {id: 'enable_zoom', prop: '_enable_zoom', type: 'checked'},
+            {id: 'enable_legend', prop: '_enable_legend', type: 'checked'},
+            {id: 'enable_show_always_informations', prop: '_enable_show_always_informations', type: 'checked'},
+            {id: 'ghostmap_hours', prop: '_ghostmap_hours', type: 'value'},
+            {id: 'antialiasing', prop: '_antialiasing', type: 'value'},
+            {id: 'unit_temperature', prop: '_unit_temperature', type: 'value'}
+        ];
 
         configValues.forEach(({id, prop, type}) => {
             const element = this.shadowRoot.querySelector(`#${id}`);

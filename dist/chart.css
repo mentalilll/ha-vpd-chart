@@ -10,6 +10,13 @@ div.vpd-chart-view, div.vpd-chart-view .vpd-card-container {
     overflow: hidden;
 }
 
+div.vpd-chart-view div#vpd-table-container {
+    height: 100%;
+    width: 100%;
+    min-height: 50px;
+    overflow: hidden;
+}
+
 .table-container:first-child {
     display: flex;
 }

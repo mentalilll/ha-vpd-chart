@@ -13,6 +13,7 @@ export const language = {
     temperature_sensor: "Sensore di temperatura",
     humidity_sensor: "Sensore di umidità",
     leaf_temperature_sensor: "Sensore di temperatura della foglia",
+    antialiasing: "Antialiasing (Piu' alto, meglio, ma piu' lento)",
     description: {
         is_bar_view: "Abilita la visualizzazione a barre di questo grafico per informazioni rapide sui sensori",
         enable_axes: "Abilita gli assi sul grafico",

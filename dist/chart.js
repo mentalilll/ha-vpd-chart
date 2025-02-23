@@ -22,41 +22,38 @@ export const chart = {
                 </div>
             </ha-card>
         `;
-        await fetch(`/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`)
-            .then(response => {
-                if (response.ok) {
-                    this.innerHTML = this.htmlTemplate.replace('##url##', `/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
-                    this.content = this.querySelector("div.vpd-card-container");
-                    this.roomdom = this.querySelector("div#rooms");
-                    this.ghostmapDom = this.querySelector("div#ghostmap");
-                    this.mouseTooltip = this.querySelector("div#mouse-tooltip");
-                    return;
-                }
-                throw new Error('fallback to local/community');
-            })
-            .catch(() => {
-                this.innerHTML = this.htmlTemplate.replace('##url##', `/local/community/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
+        try {
+            const response = await fetch(`/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
+            if (response.ok) {
+                this.innerHTML = this.htmlTemplate.replace('##url##', `/hacsfiles/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
                 this.content = this.querySelector("div.vpd-card-container");
                 this.roomdom = this.querySelector("div#rooms");
                 this.ghostmapDom = this.querySelector("div#ghostmap");
                 this.mouseTooltip = this.querySelector("div#mouse-tooltip");
-            });
-
+            } else {
+                throw new Error('fallback to local/community');
+            }
+        } catch (error) {
+            this.innerHTML = this.htmlTemplate.replace('##url##', `/local/community/ha-vpd-chart/chart.css?v=${window.vpdChartVersion}`);
+        }
     },
     async buildChart() {
         if (!this.content) {
-
             await this.initializeChart.call(this);
 
-            const table = this.buildTable();
-            if (!table.isConnected) {
-                this.content.appendChild(table);
-                this.setupEventListeners.call(this);
+            const tableContainer = this.querySelector('#vpd-table-container') || document.createElement('div');
+            tableContainer.id = 'vpd-table-container';
+            if (!this.content.querySelector('#vpd-table-container')) {
+                this.content.appendChild(tableContainer);
             }
+            await this.buildTable(tableContainer);
+
+            this.setupEventListeners.call(this);
+
             this.updateGhostMapPeriodically.call(this);
         } else {
             if (this.shouldUpdate() || (this.lastUpdate === undefined || Date.now() - this.lastUpdate > 1000)) {
-                this.refreshTable.call(this);
+                await this.buildTable(this.querySelector('#vpd-table-container'));
                 this.lastUpdate = Date.now();
             }
         }
@@ -67,11 +64,20 @@ export const chart = {
             this.removeGridLines();
         }
 
-        if (this.min_height > 0) {
-            this.content.style.minHeight = `${this.min_height}px`;
-            this.querySelector("div.vpd-container").style.minHeight = `${this.min_height}px`;
-        }
 
+        if (this.min_height > 0 && this.content) {
+            this.content.style.minHeight = `${this.min_height}px`;
+            const vpdContainer = this.querySelector("div.vpd-container");
+            const tableContainers = this.querySelectorAll('div#vpd-table-container');
+            if (vpdContainer) {
+                vpdContainer.style.minHeight = `${this.min_height}px`;
+            }
+            if (tableContainers) {
+                tableContainers.forEach(tableContainer => {
+                    tableContainer.style.minHeight = `${this.min_height}px`;
+                })
+            }
+        }
         this.buildTooltip();
     },
     handleZoom(event) {
@@ -225,14 +231,12 @@ export const chart = {
         }
         tooltip.style.visibility = 'visible';
     },
-    buildTable() {
-        const container = this.querySelector('.vpd-container') || document.createElement('div');
-        container.className = 'vpd-container';
+    async buildTable(container) {
         const maxHumidity = this.max_humidity;
         const stepsHumidity = this.steps_humidity;
         const vpdMatrixLength = Math.ceil((this.max_temperature - this.min_temperature) / this.steps_temperature) + 1;
 
-        const createRow = (row, stepsHumidity, maxHumidity) => {
+        const createRow = (row) => {
             const rowElement = document.createElement('div');
             rowElement.className = 'vpd-row';
             let segments = [];
@@ -286,30 +290,41 @@ export const chart = {
             return rowElement;
         };
 
-        this.config.rooms.forEach((room, index) => {
-            let tableContainer = container.querySelector(`.room-${index}-table-container`) || document.createElement('div');
-            tableContainer.className = `room-${index}-table-container table-container`;
-            const temperature = parseFloat(this._hass.states[room.temperature].state);
-            const leafTemperature = room.leaf_temperature ? parseFloat(this._hass.states[room.leaf_temperature].state) : undefined;
-            let leafTemperatureOffset = leafTemperature !== undefined ? temperature - leafTemperature : this.getLeafTemperatureOffset();
+        const processRoom = async (room, roomIndex) => {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    let tableContainer = container.querySelector(`.room-${roomIndex}-table-container`);
+                    if (!tableContainer) {
+                        tableContainer = document.createElement('div');
+                        tableContainer.className = `room-${roomIndex}-table-container table-container`;
+                        container.appendChild(tableContainer);
+                    }
 
-            let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity, leafTemperatureOffset);
+                    const temperature = parseFloat(this._hass.states[room.temperature].state);
+                    const leafTemperature = room.leaf_temperature ? parseFloat(this._hass.states[room.leaf_temperature].state) : undefined;
+                    let leafTemperatureOffset = leafTemperature !== undefined ? temperature - leafTemperature : this.getLeafTemperatureOffset();
 
-            const fragment = document.createDocumentFragment();
-            for (let i = 0; i < vpdMatrixLength; i++) {
-                fragment.appendChild(createRow(vpdMatrix[i], stepsHumidity, maxHumidity));
+                    let vpdMatrix = this.createVPDMatrix(this.min_temperature, this.max_temperature, this.steps_temperature, this.max_humidity, this.min_humidity, this.steps_humidity, leafTemperatureOffset);
+
+                    const fragment = document.createDocumentFragment();
+                    for (let i = 0; i < vpdMatrixLength; i++) {
+                        fragment.appendChild(createRow(vpdMatrix[i]));
+                    }
+
+                    tableContainer.replaceChildren(fragment);
+                    resolve();
+                }, 0);
+            });
+        };
+
+        const updateDOM = async () => {
+            for (let roomIndex = 0; roomIndex < this.config.rooms.length; roomIndex++) {
+                const room = this.config.rooms[roomIndex];
+                await processRoom(room, roomIndex);
             }
+        };
 
-            if (!tableContainer.isConnected) {
-                tableContainer.appendChild(fragment);
-                container.appendChild(tableContainer);
-            } else {
-                tableContainer.replaceChildren(fragment);
-            }
-        });
-        return container;
-    }, refreshTable() {
-        this.buildTable();
+        await updateDOM();
     }, addGridLines() {
         const grid = this.querySelector('.vpd-grid') || document.createElement('div');
         grid.className = 'vpd-grid';

@@ -1,5 +1,5 @@
 // Set version for the card
-window.vpdChartVersion = "2.0.0-dev3";
+window.vpdChartVersion = "2.0.0-dev4";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -98,6 +98,49 @@ class HaVpdChart extends HTMLElement {
     }
 
     updateChartView() {
+        switch (this.config.antialiasing) {
+            case 1:
+                this.steps_temperature = 1;
+                this.steps_humidity = 1;
+                break;
+            case 2:
+                this.steps_temperature = .5;
+                this.steps_humidity = .5;
+                break;
+            case 3:
+                this.steps_temperature = .3;
+                this.steps_humidity = .3;
+                break;
+            case 4:
+                this.steps_temperature = .2;
+                this.steps_humidity = .2;
+                break;
+            case 5:
+                this.steps_temperature = .1;
+                this.steps_humidity = .1;
+                break;
+            case 6:
+                this.steps_temperature = .09;
+                this.steps_humidity = .09;
+                break;
+            case 7:
+                this.steps_temperature = .08;
+                this.steps_humidity = .08;
+                break;
+            case 8:
+                this.steps_temperature = .07;
+                this.steps_humidity = .07;
+                break;
+            case 9:
+                this.steps_temperature = .06;
+                this.steps_humidity = .06;
+                break;
+            case 10:
+                this.steps_temperature = .05;
+                this.steps_humidity = .05;
+                break;
+
+        }
         this.is_bar_view ? this.buildBarChart() : this.buildChart();
     }
 

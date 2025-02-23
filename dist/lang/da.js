@@ -13,6 +13,7 @@ export const language = {
     temperature_sensor: "Temperatursensor",
     humidity_sensor: "Fugtighedssensor",
     leaf_temperature_sensor: "Bladtemperatursensor",
+    antialiasing: "Antialiasing (Højere er bedre, men snabbere)",
     description: {
         is_bar_view: "Aktiver søjlediagram for hurtig sensorinformation",
         enable_axes: "Aktiver akser i diagrammet",
