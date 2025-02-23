@@ -1,5 +1,9 @@
 export const methods = {
-    calculateVPD(Tleaf, Tair, RH) {
+    calculateVPD(Tleaf, Tair, RH, unit_of_measuerment = "°F") {
+        if (unit_of_measuerment === "°F" || unit_of_measuerment === "F") {
+            Tleaf = (Tleaf - 32) * 5 / 9;
+            Tair = (Tair - 32) * 5 / 9;
+        }
         const VPleaf = 610.7 * Math.exp(17.27 * Tleaf / (Tleaf + 237.3)) / 1000;
         const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000 * RH / 100;
         return Number(VPleaf - VPair).toFixed(2);
@@ -82,7 +86,7 @@ export const methods = {
 
             for (let j = 0; j < humiditySteps; j++) {
                 const RH = maxHumidity - j * stepsHumidity;
-                const vpd = this.calculateVPD(Tleaf, Tair, RH);
+                const vpd = this.calculateVPD(Tleaf, Tair, RH, this.unit_temperature);
                 const fixedVpd = this.toFixedNumber(vpd);
 
                 let className = vpdClassCache.get(fixedVpd);

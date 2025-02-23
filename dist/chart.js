@@ -179,11 +179,11 @@ export const chart = {
                     leafTemperatureOffset = parseFloat(this._hass.states[room.temperature].state) - parseFloat(this._hass.states[room.leaf_temperature].state);
                 }
             }
-        }
-        let leafTemperature = temperature - leafTemperatureOffset;
+            let leafTemperature = temperature - leafTemperatureOffset;
+            let vpd = this.calculateVPD(leafTemperature, temperature, humidity, this._hass.states[room.temperature].attributes['unit_of_measurement']);
+            this.buildMouseTooltip(event, humidity, temperature, vpd);
 
-        const vpd = this.calculateVPD(leafTemperature, temperature, humidity);
-        this.buildMouseTooltip(event, humidity, temperature, vpd);
+        }
 
         if (this.enable_crosshair) {
             const mouseHorizontalLine = this.querySelector(`.mouse-horizontal-line`);
@@ -425,7 +425,7 @@ export const chart = {
                 if (room.vpd !== undefined) {
                     vpd = parseFloat(this._hass.states[room.vpd].state);
                 } else {
-                    vpd = this.calculateVPD(leafTemperature, temperature, humidity);
+                    vpd = this.calculateVPD(leafTemperature, temperature, humidity, this._hass.states[room.temperature].attributes['unit_of_measurement']);
                 }
                 const relativeTemperature = temperature - this.min_temperature;
                 const totalTemperatureRange = this.max_temperature - this.min_temperature;

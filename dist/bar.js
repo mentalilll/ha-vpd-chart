@@ -48,7 +48,7 @@ export const bar = {
                     if (room.vpd !== undefined) {
                         vpd = parseFloat(this._hass.states[room.vpd].state);
                     } else {
-                        vpd = this.calculateVPD(leafTemperature, temperature, humidity);
+                        vpd = this.calculateVPD(leafTemperature, temperature, humidity, this._hass.states[room.temperature].attributes['unit_of_measurement']);
                     }
                     let showHumidity = humidity;
 
@@ -113,7 +113,7 @@ export const bar = {
             if (room.vpd !== undefined) {
                 vpd = this.toFixedNumber(this._hass.states[room.vpd].state);
             } else {
-                vpd = this.calculateVPD(leafTemperature, temperature, humidity);
+                vpd = this.calculateVPD(leafTemperature, temperature, humidity, this._hass.states[room.temperature].attributes['unit_of_measurement']);
             }
 
             let showHumidity = humidity;
@@ -208,7 +208,7 @@ export const bar = {
                 if (humidities[tempIndex]) {
                     data['room-' + index].push({
                         time: temperature.last_changed,
-                        vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - this.getLeafTemperatureOffset(), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state)),
+                        vpd: this.calculateVPD(this.toFixedNumber(temperature.state) - this.getLeafTemperatureOffset(), this.toFixedNumber(temperature.state), this.toFixedNumber(humidities[tempIndex].state), this._hass.states[room.temperature].attributes['unit_of_measurement']),
                     });
                 }
             });

@@ -125,7 +125,7 @@ class HaVpdChart extends HTMLElement {
         });
 
         if (this.config.calculateVPD) {
-            this.calculateVPD = new Function('Tleaf', 'Tair', 'RH', this.config.calculateVPD);
+            this.calculateVPD = new Function('Tleaf', 'Tair', 'RH', 'unit_of_measuerment', this.config.calculateVPD);
         }
     }
 }
