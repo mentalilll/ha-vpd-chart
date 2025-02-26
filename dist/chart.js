@@ -437,11 +437,9 @@ export const chart = {
                         leafTemperature = parseFloat(this._hass.states[room.leaf_temperature].state);
                     }
                 }
-                if (room.vpd !== undefined) {
-                    vpd = parseFloat(this._hass.states[room.vpd].state);
-                } else {
-                    vpd = this.calculateVPD(leafTemperature, temperature, humidity, this._hass.states[room.temperature].attributes['unit_of_measurement']);
-                }
+
+                vpd = this.calculateVPD(leafTemperature, temperature, humidity, this._hass.states[room.temperature].attributes['unit_of_measurement']);
+
                 const relativeTemperature = temperature - this.min_temperature;
                 const totalTemperatureRange = this.max_temperature - this.min_temperature;
                 const percentageTemperature = (relativeTemperature / totalTemperatureRange) * 100;
@@ -457,6 +455,11 @@ export const chart = {
                     if (name === undefined) {
                         name = `<svg fill="#ffffff" width="13" height="13" viewBox="-1.7 0 20.4 20.4" xmlns="http://www.w3.org/2000/svg" class="cf-icon-svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.32639999999999997"></g><g id="SVGRepo_iconCarrier"><path d="M16.476 10.283A7.917 7.917 0 1 1 8.56 2.366a7.916 7.916 0 0 1 7.916 7.917zm-5.034-2.687a2.845 2.845 0 0 0-.223-1.13A2.877 2.877 0 0 0 9.692 4.92a2.747 2.747 0 0 0-1.116-.227 2.79 2.79 0 0 0-1.129.227 2.903 2.903 0 0 0-1.543 1.546 2.803 2.803 0 0 0-.227 1.128v.02a.792.792 0 0 0 1.583 0v-.02a1.23 1.23 0 0 1 .099-.503 1.32 1.32 0 0 1 .715-.717 1.223 1.223 0 0 1 .502-.098 1.18 1.18 0 0 1 .485.096 1.294 1.294 0 0 1 .418.283 1.307 1.307 0 0 1 .281.427 1.273 1.273 0 0 1 .099.513 1.706 1.706 0 0 1-.05.45 1.546 1.546 0 0 1-.132.335 2.11 2.11 0 0 1-.219.318c-.126.15-.25.293-.365.424-.135.142-.26.28-.374.412a4.113 4.113 0 0 0-.451.639 3.525 3.525 0 0 0-.342.842 3.904 3.904 0 0 0-.12.995v.035a.792.792 0 0 0 1.583 0v-.035a2.324 2.324 0 0 1 .068-.59 1.944 1.944 0 0 1 .187-.463 2.49 2.49 0 0 1 .276-.39c.098-.115.209-.237.329-.363l.018-.02c.129-.144.264-.301.403-.466a3.712 3.712 0 0 0 .384-.556 3.083 3.083 0 0 0 .28-.692 3.275 3.275 0 0 0 .108-.875zM9.58 14.895a.982.982 0 0 0-.294-.707 1.059 1.059 0 0 0-.32-.212l-.004-.001a.968.968 0 0 0-.382-.079 1.017 1.017 0 0 0-.397.08 1.053 1.053 0 0 0-.326.212 1.002 1.002 0 0 0-.215 1.098 1.028 1.028 0 0 0 .216.32 1.027 1.027 0 0 0 .722.295.968.968 0 0 0 .382-.078l.005-.002a1.01 1.01 0 0 0 .534-.534.98.98 0 0 0 .08-.392z"></path></g></svg>`;
                     }
+                    let leafTemperatureHtml = "";
+                    if (room.leaf_temperature !== undefined) {
+                        leafTemperatureHtml = `<span class="roomLeaf_${index}">${this.leaf_text ? this.leaf_text + ': ' : ''}${leafTemperature}${this.unit_temperature}</span>`;
+                    }
+
                     let htmlTemplate = `
                     <div class="room room_${index}">
                         <div class="room-pointer-${index} room-pointer room-circle" data-index="${index}"></div>
@@ -465,23 +468,24 @@ export const chart = {
                         <div class="custom-tooltip custom-tooltip-${index}" data-index="${index}">
                             <span class="room-name">${name}</span>
                             <div class="tooltipAdditionalInformations">
-                                <span class="kpaText_${index}" class="kpaText_${index}">${this.kpa_text ? this.kpa_text + ': ' : ''}${vpd}</span>
-                                <span class="roomHumidity_${index}" class="roomHumidity_${index}">${this.rh_text ? this.rh_text + ': ' : ''}${showHumidity}</span>
-                                <span class="roomAir_${index}" class="roomAir_${index}">${this.air_text ? this.air_text + ': ' : ''}${temperature}</span>
+                                <span class="kpaText_${index}">${this.kpa_text ? this.kpa_text + ': ' : ''}${vpd}</span>
+                                <span class="roomHumidity_${index}">${this.rh_text ? this.rh_text + ': ' : ''}${showHumidity}</span>
+                                <span class="roomAir_${index}" >${this.air_text ? this.air_text + ': ' : ''}${temperature}${this.unit_temperature}</span>
+                                ${leafTemperatureHtml}
                                 <span class="roomVPD_${index}" class="roomVPD_${index}">${this.getPhaseClass(vpd)}</span>
                             </div>
                         </div>
                     </div>
                 `;
                     rooms.innerHTML += htmlTemplate;
-                    this.updatePointer(index, percentageHumidity, percentageTemperature, room.name, vpd, showHumidity, temperature);
+                    this.updatePointer(index, percentageHumidity, percentageTemperature, room.name, vpd, showHumidity, temperature, leafTemperature);
                 } else {
-                    this.updatePointer(index, percentageHumidity, percentageTemperature, room.name, vpd, showHumidity, temperature);
+                    this.updatePointer(index, percentageHumidity, percentageTemperature, room.name, vpd, showHumidity, temperature, leafTemperature);
                 }
             }
         });
     },
-    updatePointer(index, percentageHumidity, percentageTemperature, roomName = "", vpd, humidity, temperature) {
+    updatePointer(index, percentageHumidity, percentageTemperature, roomName = "", vpd, humidity, temperature, leafTemperature) {
         const pointer = this.querySelector(`.room-pointer[data-index="${index}"]`) || document.createElement('div');
         pointer.setAttribute('data-index', index.toString());
         pointer.style.left = `${percentageHumidity}%`;
@@ -540,11 +544,15 @@ export const chart = {
             let kpaText = tooltip.querySelector('.kpaText_' + index);
             let rhText = tooltip.querySelector('.roomHumidity_' + index);
             let temperatureText = tooltip.querySelector('.roomAir_' + index);
+            let leafTemperatureText = tooltip.querySelector('.roomLeaf_' + index);
             let phaseClass = tooltip.querySelector('.roomVPD_' + index);
 
             kpaText.innerHTML = `${this.kpa_text ? this.kpa_text + ': ' : ''}${vpd}`;
             rhText.innerHTML = `${this.rh_text ? this.rh_text + ': ' : ''}${humidity}%`;
             temperatureText.innerHTML = `${this.air_text ? this.air_text + ': ' : ''}${temperature}${this.unit_temperature}`;
+            if (leafTemperatureText) {
+                leafTemperatureText.innerHTML = `${this.leaf_text ? this.leaf_text + ': ' : ''}${leafTemperature}${this.unit_temperature}`;
+            }
             phaseClass.innerHTML = `${this.getPhaseClass(vpd)}`;
             tooltip.addEventListener('mouseover', (event) => {
                 event.stopImmediatePropagation();

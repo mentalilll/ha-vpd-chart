@@ -1,6 +1,7 @@
 export const language = {
     name: 'Имя',
     air_text: "воздушный текст",
+    leaf_text: "текст листьев",
     rh_text: "текст RH",
     kpa_text: "текст кПа",
     min_height: "Минимальная высота таблицы",

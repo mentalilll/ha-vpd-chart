@@ -1,5 +1,5 @@
-// Set version for the card
-window.vpdChartVersion = "2.0.0-dev4";
+// Set version for the card 
+window.vpdChartVersion = "2.0.0";
 
 import {methods} from './methods.js';
 import {chart} from './chart.js';
@@ -8,7 +8,7 @@ import {ghostmap} from './ghostmap.js';
 import {HaVpdChartEditor} from './ha-vpd-chart-editor.js';
 
 const CONFIG_KEYS = [
-    'vpd_phases', 'sensors', 'air_text', 'rh_text', 'kpa_text', 'min_temperature',
+    'vpd_phases', 'sensors', 'air_text', 'leaf_text', 'rh_text', 'kpa_text', 'min_temperature',
     'max_temperature', 'min_humidity', 'max_humidity', 'min_height',
     'is_bar_view', 'enable_axes', 'enable_ghostclick', 'enable_ghostmap', 'enable_triangle',
     'enable_tooltip', 'enable_crosshair', 'ghostmap_hours',
@@ -71,6 +71,7 @@ class HaVpdChart extends HTMLElement {
             min_height: {type: Number},
             vpd_phases: {type: Array},
             air_text: {type: String},
+            leaf_text: {type: String},
             rh_text: {type: String},
             kpa_text: {type: String},
             enable_tooltip: {type: Boolean},

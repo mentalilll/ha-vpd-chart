@@ -39,6 +39,7 @@ export const ghostmap = {
     processSensorData(fragment, temperatures, humidities, index) {
         let opacityFade = 1;
         let fadeStep = (1 / (temperatures.length - 1)).toFixed(2);
+        temperatures.reverse();
         temperatures.forEach((temperature, tempIndex) => {
             if (humidities[tempIndex]) {
                 opacityFade -= fadeStep;

@@ -1,6 +1,7 @@
 export const language = {
     name: 'Navn',
     air_text: "Luft tekst",
+    leaf_text: "Blad tekst",
     rh_text: "RH tekst",
     kpa_text: "kPa tekst",
     min_height: "Min. højde på bord",

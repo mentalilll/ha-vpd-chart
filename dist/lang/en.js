@@ -1,6 +1,7 @@
 export const language = {
     name: 'Name',
     air_text: "Air Text",
+    leaf_text: "Leaf Text",
     rh_text: "RH Text",
     kpa_text: "kPa Text",
     min_height: "Min. Height of Table",

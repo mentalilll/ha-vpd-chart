@@ -58,6 +58,9 @@ export class HaVpdChartEditor extends HTMLElement {
         if (config.air_text === undefined) {
             config.air_text = "Air";
         }
+        if (config.leaf_text === undefined) {
+            config.leaf_text = "Leaf";
+        }
         if (config.rh_text === undefined) {
             config.rh_text = "RH";
         }
@@ -108,6 +111,10 @@ export class HaVpdChartEditor extends HTMLElement {
 
     get _air_text() {
         return this.config.air_text || '';
+    }
+
+    get _leaf_text() {
+        return this.config.leaf_text || '';
     }
 
     get _rh_text() {
@@ -317,17 +324,17 @@ export class HaVpdChartEditor extends HTMLElement {
                 <tr>
                     <td>
                         <ha-textfield label="${this.language.air_text}" id="air_text"></ha-textfield>
-                    </td>
-                    <td>
-                        <ha-textfield label="${this.language.rh_text}" id="rh_text"></ha-textfield>
+                    </td>         
+                   <td>
+                        <ha-textfield label="${this.language.leaf_text}" id="leaf_text"></ha-textfield>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <ha-textfield label="${this.language.kpa_text}" id="kpa_text"></ha-textfield>
+                        <ha-textfield label="${this.language.rh_text}" id="rh_text"></ha-textfield>
                     </td>
                     <td>
-                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.min_height}" id="min_height"></ha-textfield>
+                        <ha-textfield label="${this.language.kpa_text}" id="kpa_text"></ha-textfield>
                     </td>
                 </tr>
                 <tr>
@@ -355,8 +362,11 @@ export class HaVpdChartEditor extends HTMLElement {
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2">
-                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" min="1" max="10" type="number" label="${this.language.antialiasing}" id="antialiasing"></ha-textfield>
+                    <td>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" min="1" max="10" type="number" title="${this.language.antialiasing}" label="${this.language.antialiasing.substring(0, 20)}..." id="antialiasing"></ha-textfield>
+                    </td>
+                    <td>
+                        <ha-textfield pattern="[0-9]+([.][0-9]+)?" type="number" label="${this.language.min_height}" id="min_height"></ha-textfield>
                     </td>
                 </tr>
             </table>
@@ -476,6 +486,7 @@ export class HaVpdChartEditor extends HTMLElement {
 
         const configValues = [
             {id: 'air_text', prop: '_air_text', type: 'value'},
+            {id: 'leaf_text', prop: '_leaf_text', type: 'value'},
             {id: 'rh_text', prop: '_rh_text', type: 'value'},
             {id: 'kpa_text', prop: '_kpa_text', type: 'value'},
             {id: 'min_temperature', prop: '_min_temperature', type: 'value'},
