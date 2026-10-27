@@ -1,6 +1,6 @@
 # VPD Chart for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz)
 [![Validate](https://github.com/mentalilll/ha-vpd-chart/actions/workflows/validate.yaml/badge.svg)](https://github.com/mentalilll/ha-vpd-chart/actions/workflows/validate.yaml)
 [![Release](https://img.shields.io/github/v/release/mentalilll/ha-vpd-chart?include_prereleases)](https://github.com/mentalilll/ha-vpd-chart/releases)
 
@@ -40,11 +40,7 @@ A Lovelace card that shows the **vapour pressure deficit (VPD)** of your grow te
 
 [![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=mentalilll&repository=ha-vpd-chart&category=plugin)
 
-Or manually in HACS:
-
-1. Open HACS → **⋮** → **Custom repositories**.
-2. Add `https://github.com/mentalilll/ha-vpd-chart` with the type **Dashboard**.
-3. Search for **VPD Chart**, download it and reload the browser.
+Or open HACS, search for **VPD Chart**, download it and reload the browser.
 
 ### Manual
 
