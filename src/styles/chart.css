@@ -1,0 +1,656 @@
+:host {
+    display: block;
+}
+
+ha-card {
+    overflow: hidden;
+    height: 100%;
+}
+
+.vpd-chart-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.vpd-viewport {
+    position: relative;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: var(--vpd-min-height, 200px);
+    overflow: hidden;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.vpd-viewport.zoomed {
+    touch-action: none;
+    cursor: grab;
+}
+
+.vpd-viewport.panning {
+    cursor: grabbing;
+}
+
+.vpd-stage {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    --inv: 1;
+}
+
+.vpd-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* grid & axes */
+.vpd-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.grid-line {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.grid-line.horizontal {
+    left: 0;
+    right: 0;
+    height: calc(1px * var(--inv));
+}
+
+.grid-line.vertical {
+    top: 0;
+    bottom: 0;
+    width: calc(1px * var(--inv));
+}
+
+.axis-label {
+    position: absolute;
+    color: #ffffff;
+    font-size: calc(11px * var(--inv));
+    line-height: 1;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.axis-label.temperature {
+    left: calc(4px * var(--inv));
+    transform: translateY(-50%);
+}
+
+.axis-label.humidity {
+    top: calc(4px * var(--inv));
+    transform: translateX(-50%);
+}
+
+/* history trail */
+.vpd-history {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.vpd-history .history-dot {
+    pointer-events: stroke;
+    cursor: help;
+}
+
+/* rooms */
+.vpd-rooms,
+.room {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.room.vpd-unavailable {
+    display: none;
+}
+
+.room-line {
+    position: absolute;
+    display: none;
+    background: var(--room-color, #ffffff);
+    opacity: 0.55;
+}
+
+.room.active .room-line {
+    display: block;
+}
+
+.room-line.horizontal {
+    left: 0;
+    right: 0;
+    height: calc(1px * var(--inv));
+}
+
+.room-line.vertical {
+    top: 0;
+    bottom: 0;
+    width: calc(1px * var(--inv));
+}
+
+/* ---- markers: solid room colour, white border, no glow ---- */
+.room-pointer {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--room-color, #ffffff);
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    transform: translate(-50%, -50%) scale(var(--inv));
+    transform-origin: 50% 50%;
+    pointer-events: all;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.room.active .room-pointer:not(.triangle) {
+    width: 18px;
+    height: 18px;
+    border-width: 3px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+    z-index: 3;
+}
+
+.room-pointer svg {
+    display: none;
+}
+
+/* triangle: the tip is the measured point */
+.room-pointer.triangle {
+    width: 20px;
+    height: 16px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    transform: translate(-50%, -100%) scale(var(--inv));
+    transform-origin: 50% 100%;
+}
+
+.room-pointer.triangle svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.room-pointer.triangle path {
+    fill: var(--room-color, #ffffff);
+    stroke: #ffffff;
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+
+.room.active .room-pointer.triangle {
+    width: 24px;
+    height: 19px;
+    z-index: 3;
+}
+
+.room.active .room-pointer.triangle path {
+    stroke-width: 2.6;
+}
+
+.room.out-of-range .room-pointer {
+    opacity: 0.6;
+}
+
+/* warning badges: yellow triangle (target phase / condensation), red "!" (mould risk) */
+.room.has-warning .room-pointer::before {
+    content: "!";
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    width: 14px;
+    height: 12px;
+    padding-top: 2px;
+    box-sizing: border-box;
+    background: #ffb74d;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    color: #1c1c1c;
+    font-size: 8.5px;
+    font-weight: 800;
+    line-height: 10px;
+    text-align: center;
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9));
+    pointer-events: none;
+}
+
+.room.has-mold .room-pointer::after {
+    content: "!";
+    position: absolute;
+    top: -7px;
+    right: -8px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff5252;
+    border: 1.5px solid #ffffff;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 12px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+/* both: triangle on the left, red badge on the right */
+.room.has-warning.has-mold .room-pointer::before {
+    right: auto;
+    left: -9px;
+}
+
+.room.has-warning .room-pointer.triangle::before {
+    top: -8px;
+    right: -7px;
+}
+
+.room.has-warning.has-mold .room-pointer.triangle::before {
+    right: auto;
+    left: -7px;
+}
+
+.room.has-mold .room-pointer.triangle::after {
+    top: -6px;
+    right: -6px;
+}
+
+.room-tooltip {
+    --tt-bg: rgba(20, 20, 22, 0.96);
+    position: absolute;
+    transform-origin: 0 0;
+    pointer-events: all;
+    cursor: pointer;
+    min-width: 0;
+    max-width: 260px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: var(--tt-bg);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 1.35;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    z-index: 3;
+    transition: opacity 0.15s;
+}
+
+.room.active .room-tooltip {
+    --tt-bg: rgba(12, 12, 14, 0.98);
+    z-index: 5;
+}
+
+.room.active:not(.measuring) .room-tooltip {
+    padding: 8px 12px 9px;
+}
+
+.room.hovered .room-tooltip {
+    z-index: 6;
+}
+
+.room.pinned .room-tooltip {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1.5px var(--room-color, #ffffff);
+}
+
+.no-tooltips .room-tooltip {
+    display: none;
+}
+
+/* the hovered room's marker stays visible on top of its (expanded) tooltip */
+.room.hovered .room-pointer {
+    z-index: 8;
+}
+
+.tt-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.tt-dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--room-color, #ffffff);
+    box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.6);
+}
+
+.tt-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tt-name svg {
+    width: 12px;
+    height: 12px;
+    vertical-align: -1px;
+}
+
+.tt-mold {
+    margin-top: 2px;
+    color: #ff6b6b;
+    font-size: 10.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tt-mold[hidden],
+.room.active .tt-mold,
+.always-details .room:not(.compact) .tt-mold {
+    display: none;
+}
+
+.tt-alert {
+    color: #ffb74d;
+    font-size: 11px;
+}
+
+.tt-alert[hidden] {
+    display: none;
+}
+
+.tt-vpd {
+    margin-left: auto;
+    padding-left: 10px;
+    font-variant-numeric: tabular-nums;
+}
+
+.tt-vpd b {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.room.active:not(.measuring) .tt-vpd b {
+    font-size: 15px;
+}
+
+.tt-vpd small {
+    margin-left: 3px;
+    font-size: 10px;
+    opacity: 0.65;
+}
+
+.tt-body {
+    display: none;
+    margin-top: 6px;
+}
+
+.always-details .tt-body,
+.room.active .tt-body {
+    display: block;
+}
+
+.room.compact:not(.active) .tt-body,
+.room.measuring.compact .tt-body {
+    display: none !important;
+}
+
+.room.compact:not(.active) .room-tooltip,
+.room.measuring.compact .room-tooltip {
+    padding: 4px 8px !important;
+}
+
+.tt-phase {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 16px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+
+.tt-details {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    column-gap: 8px;
+    row-gap: 2px;
+    align-items: baseline;
+    white-space: nowrap;
+}
+
+.tt-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px;
+}
+
+.tt-value {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    padding-right: 6px;
+}
+
+.tt-warn:empty {
+    display: none;
+}
+
+.tt-warn .mold {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+.tt-warn {
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffb74d;
+    font-size: 11px;
+    white-space: normal;
+}
+
+/* mouse crosshair & tooltip (viewport coordinates, not zoomed) */
+.crosshair {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(255, 255, 255, 0.75);
+    opacity: 0;
+    z-index: 6;
+}
+
+.crosshair-h {
+    left: 0;
+    right: 0;
+    height: 1px;
+}
+
+.crosshair-v {
+    top: 0;
+    bottom: 0;
+    width: 1px;
+}
+
+.mouse-tooltip {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    max-width: calc(100% - 16px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 7;
+}
+
+.zoom-hint {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 8;
+}
+
+.zoom-hint.visible {
+    opacity: 1;
+}
+
+.zoom-reset {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 8;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    font-size: 17px;
+    line-height: 30px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.zoom-reset[hidden] {
+    display: none;
+}
+
+/* legend */
+.vpd-legend {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+    pointer-events: none;
+    z-index: 7;
+}
+
+.legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    pointer-events: all;
+}
+
+.legend-chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--room-color, #ffffff);
+}
+
+.legend-chip.active {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.legend-chip.pinned {
+    border-color: rgba(255, 255, 255, 0.85);
+}
+
+.legend-chip.unavailable {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.legend-chip.off-target .dot {
+    box-shadow: 0 0 0 2px #ff5252;
+}
+
+/* cycling progress */
+.cycle-progress {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 8;
+}
+
+/* time in phase */
+.phase-stats {
+    padding: 8px 12px 10px;
+    color: var(--primary-text-color);
+    font-size: 12px;
+}
+
+.phase-stats[hidden] {
+    display: none;
+}
+
+.phase-stats-title {
+    color: var(--secondary-text-color);
+    margin-bottom: 4px;
+}
+
+.phase-stats-bar {
+    display: flex;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: var(--divider-color, rgba(127, 127, 127, 0.3));
+}
+
+.phase-stats-bar span {
+    height: 100%;
+}
+
+.phase-stats-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    margin-top: 6px;
+    color: var(--secondary-text-color);
+}
+
+.phase-stats-legend .swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    margin-right: 4px;
+}
+
+.phase-stats-legend .target {
+    color: var(--primary-text-color);
+    font-weight: 600;
+}

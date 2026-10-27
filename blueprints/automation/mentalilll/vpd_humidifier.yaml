@@ -1,0 +1,162 @@
+blueprint:
+  name: VPD humidifier control
+  description: >-
+    Keeps the VPD of a grow tent in a target range by switching a humidifier
+    (and optionally a dehumidifier). A high VPD means the air is too dry, so the
+    humidifier turns on; it turns off again once the VPD has dropped to the
+    lower bound (hysteresis). A maximum humidity acts as mould protection.
+
+
+    Works with any VPD sensor, e.g. the template sensor from
+    https://github.com/mentalilll/ha-vpd-chart/blob/main/examples/vpd_sensor.yaml
+  domain: automation
+  source_url: https://github.com/mentalilll/ha-vpd-chart/blob/main/blueprints/automation/mentalilll/vpd_humidifier.yaml
+  author: mentalilll
+  homeassistant:
+    min_version: 2024.8.0
+  input:
+    sensors:
+      name: Sensors
+      icon: mdi:thermometer-water
+      input:
+        vpd_sensor:
+          name: VPD sensor
+          description: Sensor with the VPD in kPa.
+          selector:
+            entity:
+              filter:
+                - domain: sensor
+        humidity_sensor:
+          name: Humidity sensor (optional)
+          description: Used for the mould protection below. Leave empty to skip it.
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: sensor
+                  device_class: humidity
+    devices:
+      name: Devices
+      icon: mdi:air-humidifier
+      input:
+        humidifier:
+          name: Humidifier
+          description: Humidifier, or the switch / smart plug it is connected to.
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: [humidifier, switch, fan, input_boolean, light]
+        dehumidifier:
+          name: Dehumidifier (optional)
+          description: Turned on when the VPD falls below the dehumidifier threshold.
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                - domain: [humidifier, switch, fan, input_boolean, light]
+    thresholds:
+      name: Thresholds
+      icon: mdi:tune-variant
+      input:
+        vpd_humidifier_on:
+          name: Humidifier on above
+          description: VPD at or above this value turns the humidifier on.
+          default: 1.2
+          selector:
+            number: {min: 0.2, max: 3, step: 0.05, unit_of_measurement: kPa, mode: slider}
+        vpd_humidifier_off:
+          name: Humidifier off at
+          description: VPD at or below this value turns the humidifier off again. Must be lower than the on value.
+          default: 1.0
+          selector:
+            number: {min: 0.2, max: 3, step: 0.05, unit_of_measurement: kPa, mode: slider}
+        vpd_dehumidifier_on:
+          name: Dehumidifier on below
+          description: VPD at or below this value turns the dehumidifier on (only with a dehumidifier).
+          default: 0.6
+          selector:
+            number: {min: 0, max: 3, step: 0.05, unit_of_measurement: kPa, mode: slider}
+        vpd_dehumidifier_off:
+          name: Dehumidifier off at
+          description: VPD at or above this value turns the dehumidifier off again.
+          default: 0.8
+          selector:
+            number: {min: 0, max: 3, step: 0.05, unit_of_measurement: kPa, mode: slider}
+        max_humidity:
+          name: Maximum humidity
+          description: Mould protection. The humidifier never runs at or above this humidity (needs the humidity sensor).
+          default: 75
+          selector:
+            number: {min: 40, max: 100, step: 1, unit_of_measurement: "%", mode: slider}
+    conditions:
+      name: Conditions
+      icon: mdi:filter-outline
+      collapsed: true
+      input:
+        enabled_entity:
+          name: Only while on (optional)
+          description: e.g. the grow light or an input_boolean. While it is off, the devices are left alone.
+          default: ""
+          selector:
+            entity: {}
+
+mode: queued
+max: 3
+max_exceeded: silent
+
+triggers:
+  - trigger: state
+    entity_id: !input vpd_sensor
+  - trigger: homeassistant
+    event: start
+  - trigger: time_pattern
+    minutes: "/5"
+
+variables:
+  vpd_sensor: !input vpd_sensor
+  humidity_sensor: !input humidity_sensor
+  humidifier: !input humidifier
+  dehumidifier: !input dehumidifier
+  enabled_entity: !input enabled_entity
+  hum_on: !input vpd_humidifier_on
+  hum_off: !input vpd_humidifier_off
+  dehum_on: !input vpd_dehumidifier_on
+  dehum_off: !input vpd_dehumidifier_off
+  max_humidity: !input max_humidity
+  vpd: "{{ states(vpd_sensor) | float(none) }}"
+  humidity: "{{ states(humidity_sensor) | float(none) if humidity_sensor else none }}"
+  too_humid: "{{ humidity is not none and humidity >= max_humidity | float }}"
+
+conditions:
+  - "{{ vpd is not none }}"
+  - "{{ not enabled_entity or is_state(enabled_entity, 'on') }}"
+
+actions:
+  # humidifier
+  - choose:
+      - conditions: "{{ too_humid or vpd <= hum_off | float }}"
+        sequence:
+          - action: homeassistant.turn_off
+            target:
+              entity_id: "{{ humidifier }}"
+      - conditions: "{{ vpd >= hum_on | float }}"
+        sequence:
+          - action: homeassistant.turn_on
+            target:
+              entity_id: "{{ humidifier }}"
+  # dehumidifier (optional)
+  - if: "{{ dehumidifier | count > 0 }}"
+    then:
+      - choose:
+          - conditions: "{{ vpd <= dehum_on | float }}"
+            sequence:
+              - action: homeassistant.turn_on
+                target:
+                  entity_id: "{{ dehumidifier }}"
+          - conditions: "{{ vpd >= dehum_off | float }}"
+            sequence:
+              - action: homeassistant.turn_off
+                target:
+                  entity_id: "{{ dehumidifier }}"

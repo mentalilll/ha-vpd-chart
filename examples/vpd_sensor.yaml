@@ -1,0 +1,38 @@
+# VPD template sensor - same formula as the card (Magnus, leaf temperature).
+#
+# Option A (UI): Settings -> Devices & services -> Helpers -> Create helper ->
+#   Template -> Template sensor. Paste the "state" template below, set the unit
+#   to kPa, device class "Pressure" and state class "Measurement".
+#
+# Option B (YAML): put this file into your packages folder or copy the
+#   "template:" block into configuration.yaml, then reload template entities.
+#
+# Replace the entity ids and the leaf offset. With an IR leaf sensor, set
+# leaf_sensor to its entity id; the offset is then ignored.
+# The offset is in the unit of the temperature sensor (2 °C = 3.6 °F).
+
+template:
+  - sensor:
+      - name: Tent 1 VPD
+        unique_id: tent_1_vpd
+        unit_of_measurement: kPa
+        device_class: pressure
+        state_class: measurement
+        icon: mdi:water-percent
+        availability: >
+          {{ has_value('sensor.tent1_temperature') and has_value('sensor.tent1_humidity') }}
+        state: >
+          {% set air_sensor = 'sensor.tent1_temperature' %}
+          {% set humidity_sensor = 'sensor.tent1_humidity' %}
+          {% set leaf_sensor = '' %}
+          {% set leaf_offset = 2 %}
+          {% set t_air = states(air_sensor) | float %}
+          {% set rh = states(humidity_sensor) | float %}
+          {% set t_leaf = states(leaf_sensor) | float(t_air - leaf_offset) if leaf_sensor else t_air - leaf_offset %}
+          {% if state_attr(air_sensor, 'unit_of_measurement') in ['°F', 'F', '℉'] %}
+            {% set t_air = (t_air - 32) * 5 / 9 %}
+            {% set t_leaf = (t_leaf - 32) * 5 / 9 %}
+          {% endif %}
+          {% set svp_leaf = 0.6107 * e ** (17.27 * t_leaf / (t_leaf + 237.3)) %}
+          {% set svp_air = 0.6107 * e ** (17.27 * t_air / (t_air + 237.3)) %}
+          {{ (svp_leaf - svp_air * rh / 100) | round(2) }}

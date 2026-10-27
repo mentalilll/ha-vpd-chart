@@ -1,0 +1,19 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Editor backups
+*~
+*.bak
+*.swp
+
+# Local files that are not part of the card
+www/
+.backup-pre-review/
+
+# Tooling
+node_modules/
+coverage/
+.DS_Store
+Thumbs.db

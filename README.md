@@ -1,243 +1,238 @@
-# HaVpdChart for Home Assistant
+# VPD Chart for Home Assistant
 
-![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/startscreen.gif?raw=true)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz)
+[![Validate](https://github.com/mentalilll/ha-vpd-chart/actions/workflows/validate.yaml/badge.svg)](https://github.com/mentalilll/ha-vpd-chart/actions/workflows/validate.yaml)
+[![Release](https://img.shields.io/github/v/release/mentalilll/ha-vpd-chart?include_prereleases)](https://github.com/mentalilll/ha-vpd-chart/releases)
 
-![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/bar_view.png?raw=true)
+A Lovelace card that shows the **vapour pressure deficit (VPD)** of your grow tents and rooms: where the climate is right now, where it has been, how long it stayed in each growth phase, and when it needs your attention.
 
-![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/bar_view_light.png?raw=true)
+![VPD Chart](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/demo.gif?raw=true)
 
-![HaVpdChart Image](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/settings.png?raw=true)
+## Features
 
-`HaVpdChart` is a custom card component for Home Assistant that allows for visual representations of VPD (Vapour Pressure Deficit) based on temperature and humidity sensors. It's ideal for monitoring environmental conditions in tents or rooms.
+- **VPD chart** (temperature × humidity) with your own phases, borders and colours
+- **Several rooms** in one chart, each with its own colour. Hover, tap or use the legend to select one
+- **Leaf temperature** from an IR sensor, a fixed offset or an `input_number`
+- **History trail** of the last hours and **time in phase** statistics, from Home Assistant's long term statistics
+- **Target phase** per room, with a warning when the room leaves it
+- **Mould risk** warning when the humidity stayed high for too long (optional)
+- **Dew point** and condensation warning (optional)
+- **Bar view** as a compact overview, light and dark theme
+- Celsius and Fahrenheit, numbers in your locale
+- Zoom (Ctrl + mouse wheel, pinch on touch devices) and pan
+- Visual editor, 10 languages
+- [VPD template sensor and humidifier blueprint](#vpd-sensor-and-humidifier-automation) included
 
-## Prerequisites
+> [!TIP]
+> Want to **control** your climate, not just see it? This repo also ships a ready-to-use [VPD template sensor](examples/vpd_sensor.yaml) and an [automation blueprint](blueprints/automation/mentalilll/vpd_humidifier.yaml) for humidifiers and dehumidifiers. See [VPD sensor and humidifier automation](#vpd-sensor-and-humidifier-automation).
 
-* A running Home Assistant installation.
-* Basic understanding of Home Assistant configuration (including YAML).
+## Screenshots
+
+| Chart with history, target phase and mould warning | Bar view |
+|---|---|
+| ![Chart](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/chart.png?raw=true) | ![Bar view](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/bar_view.png?raw=true) |
+| **Bar view, light theme** | **Visual editor** |
+| ![Bar view light](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/bar_view_light.png?raw=true) | ![Editor](https://github.com/mentalilll/ha-vpd-chart/blob/main/assets/settings.png?raw=true) |
 
 ## Installation
 
-There are two main ways to install the `HaVpdChart` card: via HACS (recommended) or manually.
+### HACS (recommended)
 
-### Method 1: HACS Installation (Recommended)
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=mentalilll&repository=ha-vpd-chart&category=plugin)
 
-If you don't have [HACS (Home Assistant Community Store)](https://hacs.xyz) installed yet, follow their official installation guide first.
+Or manually in HACS:
 
-1. **Add Custom Repository:**
-    * Open HACS in your Home Assistant instance.
-    * Click on `Frontend`.
-    * Click the three-dot menu in the top-right corner and select `Custom repositories`.
-    * In the dialog:
-        * Enter the Repository URL: `https://github.com/mentalilll/ha-vpd-chart`
-        * Select the Category: `Lovelace`
-        * Click `Add`.
-2. **Install Plugin:**
-    * Close the `Custom repositories` dialog.
-    * Search for `HaVpdChart` in the HACS Frontend section.
-    * Click on the `HaVpdChart` entry.
-    * Click `Download` and follow the prompts to install the card.
-3. **Add to Dashboard:**
-    * Follow the [Usage](#usage) instructions below to add the card to your Lovelace dashboard.
+1. Open HACS → **⋮** → **Custom repositories**.
+2. Add `https://github.com/mentalilll/ha-vpd-chart` with the type **Dashboard**.
+3. Search for **VPD Chart**, download it and reload the browser.
 
-### Method 2: Manual Installation (from GitHub)
+### Manual
 
-1. **Download the Release:**
-    * Go to the [Releases page](https://github.com/mentalilll/ha-vpd-chart/releases) of the `ha-vpd-chart` repository.
-    * Download the `ha-vpd-chart.js` file from the latest release assets.
-2. **Upload to Home Assistant:**
-    * Navigate to your Home Assistant configuration directory (often called `config`).
-    * If they don't exist, create the directories `www/community/ha-vpd-chart/`. The full path would be `<config>/www/community/ha-vpd-chart/`.
-    * Copy the downloaded `ha-vpd-chart.js` file into this `ha-vpd-chart` directory.
-3. **Add Resource Reference:**
-    * In the Home Assistant UI, navigate to `Configuration` -> `Lovelace Dashboards`.
-    * Click the `Resources` tab (or the three-dot menu and then `Resources` if you only have one dashboard).
-    * *Alternatively*, if you don't see the UI option, navigate directly to `http://<your_homeassistant_ip>:8123/config/lovelace/resources`.
-    * Click `Add Resource`.
-    * Enter the following details:
-        * **URL:** `/local/community/ha-vpd-chart/ha-vpd-chart.js` (Note: `/local` maps to the `www` directory).
-        * **Resource Type:** `JavaScript Module`.
-    * Click `Create`.
-4. **Restart (Optional but Recommended):**
-    * Restart Home Assistant to ensure the resource is loaded correctly. A browser cache refresh (Ctrl+F5 or Cmd+Shift+R) might also be needed.
-5. **Add to Dashboard:**
-    * Follow the [Usage](#usage) instructions below.
+1. Download `ha-vpd-chart.js` from the [latest release](https://github.com/mentalilll/ha-vpd-chart/releases).
+2. Copy it to `<config>/www/community/ha-vpd-chart/ha-vpd-chart.js`.
+3. Add the resource: **Settings → Dashboards → ⋮ → Resources → Add resource**, URL `/local/community/ha-vpd-chart/ha-vpd-chart.js`, type **JavaScript module**.
+4. Reload the browser (Ctrl + F5).
 
 ## Usage
 
-You can configure the `HaVpdChart` card using the visual UI editor or by using YAML.
-
-1. Navigate to the Lovelace dashboard where you want to add the card.
-2. Enter `Edit Dashboard` mode.
-3. Click `Add Card`.
-4. Search for `Custom: VPD Chart` and select it.
-5. Configure the card options through the visual editor.
-
-Alternatively, you can use the YAML configuration:
-
-Easy start as Chart View:
+Add the card from the card picker (**VPD Chart**) and set it up in the visual editor: rooms with sensor pickers, feature toggles, history and mould settings, and a slider for the phase borders (see [Screenshots](#screenshots)). Or use YAML:
 
 ```yaml
 type: custom:ha-vpd-chart
 rooms:
-  - temperature: sensor.temperature_2
-    humidity: sensor.humidity_2
-    name: Tent 1
-  - temperature: sensor.temperature_tent_2
-    humidity: sensor.humidity_tent_2
-    name: Tent 2
+  - name: Tent 1
+    temperature: sensor.tent1_temperature
+    humidity: sensor.tent1_humidity
+    leaf_temperature: sensor.tent1_leaf_temperature   # optional IR sensor
+    target_phase: late-veg                            # optional
+  - name: Tent 2
+    temperature: sensor.tent2_temperature
+    humidity: sensor.tent2_humidity
+history_hours: 24
+enable_mold_risk: true
+enable_dewpoint: true
 ```
 
-Easy start for Fahrenheit Chart View:
-
-***Attention: your sensor needs to have °F as unit of measurement***
-
-```yaml
-type: custom:ha-vpd-chart
-rooms:
-  - name: Raum 2
-    temperature: input_number.test_temp_2
-    humidity: input_number.test_rh_2
-    leaf_temperature: input_number.test_leaf_temp_2
-min_temperature: 40
-max_temperature: 96
-min_humidity: 26
-max_humidity: 90
-```
-
-Easy start as Bar View:
+Bar view:
 
 ```yaml
 type: custom:ha-vpd-chart
 is_bar_view: true
+history_hours: 24
 rooms:
-  - temperature: sensor.temperature_2
-    humidity: sensor.humidity_2
-    name: Tent 1
-  - temperature: sensor.temperature_tent_2
-    humidity: sensor.humidity_tent_2
-    name: Tent 2
+  - name: Tent 1
+    temperature: sensor.tent1_temperature
+    humidity: sensor.tent1_humidity
 ```
 
-To use the `HaVpdChart` in your Lovelace dashboard, add the following configuration to your dashboard. Adjust the rooms and other options according to your setup:
+Fahrenheit works automatically when the temperature sensor reports `°F`. If no range is configured, the chart then uses 41–95 °F.
+
+### Reading the chart
+
+| Marker | Meaning |
+|---|---|
+| ▼ / ● in the room colour | Current climate of the room. The tip of the triangle is the measured point |
+| Yellow ⚠ at the marker | Target phase missed or condensation risk. The reason is listed in the tooltip |
+| Red **!** at the marker | Mould risk. A red line in the tooltip says how long the humidity was too high |
+| Small dots and line | History trail of the selected room (`history_hours`) |
+
+**Tooltips:** with `enable_show_always_information: true` every room shows its details as long as there is room for them; otherwise all tooltips are compact. With `false` the tooltips stay compact until you hover or select a room. Tooltips avoid each other, the markers and the legend, and move to the side of the marker when the card is low.
+
+**Interaction:** hover a marker or legend chip to highlight a room, click it to keep the selection, click again to release it. Zoom with Ctrl / ⌘ + mouse wheel or pinch, drag to pan, double click (or the reset button) to reset the zoom. With `tap_action: more-info` a click opens the entity details instead.
+
+### Options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `rooms` | list | **required** | Rooms, see below |
+| `is_bar_view` | boolean | `false` | Compact bar view instead of the chart |
+| `min_temperature` / `max_temperature` | number | `5` / `35` (`41` / `95` for °F) | Temperature range of the chart |
+| `min_humidity` / `max_humidity` | number | `10` / `90` | Humidity range of the chart |
+| `min_height` | number | `200` | Minimum chart height in px |
+| `leaf_temperature_offset` | number \| entity | `2` | Leaf is this much colder than the air (rooms without leaf sensor). Number or entity id, in the unit of the sensor |
+| `history_hours` | number | `0` | Hours of history for the trail and the phase statistics, `0` = off |
+| `enable_phase_stats` | boolean | `true` | Show time in phase (needs `history_hours`) |
+| `enable_mold_risk` | boolean | `false` | Mould risk warning when the humidity stayed at or above `mold_risk_humidity` for at least `mold_risk_hours` in a row |
+| `mold_risk_humidity` | number | `75` | Humidity threshold in % for the mould risk |
+| `mold_risk_hours` | number | `6` | Uninterrupted hours above the threshold that trigger the warning |
+| `enable_dewpoint` | boolean | `false` | Dew point in the tooltip and condensation warning (leaf less than 1 °C / 1.8 °F above the dew point) |
+| `enable_tooltip` | boolean | `true` | Tooltips at the room markers |
+| `enable_show_always_information` | boolean | `true` | Details in every tooltip; `false` = compact until hovered or selected |
+| `enable_legend` | boolean | `true` | Room legend |
+| `enable_axes` | boolean | `true` | Grid and axis labels |
+| `enable_triangle` | boolean | `true` | Triangle marker (tip on the measured point) instead of a dot |
+| `enable_crosshair` | boolean | `true` | Crosshair with VPD readout following the mouse |
+| `enable_zoom` | boolean | `true` | Zoom and pan |
+| `enable_cycle_rooms` | boolean | `false` | Select the next room every 10 seconds |
+| `tap_action` | `none` \| `more-info` | `none` | A tap selects the room (`none`) or opens the entity details |
+| `air_text`, `rh_text`, `leaf_text`, `kpa_text` | string | translated | Labels in the tooltip, `""` hides a label |
+| `vpd_phases` | list | see below | Phases with borders and colours |
+| `calculateVPD` | string | built in | Custom formula (function body), variables `Tleaf`, `Tair`, `RH`, `unit_of_measurement` |
+
+#### Room options
+
+| Option | Type | Description |
+|---|---|---|
+| `temperature` | entity | **Required.** Air temperature |
+| `humidity` | entity | **Required.** Relative humidity |
+| `name` | string | Display name |
+| `leaf_temperature` | entity | Leaf temperature (e.g. IR sensor), replaces the offset |
+| `vpd` | entity | Existing VPD sensor, used instead of the calculated value |
+| `target_phase` | string | `className` or `label` of the phase this room should be in |
+| `color` | string | Colour of the marker, e.g. `#56b4e9`. Without it, the room gets a colour from a colour-blind safe palette |
+
+#### VPD phases
 
 ```yaml
-type: custom:ha-vpd-chart
-air_text: Temp. #optional "" for Empty
-rh_text: r.H. #optional "" for Empty
-min_temperature: 5 #optional
-max_temperature: 35 #optional
-min_humidity: 10 #optional
-max_humidity: 100 #optional
-min_height: 200 #optional (minimum height of the chart as px)
-is_bar_view: false #optional
-enable_tooltip: true #optional
-enable_axes: true #optional
-enable_ghostmap: true #optional
-enable_triangle: true #optional
-enable_crosshair: true #optional
-enable_zoom: true #optional
-enable_show_always_informations: true #optional
-enable_legend: true #optional
-leaf_temperature_offset: 2 || input_number.leaf_offset_example #optional
-rooms:
-  - temperature: sensor.temperature_2
-    humidity: sensor.humidity_2
-    leaf_temperature: sensor.infrared_sensor #optional
-    name: Tent 1
-  - temperature: sensor.temperature_tent_2
-    humidity: sensor.humidity_tent_2
-    name: Tent 2
-vpd_phases: #optional
-  - upper: 0.0
+vpd_phases:
+  - upper: 0
     className: gray-danger-zone
-    color: #999999
-  - lower: 0.0
+    color: "#999999"
+  - lower: 0
     upper: 0.4
     className: under-transpiration
-    color: #0000FF
+    label: Under transpiration    # optional display name
+    color: "#1a6c9c"
   - lower: 0.4
     upper: 0.8
     className: early-veg
+    color: "#22ab9c"
   - lower: 0.8
     upper: 1.2
     className: late-veg
+    color: "#9cc55b"
   - lower: 1.2
     upper: 1.6
     className: mid-late-flower
+    color: "#e7c12b"
   - lower: 1.6
     className: danger-zone
-calculateVPD: |2-
-          const VPleaf = 610.7 * Math.exp(17.27 * Tleaf / (Tleaf + 237.3)) / 1000; 
-          const VPair = 610.7 * Math.exp(17.27 * Tair / (Tair + 237.3)) / 1000 * RH / 100;
-          return VPleaf - VPair;
+    color: "#ce4234"
 ```
 
-## Configuration Parameters
+A value exactly on a border belongs to the upper phase (`lower` is inclusive, `upper` exclusive). In the editor you can drag the borders with a slider.
 
-| Name                            | Type           | Required     | Default                                 | Description                                                                                       |
-|---------------------------------|----------------|--------------|-----------------------------------------|---------------------------------------------------------------------------------------------------|
-| type                            | string         | **required** |                                         | Must be `custom:ha-vpd-chart`.                                                                    |
-| air_text                        | string         | optional     | `Air`                                   | The text used for temperature readings. Default is "Air".                                         |
-| rh_text                         | string         | optional     | `RH`                                    | The text used for humidity readings. Default is "RH".                                             |
-| kpa_text                        | string         | optional     | `kPa`                                   | The text used for kPa readings. Default is "kPa".                                                 |
-| min_temperature                 | number         | optional     | `5`                                     | Minimum temperature in the chart. Default is 5.                                                   |
-| min_humidity                    | number         | optional     | `10`                                    | Minimum humidity in the chart. Default is 10.                                                     |
-| max_temperature                 | number         | optional     | `35`                                    | Maximum temperature in the chart. Default is 35.                                                  |
-| max_humidity                    | number         | optional     | `90`                                    | Maximum humidity in the chart. Default is 90.                                                     |
-| min_height                      | number         | optional     | `200`                                   | Minimum height of the chart as px. Default is 200.                                                |
-| leaf_temperature_offset         | number\|string | optional     | `2`\|`input_number.leaf_offset_example` | Sets the Temperature Offset of the Leaf                                                           |                                                                                                     |
-| rooms                           | list           | **required** |                                         | A list of rooms with their temperature and humidity entity IDs, and an optional name for display. |
-| vpd_phases                      | list           | optional     | See description                         | A list of VPD phases and their classes for visual representation. See below for defaults.         |
-| enable_tooltip                  | boolean        | optional     | `true`                                  | Tooltip enabled by default.                                                                       |
-| is_bar_view                     | boolean        | optional     | `true`                                  | Enable Bar view of this chart for fast information of sensors                                     |
-| enable_axes                     | boolean        | optional     | `true`                                  | Enable Axes on the Chart                                                                          |
-| enable_ghostmap                 | boolean        | optional     | `true`                                  | Enable Ghostmap on the Chart                                                                      |
-| enable_ghostclick               | boolean        | optional     | `true`                                  | Enable Ghostclick instead of Hover                                                                |
-| enable_triangle                 | boolean        | optional     | `true`                                  | Enable Triangle instead of Circle for tooltip marker                                              |
-| enable_crosshair                | boolean        | optional     | `true`                                  | Enable MouseHover Crosshair                                                                       |
-| enable_zoom                     | boolean        | optional     | `true`                                  | Enable zoom function for chart                                                                    |
-| enable_show_always_informations | boolean        | optional     | `true`                                  | Enable show always tooltip informations for chart                                                 |
-| enable_legend                   | boolean        | optional     | `true`                                  | Enable Legend function for chart                                                                  |
-| calculateVPD                    | string         | optional     | See description                         | Custom function to calculate VPD.                                                                 |
+### History and mould risk
 
-**Template for VPD Sensor History**
+The trail and the phase statistics use Home Assistant's **long term statistics** (5 minute means up to 48 h, hourly means above). They exist for sensors with a `state_class` (most temperature and humidity sensors). For other entities, e.g. `input_number`, the card falls back to the recorder history, which is limited by your `purge_keep_days`.
 
-ATTENTION: EDIT THE YOUR_*_SENSOR PARTS WITH YOUR SENSOR NAMES!
+The mould risk looks at the same data (the last 24 h when `history_hours` is `0`), so it works without showing the trail. It is a rule of thumb, not a measurement: long periods above roughly 75 % RH make mould likely, especially in dense flowers.
+
+### Custom VPD formula
 
 ```yaml
-sensor:
-  - platform: template
-    sensors:
-      gd_vpd:
-        icon_template: 'mdi:water-percent'
-        unit_of_measurement: kPa
-        value_template: |
-
-          {% set T = states('sensor.YOUR_TEMPERATURE_SENSOR')|float %}
-          {% set RH = states('sensor.YOUR_HUMIDITY_SENSOR')|float %}
-          {% set SVP = 0.61078 * e ** (T / (T + 237.3) * 17.2694) %}
-          {% set VPD = SVP * ((100 - RH) / 100) %}
-          {{ VPD | round(2) }}
-  - platform: template
-    sensors:
-      gd_vpd_leaf:
-        icon_template: 'mdi:leaf'
-        unit_of_measurement: kPa
-        value_template: >
-          {% set T = states('sensor.YOUR_TEMPERATURE_SENSOR')|float %}
-          {% set RH = states('sensor.YOUR_HUMIDITY_SENSOR')|float %}
-          {% set LT = states('sensor.YOUR_TEMPERATURE_SENSOR')|float - 2 %} # OR {% set LT = states('sensor.YOUR_INFRARED_SENSOR')|float %} 
-          {% set ASVP = 0.61078 * e ** (T / (T + 237.3) * 17.2694) %}
-          {% set LSVP = 0.61078 * e ** (LT / (LT + 237.3) * 17.2694) %}
-          {% set LVPD = LSVP - (ASVP * RH / 100) %}
-
-          {{ LVPD | round(2) }}
+# air VPD without leaf temperature
+calculateVPD: |
+  const svp = 0.61078 * Math.exp(17.27 * Tair / (Tair + 237.3));
+  return svp * (1 - RH / 100);
 ```
 
-**Default `vpd_phases` Configuration:**
+The editor checks the formula while you type. If it fails at runtime, the card falls back to the built-in formula.
 
-- `under-transpiration`: VPD < 0.4
-- `early-veg`: 0.4 ≤ VPD < 0.8
-- `late-veg`: 0.8 ≤ VPD < 1.2
-- `mid-late-flower`: 1.2 ≤ VPD < 1.6
-- `danger-zone`: VPD ≥ 1.6
+## VPD sensor and humidifier automation
+
+The card only displays. To use the VPD in automations, two templates are included.
+
+**VPD template sensor:** [`examples/vpd_sensor.yaml`](examples/vpd_sensor.yaml) calculates the VPD with the same formula as the card (leaf sensor or offset, °C and °F). Create it as a template helper in the UI (**Settings → Devices & services → Helpers → Template sensor**, paste the state template) or copy it into your configuration as YAML. With long term statistics enabled (`state_class: measurement`), you can also pass it to the card as `vpd:` of a room.
+
+**Humidifier blueprint:** keeps the VPD in a range by switching a humidifier and optionally a dehumidifier, with hysteresis, a maximum humidity as mould protection and an optional "only while the light is on" condition.
+
+[![Import blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fmentalilll%2Fha-vpd-chart%2Fblob%2Fmain%2Fblueprints%2Fautomation%2Fmentalilll%2Fvpd_humidifier.yaml)
+
+| Input | Default | Description |
+|---|---|---|
+| VPD sensor | | Any sensor with the VPD in kPa |
+| Humidifier / Dehumidifier | | `humidifier`, `switch`, `fan`, `input_boolean` or `light` entities |
+| Humidifier on above / off at | `1.2` / `1.0` kPa | Too dry → humidifier on, until the VPD dropped to the lower value |
+| Dehumidifier on below / off at | `0.6` / `0.8` kPa | Too humid → dehumidifier on, until the VPD rose to the upper value |
+| Maximum humidity | `75` % | The humidifier never runs at or above this humidity (needs a humidity sensor) |
+| Only while on | | e.g. the grow light; outside of it, the devices are left alone |
+
+## Troubleshooting
+
+- **The card still looks like the old version:** reload the browser with Ctrl + F5. In the browser console the card prints `HA-VPD-CHART v<version>`. For manual installations add a version to the resource URL, e.g. `/local/community/ha-vpd-chart/ha-vpd-chart.js?v=3.0.0`.
+- **No trail or phase statistics:** set `history_hours`, and check that the sensors have a `state_class` (Developer tools → States). Without it, only the recorder history is used.
+- **Room shows "unavailable":** one of its sensors has no numeric state.
+- **Wrong VPD with °F sensors:** `leaf_temperature_offset` is in the unit of the sensor, so 2 °C correspond to 3.6 °F.
+
+## Upgrading from 2.x
+
+- The card is now a single file, `ha-vpd-chart.js`. HACS updates the resource; for manual installations change the resource URL.
+- Mouse wheel zoom needs **Ctrl** (or ⌘), so your dashboard scrolls normally.
+- The `antialiasing` option is ignored; the background is always drawn in full resolution.
+- The card uses a shadow DOM. `card-mod` styles that targeted inner elements need to be adapted.
+- Labels follow the Home Assistant language unless you set `air_text` etc. explicitly.
+
+## Development
+
+```bash
+npm install
+npm run watch     # rebuilds dist/ha-vpd-chart.js on change
+npm run check     # lint, tests and production build
+```
+
+The source lives in `src/`, the bundle in `dist/` is what HACS installs. Please run `npm run build` before committing.
+
+## License
+
+[MIT](LICENSE)

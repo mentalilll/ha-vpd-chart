@@ -1,17 +1,34 @@
 name: Validate
+
 on:
   push:
   pull_request:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * 1"
   workflow_dispatch:
 
 jobs:
-  validate-hacs:
-    runs-on: "ubuntu-latest"
+  hacs:
+    name: HACS validation
+    runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v3"
-      - name: HACS validation
-        uses: "hacs/action@main"
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
         with:
-          category: "plugin"
+          category: plugin
+
+  build:
+    name: Lint, test & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Check that dist/ is up to date
+        run: git diff --exit-code -- dist/ || (echo "::error::dist/ is outdated, run 'npm run build' and commit the result" && exit 1)

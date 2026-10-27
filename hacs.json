@@ -1,5 +1,7 @@
 {
-    "name": "Homeassistant VPD Chart",
+    "name": "VPD Chart",
+    "filename": "ha-vpd-chart.js",
     "content_in_root": false,
-    "render_readme": true
+    "render_readme": true,
+    "homeassistant": "2024.8.0"
 }

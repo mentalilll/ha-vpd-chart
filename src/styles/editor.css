@@ -1,0 +1,329 @@
+:host {
+    display: block;
+}
+
+.editor {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+details.section {
+    border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+    border-radius: 12px;
+    padding: 0 12px;
+}
+
+details.section[open] {
+    padding-bottom: 12px;
+}
+
+details.section > summary {
+    cursor: pointer;
+    padding: 12px 0;
+    font-weight: 500;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+details.section > summary::-webkit-details-marker {
+    display: none;
+}
+
+details.section > summary::before {
+    content: "▸";
+    transition: transform 0.2s;
+}
+
+details.section[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.helper {
+    color: var(--secondary-text-color);
+    font-size: 12px;
+    margin: 0 0 8px;
+}
+
+details.room {
+    border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+    border-radius: 10px;
+    margin-bottom: 8px;
+    background: var(--card-background-color, transparent);
+}
+
+details.room > summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 6px 8px 12px;
+    cursor: pointer;
+    list-style: none;
+}
+
+details.room > summary::-webkit-details-marker {
+    display: none;
+}
+
+details.room[open] > summary {
+    border-bottom: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
+}
+
+.room-dot {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--room-color, #ffffff);
+    box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.6);
+}
+
+.room-title {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.room-name {
+    font-weight: 500;
+}
+
+.room-sub {
+    font-size: 12px;
+    color: var(--secondary-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.room-sub.missing {
+    color: var(--warning-color, #ff9800);
+}
+
+.room-actions {
+    display: flex;
+    flex: none;
+}
+
+.room-actions button.icon {
+    --mdc-icon-size: 20px;
+    display: inline-flex;
+    padding: 6px;
+}
+
+.room-body {
+    padding: 8px 12px 12px;
+}
+
+.color-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.color-label {
+    font-size: 14px;
+    color: var(--secondary-text-color);
+}
+
+.swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.swatch {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.5));
+    background: var(--secondary-background-color, transparent);
+    color: var(--secondary-text-color);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    --mdc-icon-size: 14px;
+}
+
+.swatch.selected {
+    box-shadow: 0 0 0 2px var(--card-background-color, #1c1c1c), 0 0 0 4px var(--primary-color, #03a9f4);
+}
+
+.swatch.custom input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+button.action {
+    border: 0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    background: var(--primary-color, #03a9f4);
+    color: var(--text-primary-color, #ffffff);
+    font: inherit;
+    cursor: pointer;
+}
+
+button.action.secondary {
+    background: var(--secondary-background-color, rgba(127, 127, 127, 0.2));
+    color: var(--primary-text-color);
+}
+
+button.icon {
+    border: 0;
+    background: none;
+    color: var(--secondary-text-color);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+button.icon:hover {
+    background: var(--secondary-background-color, rgba(127, 127, 127, 0.2));
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* phases */
+.phase-slider {
+    position: relative;
+    height: 64px;
+    margin: 8px 12px 4px;
+}
+
+.phase-slider-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 26px;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--divider-color, rgba(127, 127, 127, 0.3));
+}
+
+.phase-slider-segment {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+.phase-slider-handles {
+    position: absolute;
+    inset: 0;
+}
+
+.phase-slider-handle {
+    position: absolute;
+    top: 20px;
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    border-radius: 50%;
+    background: var(--card-background-color, #ffffff);
+    border: 2px solid var(--primary-text-color, #000000);
+    box-sizing: border-box;
+    cursor: grab;
+    touch-action: none;
+    z-index: 1;
+}
+
+.phase-slider-handle.grabbed {
+    cursor: grabbing;
+    z-index: 2;
+}
+
+.phase-slider-handle .value {
+    position: absolute;
+    bottom: 26px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--primary-text-color);
+}
+
+.phase-slider-scale {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 46px;
+    font-size: 10px;
+    color: var(--secondary-text-color);
+}
+
+.phase-slider-scale span {
+    position: absolute;
+    transform: translateX(-50%);
+}
+
+.phase-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.phase-row input[type="color"] {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.phase-row input[type="text"],
+textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.4));
+    background: var(--card-background-color, transparent);
+    color: var(--primary-text-color);
+    font: inherit;
+}
+
+.phase-range {
+    grid-column: 2 / 4;
+    font-size: 11px;
+    color: var(--secondary-text-color);
+    margin-top: -4px;
+}
+
+textarea {
+    min-height: 110px;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.error {
+    color: var(--error-color, #db4437);
+    font-size: 12px;
+    min-height: 1em;
+    margin-top: 4px;
+}
