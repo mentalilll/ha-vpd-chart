@@ -31,6 +31,7 @@ export const DEFAULTS = {
     enable_triangle: true,
     enable_crosshair: true,
     enable_zoom: true,
+    enable_wheel_zoom: false,
     enable_legend: true,
     enable_cycle_rooms: false,
     enable_show_always_information: true,

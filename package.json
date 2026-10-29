@@ -1,6 +1,6 @@
 {
   "name": "ha-vpd-chart",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Home Assistant Lovelace card that visualizes the vapour pressure deficit (VPD) of grow rooms and tents.",
   "type": "module",
   "private": true,
@@ -18,7 +18,6 @@
   },
   "devDependencies": {
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-replace": "^6.0.0",
     "@rollup/plugin-terser": "^1.0.2",
     "eslint": "^9.0.0",

@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Plíseň: doba (hodiny)",
             "history_hours": "Historie (hodiny)",
             "tap_action": "Klepnutí na místnost",
+            "enable_wheel_zoom": "Přiblížení kolečkem (bez Ctrl)",
             "air_text": "Popisek vzduch",
             "leaf_text": "Popisek list",
             "rh_text": "Popisek vlhkost",

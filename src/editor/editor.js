@@ -304,6 +304,7 @@ export class HaVpdChartEditor extends HTMLElement {
     optionSchemas() {
         const number = (min, max, step, mode = 'box', unit) => ({number: {min, max, step, mode, unit_of_measurement: unit}});
         const toggle = (name) => ({name, selector: {boolean: {}}});
+        const zoomOn = this._config.enable_zoom !== false;
         return {
             chart: [
                 {
@@ -324,7 +325,10 @@ export class HaVpdChartEditor extends HTMLElement {
                         toggle('enable_tooltip'), toggle('enable_show_always_information'),
                         toggle('enable_legend'), toggle('enable_triangle'),
                         toggle('enable_crosshair'), toggle('enable_zoom'),
-                        toggle('enable_cycle_rooms'), toggle('enable_dewpoint'),
+                        toggle('enable_cycle_rooms'),
+                        // right below "Zoom" and only while zoom is on
+                        ...(zoomOn ? [toggle('enable_wheel_zoom')] : []),
+                        toggle('enable_dewpoint'),
                     ],
                 },
                 {

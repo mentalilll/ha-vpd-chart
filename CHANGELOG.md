@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.1.0 (2026-10-29)
+
+### New
+- `enable_wheel_zoom`: zoom with the mouse wheel alone, like 2.x (off by default: Ctrl / ⌘ + wheel). Also in the editor under Features.
+- Panning works with the left or right mouse button, like in 2.x.
+
+### Maintenance
+- Removed the unused build dependency `@rollup/plugin-node-resolve` (fixes a Dependabot alert for `deepmerge`). The card itself is unchanged by this.
+
 ## 3.0.0 (2026-10-27)
 
 ### Breaking changes

@@ -19,7 +19,7 @@ A Lovelace card that shows the **vapour pressure deficit (VPD)** of your grow te
 - **Dew point** and condensation warning (optional)
 - **Bar view** as a compact overview, light and dark theme
 - Celsius and Fahrenheit, numbers in your locale
-- Zoom (Ctrl + mouse wheel, pinch on touch devices) and pan
+- Zoom (Ctrl + mouse wheel or optionally the wheel alone, pinch on touch devices) and pan
 - Visual editor, 10 languages
 - [VPD template sensor and humidifier blueprint](#vpd-sensor-and-humidifier-automation) included
 
@@ -94,7 +94,7 @@ Fahrenheit works automatically when the temperature sensor reports `°F`. If no 
 
 **Tooltips:** with `enable_show_always_information: true` every room shows its details as long as there is room for them; otherwise all tooltips are compact. With `false` the tooltips stay compact until you hover or select a room. Tooltips avoid each other, the markers and the legend, and move to the side of the marker when the card is low.
 
-**Interaction:** hover a marker or legend chip to highlight a room, click it to keep the selection, click again to release it. Zoom with Ctrl / ⌘ + mouse wheel or pinch, drag to pan, double click (or the reset button) to reset the zoom. With `tap_action: more-info` a click opens the entity details instead.
+**Interaction:** hover a marker or legend chip to highlight a room, click it to keep the selection, click again to release it. Zoom with Ctrl / ⌘ + mouse wheel (or the wheel alone with `enable_wheel_zoom`) or pinch, drag with the left or right mouse button to pan, double click (or the reset button) to reset the zoom. With `tap_action: more-info` a click opens the entity details instead.
 
 ### Options
 
@@ -119,6 +119,7 @@ Fahrenheit works automatically when the temperature sensor reports `°F`. If no 
 | `enable_triangle` | boolean | `true` | Triangle marker (tip on the measured point) instead of a dot |
 | `enable_crosshair` | boolean | `true` | Crosshair with VPD readout following the mouse |
 | `enable_zoom` | boolean | `true` | Zoom and pan |
+| `enable_wheel_zoom` | boolean | `false` | Zoom with the mouse wheel alone, like 2.x. The page then does not scroll while the mouse is over the chart. Off: Ctrl / ⌘ + mouse wheel |
 | `enable_cycle_rooms` | boolean | `false` | Select the next room every 10 seconds |
 | `tap_action` | `none` \| `more-info` | `none` | A tap selects the room (`none`) or opens the entity details |
 | `air_text`, `rh_text`, `leaf_text`, `kpa_text` | string | translated | Labels in the tooltip, `""` hides a label |
@@ -214,7 +215,7 @@ The card only displays. To use the VPD in automations, two templates are include
 ## Upgrading from 2.x
 
 - The card is now a single file, `ha-vpd-chart.js`. HACS updates the resource; for manual installations change the resource URL.
-- Mouse wheel zoom needs **Ctrl** (or ⌘), so your dashboard scrolls normally.
+- Mouse wheel zoom needs **Ctrl** (or ⌘), so your dashboard scrolls normally. For the 2.x behaviour set `enable_wheel_zoom: true`.
 - The `antialiasing` option is ignored; the background is always drawn in full resolution.
 - The card uses a shadow DOM. `card-mod` styles that targeted inner elements need to be adapted.
 - Labels follow the Home Assistant language unless you set `air_text` etc. explicitly.

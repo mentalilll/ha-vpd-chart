@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Moho: duración (horas)",
             "history_hours": "Historial (horas)",
             "tap_action": "Tocar una sala",
+            "enable_wheel_zoom": "Zoom con la rueda (sin Ctrl)",
             "air_text": "Etiqueta aire",
             "leaf_text": "Etiqueta hoja",
             "rh_text": "Etiqueta humedad",

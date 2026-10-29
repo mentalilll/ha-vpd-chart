@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Moisissure : durée (heures)",
             "history_hours": "Historique (heures)",
             "tap_action": "Appui sur une pièce",
+            "enable_wheel_zoom": "Zoom à la molette (sans Ctrl)",
             "air_text": "Libellé air",
             "leaf_text": "Libellé feuille",
             "rh_text": "Libellé humidité",

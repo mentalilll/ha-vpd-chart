@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Pleśń: czas (godziny)",
             "history_hours": "Historia (godziny)",
             "tap_action": "Dotknięcie pomieszczenia",
+            "enable_wheel_zoom": "Powiększanie kółkiem (bez Ctrl)",
             "air_text": "Etykieta powietrza",
             "leaf_text": "Etykieta liścia",
             "rh_text": "Etykieta wilgotności",

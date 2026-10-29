@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Skimmel: varighed (timer)",
             "history_hours": "Historik (timer)",
             "tap_action": "Tryk på rum",
+            "enable_wheel_zoom": "Zoom med scroll (uden Ctrl)",
             "air_text": "Etiket luft",
             "leaf_text": "Etiket blad",
             "rh_text": "Etiket fugtighed",

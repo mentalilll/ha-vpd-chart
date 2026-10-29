@@ -1,7 +1,6 @@
 import {readFileSync} from 'node:fs';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
-import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
@@ -35,7 +34,6 @@ export default {
         rawCss(),
         replace({preventAssignment: true, values: {__VERSION__: JSON.stringify(pkg.version)}}),
         json(),
-        resolve(),
         production && terser({format: {comments: false}}),
     ],
 };

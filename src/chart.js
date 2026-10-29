@@ -61,7 +61,6 @@ export const chart = {
             event.stopPropagation();
             this.resetZoom();
         });
-        this.zoomHint.textContent = this.t('card.zoom_hint');
 
         this._bgKey = null;
         this._gridKey = null;
@@ -751,10 +750,19 @@ export const chart = {
         vp.addEventListener('auxclick', (event) => {
             if (event.button === 1 && this.enable_zoom) this.resetZoom();
         });
+        // no context menu after panning with the right mouse button
+        vp.addEventListener('contextmenu', (event) => {
+            if (this._suppressContextMenu) event.preventDefault();
+            this._suppressContextMenu = false;
+        });
+    },
+    /** Ctrl / Cmd + wheel always zooms, the wheel alone only with enable_wheel_zoom. */
+    isZoomWheel(event) {
+        return !!(this.enable_wheel_zoom || event.ctrlKey || event.metaKey);
     },
     onWheel(event) {
         if (!this.enable_zoom) return;
-        if (!(event.ctrlKey || event.metaKey)) {
+        if (!this.isZoomWheel(event)) {
             this.showZoomHint();
             return;
         }
@@ -764,6 +772,7 @@ export const chart = {
     },
     showZoomHint() {
         if (!this.zoomHint || this.zoom.scale > 1) return;
+        this.zoomHint.textContent = this.t('card.zoom_hint');
         this.zoomHint.classList.add('visible');
         clearTimeout(this._hintTimer);
         this._hintTimer = setTimeout(() => this.zoomHint.classList.remove('visible'), 1200);
@@ -817,8 +826,9 @@ export const chart = {
                 base: {...this.zoom},
             };
             this._pan = null;
-        } else if (this._pointers.size === 1 && this.zoom.scale > 1 && event.button === 0) {
-            this._pan = {id: event.pointerId, startX: event.clientX, startY: event.clientY, base: {...this.zoom}, active: false};
+        } else if (this._pointers.size === 1 && this.zoom.scale > 1 && (event.button === 0 || event.button === 2)) {
+            // pan with the left or (like 2.x) the right mouse button
+            this._pan = {id: event.pointerId, button: event.button, startX: event.clientX, startY: event.clientY, base: {...this.zoom}, active: false};
         }
     },
     onPointerMove(event) {
@@ -864,6 +874,7 @@ export const chart = {
         }
         if (this._pan && this._pan.id === event.pointerId) {
             if (this._pan.active) {
+                if (this._pan.button === 2) this._suppressContextMenu = true;
                 this.viewport.classList.remove('panning');
                 this.applyZoom();
             }

@@ -133,4 +133,14 @@ describe('ha-vpd-chart card', () => {
         card.remove();
         expect(card.roomCycleInterval).toBeFalsy();
     });
+    it('zooms with Ctrl + wheel, or with the wheel alone when enable_wheel_zoom is on', () => {
+        const room = {temperature: 'sensor.t1', humidity: 'sensor.h1'};
+        const wheel = (init) => Object.assign({ctrlKey: false, metaKey: false, buttons: 0}, init);
+        const ctrl = mount({rooms: [room]});
+        expect(ctrl.isZoomWheel(wheel({}))).toBe(false);
+        expect(ctrl.isZoomWheel(wheel({ctrlKey: true}))).toBe(true);
+        expect(ctrl.isZoomWheel(wheel({metaKey: true}))).toBe(true);
+        const plain = mount({rooms: [room], enable_wheel_zoom: true});
+        expect(plain.isZoomWheel(wheel({}))).toBe(true);
+    });
 });

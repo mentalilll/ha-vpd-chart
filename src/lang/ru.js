@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Плесень: длительность (часы)",
             "history_hours": "История (часы)",
             "tap_action": "Нажатие на комнату",
+            "enable_wheel_zoom": "Масштаб колесом (без Ctrl)",
             "air_text": "Подпись «воздух»",
             "leaf_text": "Подпись «лист»",
             "rh_text": "Подпись «влажность»",

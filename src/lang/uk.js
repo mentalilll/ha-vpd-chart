@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Пліснява: тривалість (години)",
             "history_hours": "Історія (години)",
             "tap_action": "Натискання на кімнату",
+            "enable_wheel_zoom": "Масштаб коліщатком (без Ctrl)",
             "air_text": "Підпис «повітря»",
             "leaf_text": "Підпис «лист»",
             "rh_text": "Підпис «вологість»",

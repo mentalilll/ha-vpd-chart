@@ -65,6 +65,7 @@ export default {
             "mold_risk_hours": "Muffa: durata (ore)",
             "history_hours": "Storico (ore)",
             "tap_action": "Tocco su una stanza",
+            "enable_wheel_zoom": "Zoom con la rotellina (senza Ctrl)",
             "air_text": "Etichetta aria",
             "leaf_text": "Etichetta foglia",
             "rh_text": "Etichetta umidità",
